@@ -1,9 +1,7 @@
 import { computed } from 'vue';
 
 import { useConfigProvider } from '@me-ui/components/config-provider/hooks/use-config-provider';
-
-/** 默认命名空间前缀 */
-const defaultNamespace = 'me';
+import { defaultNamespace } from '@me-ui/constants/config';
 
 /** BEM 命名空间 hook，参考 Element Plus 的 useNamespace */
 export function useNamespace(block: string, namespaceOverride?: string) {

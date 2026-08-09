@@ -1,6 +1,6 @@
 import type { PropType } from 'vue';
 
-import { componentSizes } from '@me-ui/utils/types';
+import { componentSizes, defaultComponentSize, defaultNamespace } from '@me-ui/constants/config';
 
 import type { ThemeTokens } from './types';
 
@@ -15,11 +15,11 @@ export const configProviderProps = {
   size: {
     type: String as PropType<typeof componentSizes[number]>,
     values: componentSizes,
-    default: 'default',
+    default: defaultComponentSize,
   },
   /** CSS 类名命名空间前缀 */
   namespace: {
     type: String,
-    default: 'me',
+    default: defaultNamespace,
   },
 } as const;

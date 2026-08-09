@@ -1,12 +1,12 @@
 <!-- ? ConfigProvider 全局配置 -->
 <template>
-  <div ref="wrapperRef" :class="ns.b.value" :style="cssVarsStyle">
+  <div :class="ns.b.value" :style="cssVarsStyle">
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRef, watch } from 'vue';
+import { computed, toRef } from 'vue';
 
 import { useNamespace } from '@me-ui/hooks/use-namespace';
 
@@ -14,7 +14,6 @@ import { configProviderProps } from './config-provider';
 import {
   provideConfigProvider,
   useConfigProvider,
-  applyThemeToElement,
 } from './hooks/use-config-provider';
 import { tokensToCssVars } from './utils';
 
@@ -23,9 +22,6 @@ defineOptions({ name: 'MeConfigProvider' });
 const props = defineProps(configProviderProps);
 
 const ns = useNamespace('config-provider');
-
-/** 包装元素引用 */
-const wrapperRef = ref<HTMLElement>();
 
 /** 全局尺寸响应式引用 */
 const sizeRef = toRef(props, 'size');
@@ -46,15 +42,4 @@ const cssVarsStyle = computed(() => tokensToCssVars(mergedTheme.value));
 
 /** 提供上下文给子组件 */
 provideConfigProvider(mergedTheme as any, sizeRef, namespaceRef);
-
-/** 监听主题变化，同步应用到 DOM 元素 */
-watch(
-  mergedTheme,
-  (tokens) => {
-    if (wrapperRef.value) {
-      applyThemeToElement(wrapperRef.value, tokens);
-    }
-  },
-  { deep: true, immediate: true },
-);
 </script>

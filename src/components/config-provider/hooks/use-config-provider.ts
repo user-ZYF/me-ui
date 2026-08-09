@@ -1,6 +1,6 @@
-import { inject, provide, ref, watch } from 'vue';
+import { inject, provide, ref } from 'vue';
 
-import { tokensToCssVars } from '../utils';
+import { defaultComponentSize, defaultNamespace } from '@me-ui/constants/config';
 
 import type { Ref } from 'vue';
 import type { ThemeTokens } from '../types';
@@ -47,41 +47,9 @@ export function provideConfigProvider(
 export function useConfigProvider(): ConfigProviderContext {
   const defaultContext: ConfigProviderContext = {
     theme: ref({}),
-    size: ref('default'),
-    namespace: ref('me'),
+    size: ref(defaultComponentSize),
+    namespace: ref(defaultNamespace),
   };
 
   return inject(configProviderKey, defaultContext);
-}
-
-/**
- * 将主题 Token 应用为 CSS 变量到指定元素
- * @param el 目标元素
- * @param tokens 主题 Token 配置
- */
-export function applyThemeToElement(el: HTMLElement, tokens: ThemeTokens) {
-  const cssVars = tokensToCssVars(tokens);
-  Object.entries(cssVars).forEach(([key, value]) => {
-    el.style.setProperty(key, value);
-  });
-}
-
-/**
- * 监听主题变化并自动应用到指定元素
- * @param el 目标元素 ref
- * @param tokens 主题 Token 配置 ref
- */
-export function watchTheme(
-  el: Ref<HTMLElement | undefined>,
-  tokens: Ref<ThemeTokens>,
-) {
-  watch(
-    tokens,
-    (newTokens) => {
-      if (el.value) {
-        applyThemeToElement(el.value, newTokens);
-      }
-    },
-    { deep: true, immediate: true },
-  );
 }

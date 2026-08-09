@@ -19,11 +19,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "ignoreDeprecations": "6.0",
 
-    "baseUrl": ".",
     "paths": {
-      "@me-ui/*": ["src/*"]
+      "@me-ui/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue", "play/**/*.ts", "play/**/*.vue"],

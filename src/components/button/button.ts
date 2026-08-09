@@ -1,6 +1,6 @@
 import type { ExtractPropTypes, PropType } from 'vue';
 
-import { componentSizes, componentTypes, type ComponentSize, type ComponentType } from '@me-ui/utils/types';
+import { componentSizes, componentTypes, type ComponentSize, type ComponentType } from '@me-ui/constants/config';
 
 /** Button 组件原生类型 */
 export const buttonNativeTypes = ['button', 'submit', 'reset'] as const;
