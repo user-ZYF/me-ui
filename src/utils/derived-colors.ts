@@ -9,6 +9,8 @@ import {
   suffixDark2,
 } from '@me-ui/styles/variables.module.less';
 
+import type { TokenConfigItem } from '@me-ui/types/config';
+
 /** 派生色规则 */
 interface DerivedRule {
   /** 派生色后缀 */
@@ -57,12 +59,6 @@ export function generateDerivedColors(baseVar: string): Record<string, string> {
   return result;
 }
 
-/** Token 配置项类型 */
-interface TokenConfigItem {
-  cssVar: string;
-  default: string;
-}
-
 let injected = false;
 
 /**
@@ -75,18 +71,18 @@ export function resetInjection(): void {
 /**
  * 生成 :root CSS 变量声明文本（基础变量 + 派生色）
  * SSR 环境下可调用此函数获取 CSS 文本，注入到 HTML 模板中避免 FOUC
- * @param config token 配置表，key 以 color 开头的基础色会自动生成派生色
+ * @param config token 配置表，derived 为 true 的项会自动生成派生色
  * @returns `:root { ... }` CSS 文本
  */
 export function getRootCssVarsText(config: Record<string, TokenConfigItem>): string {
   const declarations: string[] = [];
-  for (const [key, { cssVar, default: defaultValue }] of Object.entries(config)) {
+  for (const [, { cssVar, default: defaultValue, derived }] of Object.entries(config)) {
     declarations.push(`  ${cssVar}: ${defaultValue};`);
 
-    // 基础色：自动生成派生色
-    if (key.startsWith('color')) {
-      const derived = generateDerivedColors(cssVar);
-      for (const [name, value] of Object.entries(derived)) {
+    // 派生色：自动生成 light/dark 变体
+    if (derived) {
+      const derivedColors = generateDerivedColors(cssVar);
+      for (const [name, value] of Object.entries(derivedColors)) {
         declarations.push(`  ${name}: ${value};`);
       }
     }
@@ -97,7 +93,7 @@ export function getRootCssVarsText(config: Record<string, TokenConfigItem>): str
 /**
  * 将所有 CSS 变量注入 :root（基础变量 + 派生色）
  * 在库初始化时自动调用，确保只注入一次
- * @param config token 配置表，key 以 color 开头的基础色会自动生成派生色
+ * @param config token 配置表，derived 为 true 的项会自动生成派生色
  */
 export function injectRootCssVars(config: Record<string, TokenConfigItem>): void {
   if (injected) return;
