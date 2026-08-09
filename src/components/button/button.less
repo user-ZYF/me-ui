@@ -1,0 +1,234 @@
+@B: ~'@{namespace}-button';
+
+.@{B} {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  height: var(--me-component-size-default);
+  padding: 0 16px;
+  font-size: var(--me-font-size-base);
+  color: var(--me-text-color-regular);
+  background-color: #fff;
+  border: 1px solid var(--me-border-color);
+  border-radius: var(--me-border-radius-base);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  outline: none;
+
+  &:hover {
+    color: var(--me-color-primary);
+    border-color: var(--me-color-primary-light-7);
+    background-color: var(--me-color-primary-light-9);
+  }
+
+  &:active {
+    color: var(--me-color-primary-dark-2);
+    border-color: var(--me-color-primary);
+  }
+
+  // ========== 类型 ==========
+  &--primary {
+    color: #fff;
+    background-color: var(--me-color-primary);
+    border-color: var(--me-color-primary);
+
+    &:hover {
+      background-color: var(--me-color-primary-light-3);
+      border-color: var(--me-color-primary-light-3);
+      color: #fff;
+    }
+
+    &:active {
+      background-color: var(--me-color-primary-dark-2);
+      border-color: var(--me-color-primary-dark-2);
+    }
+  }
+
+  &--success {
+    color: #fff;
+    background-color: var(--me-color-success);
+    border-color: var(--me-color-success);
+
+    &:hover {
+      background-color: var(--me-color-success-light-3);
+      border-color: var(--me-color-success-light-3);
+      color: #fff;
+    }
+  }
+
+  &--warning {
+    color: #fff;
+    background-color: var(--me-color-warning);
+    border-color: var(--me-color-warning);
+
+    &:hover {
+      background-color: var(--me-color-warning-light-3);
+      border-color: var(--me-color-warning-light-3);
+      color: #fff;
+    }
+  }
+
+  &--danger {
+    color: #fff;
+    background-color: var(--me-color-danger);
+    border-color: var(--me-color-danger);
+
+    &:hover {
+      background-color: var(--me-color-danger-light-3);
+      border-color: var(--me-color-danger-light-3);
+      color: #fff;
+    }
+  }
+
+  &--info {
+    color: #fff;
+    background-color: var(--me-color-info);
+    border-color: var(--me-color-info);
+
+    &:hover {
+      background-color: var(--me-color-info-light-3);
+      border-color: var(--me-color-info-light-3);
+      color: #fff;
+    }
+  }
+
+  // ========== 朴素按钮 ==========
+  &.is-plain {
+    background-color: #fff;
+    color: var(--me-text-color-regular);
+    border-color: var(--me-border-color);
+
+    &.@{B}--primary {
+      color: var(--me-color-primary);
+      background-color: var(--me-color-primary-light-9);
+      border-color: var(--me-color-primary-light-7);
+
+      &:hover {
+        color: #fff;
+        background-color: var(--me-color-primary);
+        border-color: var(--me-color-primary);
+      }
+    }
+
+    &.@{B}--success {
+      color: var(--me-color-success);
+      background-color: var(--me-color-success-light-9);
+      border-color: var(--me-color-success-light-7);
+
+      &:hover {
+        color: #fff;
+        background-color: var(--me-color-success);
+        border-color: var(--me-color-success);
+      }
+    }
+
+    &.@{B}--warning {
+      color: var(--me-color-warning);
+      background-color: var(--me-color-warning-light-9);
+      border-color: var(--me-color-warning-light-7);
+
+      &:hover {
+        color: #fff;
+        background-color: var(--me-color-warning);
+        border-color: var(--me-color-warning);
+      }
+    }
+
+    &.@{B}--danger {
+      color: var(--me-color-danger);
+      background-color: var(--me-color-danger-light-9);
+      border-color: var(--me-color-danger-light-7);
+
+      &:hover {
+        color: #fff;
+        background-color: var(--me-color-danger);
+        border-color: var(--me-color-danger);
+      }
+    }
+
+    &.@{B}--info {
+      color: var(--me-color-info);
+      background-color: var(--me-color-info-light-9);
+      border-color: var(--me-color-info-light-7);
+
+      &:hover {
+        color: #fff;
+        background-color: var(--me-color-info);
+        border-color: var(--me-color-info);
+      }
+    }
+  }
+
+  // ========== 尺寸 ==========
+  &--large {
+    height: var(--me-component-size-large);
+    padding: 0 20px;
+    font-size: var(--me-font-size-medium);
+  }
+
+  &--small {
+    height: var(--me-component-size-small);
+    padding: 0 12px;
+    font-size: var(--me-font-size-small);
+  }
+
+  // ========== 圆角 ==========
+  &.is-round {
+    border-radius: var(--me-border-radius-round);
+  }
+
+  // ========== 圆形 ==========
+  &.is-circle {
+    width: var(--me-component-size-default);
+    height: var(--me-component-size-default);
+    padding: 0;
+    border-radius: var(--me-border-radius-circle);
+
+    &.@{B}--large {
+      width: var(--me-component-size-large);
+      height: var(--me-component-size-large);
+    }
+
+    &.@{B}--small {
+      width: var(--me-component-size-small);
+      height: var(--me-component-size-small);
+    }
+  }
+
+  // ========== 禁用 ==========
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  // ========== 加载中 ==========
+  &.is-loading {
+    cursor: wait;
+    opacity: 0.8;
+  }
+
+  // ========== 加载图标 ==========
+  &-loading-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 6px;
+    animation: me-button-loading-rotate 0.8s linear infinite;
+  }
+
+  &-loading-svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@keyframes me-button-loading-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
