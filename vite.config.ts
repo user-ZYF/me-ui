@@ -12,7 +12,7 @@ export default defineConfig(({ command }) => ({
   css: {
     preprocessorOptions: {
       less: {
-        additionalData: `@import "${resolve(__dirname, 'src/styles/variables.less').replace(/\\/g, '/')}";`,
+        additionalData: `@import "${resolve(__dirname, 'src/styles/variables.module.less').replace(/\\/g, '/')}";`,
       },
     },
   },

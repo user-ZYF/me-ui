@@ -1,8 +1,8 @@
+import '@me-ui/setup';
+
 import { withInstall } from '@me-ui/utils/install';
 
 import ConfigProvider from './ConfigProvider.vue';
-
-import '@me-ui/styles/var.less';
 
 export const MeConfigProvider = withInstall(ConfigProvider);
 

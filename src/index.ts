@@ -3,7 +3,7 @@ import type { App } from 'vue';
 import { MeButton } from './components/button';
 import { MeConfigProvider } from './components/config-provider';
 
-import './styles/var.less';
+import './setup';
 
 const components = [MeButton, MeConfigProvider];
 

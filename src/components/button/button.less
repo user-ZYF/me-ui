@@ -5,13 +5,13 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
-  height: var(--me-component-size-default);
+  height: var(~'@{cv-component-size-default}');
   padding: 0 16px;
-  font-size: var(--me-font-size-base);
-  color: var(--me-text-color-regular);
-  background-color: #fff;
-  border: 1px solid var(--me-border-color);
-  border-radius: var(--me-border-radius-base);
+  font-size: var(~'@{cv-font-size-base}');
+  color: var(~'@{cv-text-color-regular}');
+  background-color: @color-white;
+  border: 1px solid var(~'@{cv-border-color}');
+  border-radius: var(~'@{cv-border-radius-base}');
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
@@ -19,182 +19,182 @@
   outline: none;
 
   &:hover {
-    color: var(--me-color-primary);
-    border-color: var(--me-color-primary-light-7);
-    background-color: var(--me-color-primary-light-9);
+    color: var(~'@{cv-color-primary}');
+    border-color: var(~'@{cv-color-primary}@{suffix-light-7}');
+    background-color: var(~'@{cv-color-primary}@{suffix-light-9}');
   }
 
   &:active {
-    color: var(--me-color-primary-dark-2);
-    border-color: var(--me-color-primary);
+    color: var(~'@{cv-color-primary}@{suffix-dark-2}');
+    border-color: var(~'@{cv-color-primary}');
   }
 
   // ========== 类型 ==========
   &--primary {
-    color: #fff;
-    background-color: var(--me-color-primary);
-    border-color: var(--me-color-primary);
+    color: @color-white;
+    background-color: var(~'@{cv-color-primary}');
+    border-color: var(~'@{cv-color-primary}');
 
     &:hover {
-      background-color: var(--me-color-primary-light-3);
-      border-color: var(--me-color-primary-light-3);
-      color: #fff;
+      background-color: var(~'@{cv-color-primary}@{suffix-light-3}');
+      border-color: var(~'@{cv-color-primary}@{suffix-light-3}');
+      color: @color-white;
     }
 
     &:active {
-      background-color: var(--me-color-primary-dark-2);
-      border-color: var(--me-color-primary-dark-2);
+      background-color: var(~'@{cv-color-primary}@{suffix-dark-2}');
+      border-color: var(~'@{cv-color-primary}@{suffix-dark-2}');
     }
   }
 
   &--success {
-    color: #fff;
-    background-color: var(--me-color-success);
-    border-color: var(--me-color-success);
+    color: @color-white;
+    background-color: var(~'@{cv-color-success}');
+    border-color: var(~'@{cv-color-success}');
 
     &:hover {
-      background-color: var(--me-color-success-light-3);
-      border-color: var(--me-color-success-light-3);
-      color: #fff;
+      background-color: var(~'@{cv-color-success}@{suffix-light-3}');
+      border-color: var(~'@{cv-color-success}@{suffix-light-3}');
+      color: @color-white;
     }
   }
 
   &--warning {
-    color: #fff;
-    background-color: var(--me-color-warning);
-    border-color: var(--me-color-warning);
+    color: @color-white;
+    background-color: var(~'@{cv-color-warning}');
+    border-color: var(~'@{cv-color-warning}');
 
     &:hover {
-      background-color: var(--me-color-warning-light-3);
-      border-color: var(--me-color-warning-light-3);
-      color: #fff;
+      background-color: var(~'@{cv-color-warning}@{suffix-light-3}');
+      border-color: var(~'@{cv-color-warning}@{suffix-light-3}');
+      color: @color-white;
     }
   }
 
   &--danger {
-    color: #fff;
-    background-color: var(--me-color-danger);
-    border-color: var(--me-color-danger);
+    color: @color-white;
+    background-color: var(~'@{cv-color-danger}');
+    border-color: var(~'@{cv-color-danger}');
 
     &:hover {
-      background-color: var(--me-color-danger-light-3);
-      border-color: var(--me-color-danger-light-3);
-      color: #fff;
+      background-color: var(~'@{cv-color-danger}@{suffix-light-3}');
+      border-color: var(~'@{cv-color-danger}@{suffix-light-3}');
+      color: @color-white;
     }
   }
 
   &--info {
-    color: #fff;
-    background-color: var(--me-color-info);
-    border-color: var(--me-color-info);
+    color: @color-white;
+    background-color: var(~'@{cv-color-info}');
+    border-color: var(~'@{cv-color-info}');
 
     &:hover {
-      background-color: var(--me-color-info-light-3);
-      border-color: var(--me-color-info-light-3);
-      color: #fff;
+      background-color: var(~'@{cv-color-info}@{suffix-light-3}');
+      border-color: var(~'@{cv-color-info}@{suffix-light-3}');
+      color: @color-white;
     }
   }
 
   // ========== 朴素按钮 ==========
   &.is-plain {
-    background-color: #fff;
-    color: var(--me-text-color-regular);
-    border-color: var(--me-border-color);
+    background-color: @color-white;
+    color: var(~'@{cv-text-color-regular}');
+    border-color: var(~'@{cv-border-color}');
 
     &.@{B}--primary {
-      color: var(--me-color-primary);
-      background-color: var(--me-color-primary-light-9);
-      border-color: var(--me-color-primary-light-7);
+      color: var(~'@{cv-color-primary}');
+      background-color: var(~'@{cv-color-primary}@{suffix-light-9}');
+      border-color: var(~'@{cv-color-primary}@{suffix-light-7}');
 
       &:hover {
-        color: #fff;
-        background-color: var(--me-color-primary);
-        border-color: var(--me-color-primary);
+        color: @color-white;
+        background-color: var(~'@{cv-color-primary}');
+        border-color: var(~'@{cv-color-primary}');
       }
     }
 
     &.@{B}--success {
-      color: var(--me-color-success);
-      background-color: var(--me-color-success-light-9);
-      border-color: var(--me-color-success-light-7);
+      color: var(~'@{cv-color-success}');
+      background-color: var(~'@{cv-color-success}@{suffix-light-9}');
+      border-color: var(~'@{cv-color-success}@{suffix-light-7}');
 
       &:hover {
-        color: #fff;
-        background-color: var(--me-color-success);
-        border-color: var(--me-color-success);
+        color: @color-white;
+        background-color: var(~'@{cv-color-success}');
+        border-color: var(~'@{cv-color-success}');
       }
     }
 
     &.@{B}--warning {
-      color: var(--me-color-warning);
-      background-color: var(--me-color-warning-light-9);
-      border-color: var(--me-color-warning-light-7);
+      color: var(~'@{cv-color-warning}');
+      background-color: var(~'@{cv-color-warning}@{suffix-light-9}');
+      border-color: var(~'@{cv-color-warning}@{suffix-light-7}');
 
       &:hover {
-        color: #fff;
-        background-color: var(--me-color-warning);
-        border-color: var(--me-color-warning);
+        color: @color-white;
+        background-color: var(~'@{cv-color-warning}');
+        border-color: var(~'@{cv-color-warning}');
       }
     }
 
     &.@{B}--danger {
-      color: var(--me-color-danger);
-      background-color: var(--me-color-danger-light-9);
-      border-color: var(--me-color-danger-light-7);
+      color: var(~'@{cv-color-danger}');
+      background-color: var(~'@{cv-color-danger}@{suffix-light-9}');
+      border-color: var(~'@{cv-color-danger}@{suffix-light-7}');
 
       &:hover {
-        color: #fff;
-        background-color: var(--me-color-danger);
-        border-color: var(--me-color-danger);
+        color: @color-white;
+        background-color: var(~'@{cv-color-danger}');
+        border-color: var(~'@{cv-color-danger}');
       }
     }
 
     &.@{B}--info {
-      color: var(--me-color-info);
-      background-color: var(--me-color-info-light-9);
-      border-color: var(--me-color-info-light-7);
+      color: var(~'@{cv-color-info}');
+      background-color: var(~'@{cv-color-info}@{suffix-light-9}');
+      border-color: var(~'@{cv-color-info}@{suffix-light-7}');
 
       &:hover {
-        color: #fff;
-        background-color: var(--me-color-info);
-        border-color: var(--me-color-info);
+        color: @color-white;
+        background-color: var(~'@{cv-color-info}');
+        border-color: var(~'@{cv-color-info}');
       }
     }
   }
 
   // ========== 尺寸 ==========
   &--large {
-    height: var(--me-component-size-large);
+    height: var(~'@{cv-component-size-large}');
     padding: 0 20px;
-    font-size: var(--me-font-size-medium);
+    font-size: var(~'@{cv-font-size-medium}');
   }
 
   &--small {
-    height: var(--me-component-size-small);
+    height: var(~'@{cv-component-size-small}');
     padding: 0 12px;
-    font-size: var(--me-font-size-small);
+    font-size: var(~'@{cv-font-size-small}');
   }
 
   // ========== 圆角 ==========
   &.is-round {
-    border-radius: var(--me-border-radius-round);
+    border-radius: var(~'@{cv-border-radius-round}');
   }
 
   // ========== 圆形 ==========
   &.is-circle {
-    width: var(--me-component-size-default);
-    height: var(--me-component-size-default);
+    width: var(~'@{cv-component-size-default}');
+    height: var(~'@{cv-component-size-default}');
     padding: 0;
-    border-radius: var(--me-border-radius-circle);
+    border-radius: var(~'@{cv-border-radius-circle}');
 
     &.@{B}--large {
-      width: var(--me-component-size-large);
-      height: var(--me-component-size-large);
+      width: var(~'@{cv-component-size-large}');
+      height: var(~'@{cv-component-size-large}');
     }
 
     &.@{B}--small {
-      width: var(--me-component-size-small);
-      height: var(--me-component-size-small);
+      width: var(~'@{cv-component-size-small}');
+      height: var(~'@{cv-component-size-small}');
     }
   }
 

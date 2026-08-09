@@ -1,0 +1,155 @@
+// ==================== 命名空间 ====================
+// @namespace 供 Less 编译时 BEM 命名使用，同时通过 :export 导出给 TS
+// CSS 变量名和默认值也在此处统一定义并导出，避免 TS 和 Less 各自维护
+@namespace: me;
+
+// ==================== 基础颜色（Less 变量） ====================
+@color-white: #fff;
+@color-black: #000;
+
+// ==================== 派生色后缀（Less 变量） ====================
+// 组件 .less 文件通过 var(~'@{cv-color-primary}@{suffix-light-3}') 引用派生色
+@suffix-light-3: -light-3;
+@suffix-light-5: -light-5;
+@suffix-light-7: -light-7;
+@suffix-light-8: -light-8;
+@suffix-light-9: -light-9;
+@suffix-dark-2: -dark-2;
+
+// ==================== CSS 变量名（Less 变量） ====================
+// 组件 .less 文件通过 var(~'@{cv-xxx}') 引用，派生色从基础色拼接：var(~'@{cv-color-primary}@{suffix-light-3}')
+
+// 基础色
+@cv-color-primary: --me-color-primary;
+@cv-color-success: --me-color-success;
+@cv-color-warning: --me-color-warning;
+@cv-color-danger: --me-color-danger;
+@cv-color-info: --me-color-info;
+
+// 文字颜色
+@cv-text-color-primary: --me-text-color-primary;
+@cv-text-color-regular: --me-text-color-regular;
+@cv-text-color-secondary: --me-text-color-secondary;
+@cv-text-color-placeholder: --me-text-color-placeholder;
+@cv-text-color-disabled: --me-text-color-disabled;
+
+// 边框颜色
+@cv-border-color: --me-border-color;
+@cv-border-color-light: --me-border-color-light;
+@cv-border-color-lighter: --me-border-color-lighter;
+@cv-border-color-extra-light: --me-border-color-extra-light;
+@cv-border-color-dark: --me-border-color-dark;
+
+// 圆角
+@cv-border-radius-base: --me-border-radius-base;
+@cv-border-radius-small: --me-border-radius-small;
+@cv-border-radius-round: --me-border-radius-round;
+@cv-border-radius-circle: --me-border-radius-circle;
+
+// 字体大小
+@cv-font-size-extra-large: --me-font-size-extra-large;
+@cv-font-size-large: --me-font-size-large;
+@cv-font-size-medium: --me-font-size-medium;
+@cv-font-size-base: --me-font-size-base;
+@cv-font-size-small: --me-font-size-small;
+@cv-font-size-extra-small: --me-font-size-extra-small;
+
+// 组件尺寸
+@cv-component-size-large: --me-component-size-large;
+@cv-component-size-default: --me-component-size-default;
+@cv-component-size-small: --me-component-size-small;
+
+:export {
+  namespace: @namespace;
+
+  // ========== CSS 变量名 ==========
+  // 基础色
+  cssVarColorPrimary: @cv-color-primary;
+  cssVarColorSuccess: @cv-color-success;
+  cssVarColorWarning: @cv-color-warning;
+  cssVarColorDanger: @cv-color-danger;
+  cssVarColorInfo: @cv-color-info;
+
+  // 文字颜色
+  cssVarTextColorPrimary: @cv-text-color-primary;
+  cssVarTextColorRegular: @cv-text-color-regular;
+  cssVarTextColorSecondary: @cv-text-color-secondary;
+  cssVarTextColorPlaceholder: @cv-text-color-placeholder;
+  cssVarTextColorDisabled: @cv-text-color-disabled;
+
+  // 边框颜色
+  cssVarBorderColor: @cv-border-color;
+  cssVarBorderColorLight: @cv-border-color-light;
+  cssVarBorderColorLighter: @cv-border-color-lighter;
+  cssVarBorderColorExtraLight: @cv-border-color-extra-light;
+  cssVarBorderColorDark: @cv-border-color-dark;
+
+  // 圆角
+  cssVarBorderRadiusBase: @cv-border-radius-base;
+  cssVarBorderRadiusSmall: @cv-border-radius-small;
+  cssVarBorderRadiusRound: @cv-border-radius-round;
+  cssVarBorderRadiusCircle: @cv-border-radius-circle;
+
+  // 字体大小
+  cssVarFontSizeExtraLarge: @cv-font-size-extra-large;
+  cssVarFontSizeLarge: @cv-font-size-large;
+  cssVarFontSizeMedium: @cv-font-size-medium;
+  cssVarFontSizeBase: @cv-font-size-base;
+  cssVarFontSizeSmall: @cv-font-size-small;
+  cssVarFontSizeExtraSmall: @cv-font-size-extra-small;
+
+  // 组件尺寸
+  cssVarComponentSizeLarge: @cv-component-size-large;
+  cssVarComponentSizeDefault: @cv-component-size-default;
+  cssVarComponentSizeSmall: @cv-component-size-small;
+
+  // ========== 派生色后缀 ==========
+  suffixLight3: @suffix-light-3;
+  suffixLight5: @suffix-light-5;
+  suffixLight7: @suffix-light-7;
+  suffixLight8: @suffix-light-8;
+  suffixLight9: @suffix-light-9;
+  suffixDark2: @suffix-dark-2;
+
+  // ========== 默认值 ==========
+
+  // 基础色
+  defaultColorPrimary: #409eff;
+  defaultColorSuccess: #67c23a;
+  defaultColorWarning: #e6a23c;
+  defaultColorDanger: #f56c6c;
+  defaultColorInfo: #909399;
+
+  // 文字颜色
+  defaultTextColorPrimary: #303133;
+  defaultTextColorRegular: #606266;
+  defaultTextColorSecondary: #909399;
+  defaultTextColorPlaceholder: #a8abb2;
+  defaultTextColorDisabled: #c0c4cc;
+
+  // 边框颜色
+  defaultBorderColor: #dcdfe6;
+  defaultBorderColorLight: #e4e7ed;
+  defaultBorderColorLighter: #ebeef5;
+  defaultBorderColorExtraLight: #f2f6fc;
+  defaultBorderColorDark: #d4d7de;
+
+  // 圆角
+  defaultBorderRadiusBase: 4px;
+  defaultBorderRadiusSmall: 2px;
+  defaultBorderRadiusRound: 20px;
+  defaultBorderRadiusCircle: 100%;
+
+  // 字体大小
+  defaultFontSizeExtraLarge: 20px;
+  defaultFontSizeLarge: 18px;
+  defaultFontSizeMedium: 16px;
+  defaultFontSizeBase: 14px;
+  defaultFontSizeSmall: 13px;
+  defaultFontSizeExtraSmall: 12px;
+
+  // 组件尺寸
+  defaultComponentSizeLarge: 40px;
+  defaultComponentSizeDefault: 32px;
+  defaultComponentSizeSmall: 24px;
+}

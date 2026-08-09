@@ -12,7 +12,7 @@
       </div>
     </section>
 
-    <MeConfigProvider :theme="theme" size="small">
+    <MeConfigProvider :theme="theme" size="large">
       <section>
         <h2>Button 类型</h2>
         <div class="row">
