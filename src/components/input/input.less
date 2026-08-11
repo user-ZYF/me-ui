@@ -1,0 +1,265 @@
+@B: ~'@{namespace}-input';
+
+.@{B} {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  font-size: var(~'@{cv-font-size-base}');
+  color: var(~'@{cv-text-color-regular}');
+
+  // ========== 前置/后置内容 ==========
+  &__prepend {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(~'@{cv-component-size-default}');
+    padding: 0 20px;
+    color: var(~'@{cv-text-color-regular}');
+    background-color: var(~'@{cv-border-color-extra-light}');
+    border: 1px solid var(~'@{cv-border-color}');
+    border-right: none;
+    border-radius: var(~'@{cv-border-radius-base}') 0 0 var(~'@{cv-border-radius-base}');
+    white-space: nowrap;
+  }
+
+  &__append {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(~'@{cv-component-size-default}');
+    padding: 0 20px;
+    color: var(~'@{cv-text-color-regular}');
+    background-color: var(~'@{cv-border-color-extra-light}');
+    border: 1px solid var(~'@{cv-border-color}');
+    border-left: none;
+    border-radius: 0 var(~'@{cv-border-radius-base}') var(~'@{cv-border-radius-base}') 0;
+    white-space: nowrap;
+  }
+
+  // ========== 输入区域 ==========
+  &__wrapper {
+    display: inline-flex;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: var(~'@{cv-component-size-default}');
+    background-color: @color-white;
+    border: 1px solid var(~'@{cv-border-color}');
+    border-radius: var(~'@{cv-border-radius-base}');
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: text;
+
+    // 有前置内容时去掉左边圆角
+    .@{B}__prepend + & {
+      border-radius: 0 var(~'@{cv-border-radius-base}') var(~'@{cv-border-radius-base}') 0;
+    }
+  }
+
+  // 有后置内容时去掉右边圆角
+  &__wrapper:has(+ .@{B}__append) {
+    border-radius: var(~'@{cv-border-radius-base}') 0 0 var(~'@{cv-border-radius-base}');
+  }
+
+  // 同时有前置和后置内容时，wrapper 四角均无圆角
+  .@{B}__prepend + &__wrapper:has(+ .@{B}__append) {
+    border-radius: 0;
+  }
+
+  // ========== 输入框 ==========
+  &__inner {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    padding: 0 12px;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: inherit;
+
+    &::placeholder {
+      color: var(~'@{cv-text-color-placeholder}');
+    }
+  }
+
+  // ========== 前缀/后缀图标 ==========
+  &__prefix {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 8px;
+    color: var(~'@{cv-text-color-secondary}');
+  }
+
+  &__suffix {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-right: 8px;
+    color: var(~'@{cv-text-color-secondary}');
+  }
+
+  // ========== 清除按钮 ==========
+  &__clear {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-right: 8px;
+    color: var(~'@{cv-text-color-secondary}');
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(~'@{cv-text-color-regular}');
+    }
+  }
+
+  // ========== 密码切换按钮 ==========
+  &__password {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-right: 8px;
+    color: var(~'@{cv-text-color-secondary}');
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(~'@{cv-text-color-regular}');
+    }
+  }
+
+  // ========== 聚焦状态 ==========
+  &.is-focus {
+    // input 模式：wrapper 带边框样式
+    .@{B}__wrapper {
+      border-color: var(~'@{cv-color-primary}');
+      box-shadow: 0 0 0 2px var(~'@{cv-color-primary}@{suffix-light-8}');
+    }
+  }
+
+  // ========== 禁用状态 ==========
+  &.is-disabled {
+    // input 模式
+    .@{B}__wrapper {
+      background-color: var(~'@{cv-border-color-extra-light}');
+      cursor: not-allowed;
+    }
+
+    .@{B}__inner {
+      color: var(~'@{cv-text-color-disabled}');
+      cursor: not-allowed;
+    }
+
+    // textarea 模式：textarea 直接带背景色
+    &.is-textarea {
+      .@{B}__inner {
+        background-color: var(~'@{cv-border-color-extra-light}');
+      }
+    }
+
+    .@{B}__prefix,
+    .@{B}__suffix,
+    .@{B}__clear,
+    .@{B}__password {
+      cursor: not-allowed;
+    }
+  }
+
+  // ========== 尺寸 ==========
+  &--large {
+    font-size: var(~'@{cv-font-size-medium}');
+
+    .@{B}__wrapper {
+      height: var(~'@{cv-component-size-large}');
+    }
+
+    .@{B}__prepend,
+    .@{B}__append {
+      height: var(~'@{cv-component-size-large}');
+    }
+  }
+
+  &--small {
+    font-size: var(~'@{cv-font-size-small}');
+
+    .@{B}__wrapper {
+      height: var(~'@{cv-component-size-small}');
+    }
+
+    .@{B}__prepend,
+    .@{B}__append {
+      height: var(~'@{cv-component-size-small}');
+    }
+  }
+
+  // ========== textarea 模式 ==========
+  &.is-textarea {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    vertical-align: bottom;
+    font-size: var(~'@{cv-font-size-base}');
+
+    // textarea 直接带边框，不使用 wrapper
+    .@{B}__inner {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      height: auto;
+      padding: 8px 12px;
+      line-height: 1.5;
+      font-size: inherit;
+      font-family: inherit;
+      color: inherit;
+      background-color: @color-white;
+      border: 1px solid var(~'@{cv-border-color}');
+      border-radius: var(~'@{cv-border-radius-base}');
+      outline: none;
+      resize: vertical;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+      &::placeholder {
+        color: var(~'@{cv-text-color-placeholder}');
+      }
+
+      &:hover {
+        border-color: var(~'@{cv-border-color-light}');
+      }
+
+      &:focus {
+        border-color: var(~'@{cv-color-primary}');
+        box-shadow: 0 0 0 2px var(~'@{cv-color-primary}@{suffix-light-8}');
+      }
+
+      // clearable 时增加右侧 padding，避免文字被清除图标遮挡
+      &.is-clearable {
+        padding-right: 26px;
+      }
+    }
+
+    // 清除按钮绝对定位浮在 textarea 右上角 
+    .@{B}__clear {
+      position: absolute;
+      right: 4px;
+      top: calc(8px + 0.75em);
+      transform: translateY(-50%);
+      color: var(~'@{cv-text-color-secondary}');
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: var(~'@{cv-text-color-regular}');
+      }
+    }
+
+    // autosize 模式下禁止手动调整高度
+    &.is-autosize {
+      .@{B}__inner {
+        resize: none;
+      }
+    }
+  }
+}

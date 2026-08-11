@@ -51,16 +51,6 @@ export const buttonProps = {
     type: Boolean,
     default: false,
   },
-  /** 是否自动获取焦点 */
-  autofocus: {
-    type: Boolean,
-    default: false,
-  },
-  /** 原生 useMap 属性 */
-  useMap: {
-    type: String,
-    default: '',
-  },
 } as const;
 
 /** Button Props 类型 */

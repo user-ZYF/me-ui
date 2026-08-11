@@ -13,12 +13,16 @@
     ]"
     :type="nativeType"
     :disabled="disabled || loading"
-    :autofocus="autofocus"
     @click="onClick"
   >
-    <span v-if="loading" class="me-button-loading-icon">
-      <Loading class="me-button-loading-svg" />
-    </span>
+    <!-- loading图标 -->
+    <template v-if="loading">
+      <slot v-if="$slots.loading" name="loading" />
+      <me-icon v-else :class="ns.e('loading-icon')" :size="14">
+        <Loading />
+      </me-icon>
+    </template>
+    <!-- 默认插槽，始终显示 -->
     <slot />
   </button>
 </template>
@@ -28,6 +32,7 @@ import { computed } from 'vue';
 
 import { Loading } from '@element-plus/icons-vue';
 
+import MeIcon from '@me-ui/components/icon';
 import { useConfigProvider } from '@me-ui/components/config-provider/hooks/use-config-provider';
 import { useNamespace } from '@me-ui/hooks/use-namespace';
 
