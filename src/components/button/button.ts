@@ -29,7 +29,7 @@ export const buttonProps = {
   /** 是否禁用 */
   disabled: {
     type: Boolean,
-    default: false,
+    default: undefined,
   },
   /** 是否加载中 */
   loading: {

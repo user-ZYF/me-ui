@@ -23,7 +23,7 @@ export const inputProps = {
   /** 是否禁用 */
   disabled: {
     type: Boolean,
-    default: false,
+    default: undefined,
   },
   /** 是否只读 */
   readonly: {

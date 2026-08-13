@@ -28,6 +28,10 @@
       "types": "./dist/config-provider.d.ts",
       "import": "./dist/config-provider.js"
     },
+    "./form": {
+      "types": "./dist/form.d.ts",
+      "import": "./dist/form.js"
+    },
     "./styles": "./dist/index.css",
     "./dist/*": "./dist/*"
   },
@@ -65,6 +69,9 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
-    "element-plus": "^2.14.4"
+    "async-validator": "^4.2.5",
+    "element-plus": "^2.14.4",
+    "lodash-unified": "^1.0.3",
+    "uuid": "^14.0.1"
   }
 }

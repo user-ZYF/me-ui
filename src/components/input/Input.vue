@@ -4,7 +4,7 @@
     :class="[
       ns.b.value,
       ns.m(actualSize),
-      ns.is('disabled', disabled),
+      ns.is('disabled', actualDisabled),
       ns.is('focus', isFocused),
       ns.is('textarea', isTextarea),
       ns.is('clearable', showClearIcon),
@@ -28,7 +28,7 @@
         v-model="value"
         :style="textareaCalcStyle"
         :placeholder="placeholder"
-        :disabled="disabled"
+        :disabled="actualDisabled"
         :readonly="readonly"
         :maxlength="maxlength"
         :minlength="minlength"
@@ -52,8 +52,6 @@
         v-if="showClearIcon"
         :class="ns.e('clear')"
         :size="14"
-        role="button"
-        aria-label="清除"
         @mousedown.prevent
         @click="handleClear"
       >
@@ -82,7 +80,7 @@
           :type="actualType"
           v-model="value"
           :placeholder="placeholder"
-          :disabled="disabled"
+          :disabled="actualDisabled"
           :readonly="readonly"
           :maxlength="maxlength"
           :minlength="minlength"
@@ -104,8 +102,6 @@
           v-if="showClearIcon"
           :class="ns.e('clear')"
           :size="14"
-          role="button"
-          aria-label="清除"
           @mousedown.prevent
           @click="handleClear"
         >
@@ -116,8 +112,6 @@
           v-if="showPasswordIcon"
           :class="ns.e('password')"
           :size="14"
-          role="button"
-          :aria-label="isPasswordVisible ? '隐藏密码' : '显示密码'"
           @mousedown.prevent
           @mouseup.prevent
           @click="handleTogglePassword"
@@ -150,7 +144,7 @@ import { computed, nextTick, onMounted, ref, shallowRef, watch, type StyleValue 
 import { CircleClose, Hide, View } from '@element-plus/icons-vue';
 
 import MeIcon from '@me-ui/components/icon';
-import { useConfigProvider } from '@me-ui/components/config-provider/hooks/use-config-provider';
+import { useFormItem, useFormDisabled, useFormSize } from '@me-ui/components/form/hooks';
 import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { inputEmits, inputProps } from './input';
@@ -162,10 +156,10 @@ const props = defineProps(inputProps);
 const emit = defineEmits(inputEmits);
 
 /** v-model 绑定值 */
-const value = defineModel<string | number>('value', { default: '' });
+const value = defineModel<string | number>({ default: '' });
 
 const ns = useNamespace('input');
-const { size: configSize } = useConfigProvider();
+const { formItem } = useFormItem();
 
 /** input 元素引用 */
 const inputRef = ref<HTMLInputElement>();
@@ -179,8 +173,11 @@ const isHovering = ref(false);
 /** 密码是否可见 */
 const isPasswordVisible = ref(false);
 
-/** 实际尺寸：优先使用 prop 传入的，其次使用 ConfigProvider 的，最后使用默认值 */
-const actualSize = computed(() => props.size ?? configSize.value ?? 'default');
+/** 实际尺寸：优先使用 prop 传入的，其次继承 Form/FormItem 的，最后使用 ConfigProvider 的，最后使用默认值 */
+const actualSize = useFormSize(computed(() => props.size));
+
+/** 实际禁用状态：优先使用 prop 传入的，其次继承 Form 的 */
+const actualDisabled = useFormDisabled(computed(() => props.disabled));
 
 /** 是否为 textarea 模式 */
 const isTextarea = computed(() => props.type === 'textarea');
@@ -195,14 +192,14 @@ const actualType = computed(() => {
 
 /** 是否显示清除图标 */
 const showClearIcon = computed(() => {
-  if (!props.clearable || props.disabled || props.readonly) return false;
+  if (!props.clearable || actualDisabled.value || props.readonly) return false;
   if (!value.value && value.value !== 0) return false;
   return props.clearOnFocus ? isFocused.value : isFocused.value || isHovering.value;
 });
 
 /** 是否显示密码切换图标 */
 const showPasswordIcon = computed(() => {
-  return props.showPassword && props.type === 'password' && !props.disabled;
+  return props.showPassword && props.type === 'password' && !actualDisabled.value;
 });
 
 /** 组件元素引用 */
@@ -271,6 +268,7 @@ function handleInput(evt: Event) {
 function handleValueChange(evt: Event) {
   const target = evt.target as HTMLInputElement | HTMLTextAreaElement;
   emit('change', target.value);
+  formItem?.validate('change').catch(() => {});
 }
 
 /** 聚焦事件 */
@@ -283,6 +281,7 @@ function onFocus(evt: FocusEvent) {
 function onBlur(evt: FocusEvent) {
   isFocused.value = false;
   emit('blur', evt);
+  formItem?.validate('blur').catch(() => {});
 }
 
 /** 清空：清空绑定值并触发 clear 事件（焦点由 @mousedown.prevent 保留） */

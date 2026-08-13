@@ -2,12 +2,13 @@ import type { App } from 'vue';
 
 import { MeButton } from './components/button';
 import { MeConfigProvider } from './components/config-provider';
+import { MeForm, MeFormItem } from './components/form';
 import { MeIcon } from './components/icon';
 import { MeInput } from './components/input';
 
 import './setup';
 
-const components = [MeButton, MeConfigProvider, MeIcon, MeInput];
+const components = [MeButton, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput];
 
 /**
  * Vue 插件安装入口
@@ -19,6 +20,6 @@ function install(app: App) {
   });
 }
 
-export { MeButton, MeConfigProvider, MeIcon, MeInput };
+export { MeButton, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput };
 
 export default { install };

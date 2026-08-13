@@ -1,0 +1,146 @@
+@B: ~'@{namespace}-form';
+
+.@{B} {
+  font-size: var(~'@{cv-font-size-base}');
+
+  // ========== 尺寸 ==========
+  &--large {
+    .@{B}-item {
+      &__label {
+        font-size: var(~'@{cv-font-size-medium}');
+        line-height: var(~'@{cv-component-size-large}');
+      }
+    }
+  }
+
+  &--small {
+    .@{B}-item {
+      &__label {
+        font-size: var(~'@{cv-font-size-small}');
+        line-height: var(~'@{cv-component-size-small}');
+      }
+    }
+  }
+}
+
+// ========== FormItem ==========
+@BI: ~'@{namespace}-form-item';
+
+.@{BI} {
+  margin-bottom: 18px;
+
+  // ========== label ==========
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    height: var(~'@{cv-component-size-default}');
+    padding: 0 12px 0 0;
+    font-size: var(~'@{cv-font-size-base}');
+    color: var(~'@{cv-text-color-regular}');
+    line-height: var(~'@{cv-component-size-default}');
+    white-space: nowrap;
+  }
+
+  // 必填星号（is-required 在根元素上）
+  &.is-required {
+    .@{BI}__label {
+      &::before {
+        content: '*';
+        color: var(~'@{cv-color-danger}');
+        margin-right: 4px;
+      }
+    }
+  }
+
+  // 隐藏必填星号
+  &.is-no-asterisk {
+    .@{BI}__label {
+      &::before {
+        content: '';
+        margin: 0;
+      }
+    }
+  }
+
+  // ========== 内容区域 ==========
+  &__content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    position: relative;
+    font-size: var(~'@{cv-font-size-base}');
+    line-height: var(~'@{cv-component-size-default}');
+    min-height: var(~'@{cv-component-size-default}');
+  }
+
+  // ========== 校验状态 ==========
+  &.is-error {
+    .@{BI}__content {
+      // 子组件边框变红通过 CSS 变量覆盖
+      --me-border-color: var(~'@{cv-color-danger}');
+    }
+  }
+
+  &.is-validating {
+    .@{BI}__content {
+      opacity: 0.8;
+    }
+  }
+
+  &.is-success {
+    .@{BI}__content {
+      --me-border-color: var(~'@{cv-color-success}');
+    }
+  }
+
+  // ========== 校验错误信息 ==========
+  &__error {
+    color: var(~'@{cv-color-danger}');
+    font-size: var(~'@{cv-font-size-small}');
+    line-height: 1.5;
+    padding-top: 4px;
+    width: 100%;
+  }
+
+  // ========== 尺寸 ==========
+  &--large {
+    .@{BI}__label {
+      font-size: var(~'@{cv-font-size-medium}');
+      line-height: var(~'@{cv-component-size-large}');
+      height: var(~'@{cv-component-size-large}');
+    }
+
+    .@{BI}__content {
+      line-height: var(~'@{cv-component-size-large}');
+      min-height: var(~'@{cv-component-size-large}');
+    }
+  }
+
+  &--small {
+    .@{BI}__label {
+      font-size: var(~'@{cv-font-size-small}');
+      line-height: var(~'@{cv-component-size-small}');
+      height: var(~'@{cv-component-size-small}');
+    }
+
+    .@{BI}__content {
+      line-height: var(~'@{cv-component-size-small}');
+      min-height: var(~'@{cv-component-size-small}');
+    }
+  }
+}
+
+// ========== 过渡动画 ==========
+.@{namespace}-zoom-in-top-enter-active,
+.@{namespace}-zoom-in-top-leave-active {
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-origin: center top;
+}
+
+.@{namespace}-zoom-in-top-enter-from,
+.@{namespace}-zoom-in-top-leave-to {
+  opacity: 0;
+  transform: scaleY(0);
+}
