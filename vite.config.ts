@@ -23,7 +23,10 @@ export default defineConfig(({ command }) => ({
       entry: {
         'index': resolve(__dirname, 'src/index.ts'),
         'button': resolve(__dirname, 'src/components/button/index.ts'),
+        'checkbox': resolve(__dirname, 'src/components/checkbox/index.ts'),
         'config-provider': resolve(__dirname, 'src/components/config-provider/index.ts'),
+        'form': resolve(__dirname, 'src/components/form/index.ts'),
+        'radio': resolve(__dirname, 'src/components/radio/index.ts'),
       },
       name: 'MeUI',
     },

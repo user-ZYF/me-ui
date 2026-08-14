@@ -1,0 +1,111 @@
+@B: ~'@{namespace}-radio-button';
+
+.@{B} {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  height: var(~'@{cv-component-size-default}');
+  padding: 0 16px;
+  font-size: var(~'@{cv-font-size-base}');
+  color: var(~'@{cv-text-color-regular}');
+  background-color: @color-white;
+  border: 1px solid var(~'@{cv-border-color}');
+  border-left-color: transparent;
+  margin-left: -1px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  outline: none;
+  z-index: 0;
+
+  // ========== 隐藏原生 input ==========
+  &__input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  // ========== 内部文本 ==========
+  &__inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // ========== 第一个按钮：左边框 + 左圆角 ==========
+  &:first-child {
+    border-left-color: var(~'@{cv-border-color}');
+    margin-left: 0;
+    border-radius: var(~'@{cv-border-radius-base}') 0 0 var(~'@{cv-border-radius-base}');
+  }
+
+  // ========== 最后一个按钮：右圆角 ==========
+  &:last-child {
+    border-radius: 0 var(~'@{cv-border-radius-base}') var(~'@{cv-border-radius-base}') 0;
+  }
+
+  // ========== hover 状态 ==========
+  &:hover {
+    color: var(~'@{cv-color-primary}');
+    border-color: var(~'@{cv-color-primary}');
+    z-index: 1;
+
+    & + .@{B} {
+      border-left-color: var(~'@{cv-color-primary}');
+    }
+  }
+
+  // ========== 选中状态 ==========
+  &.is-active {
+    color: @color-white;
+    background-color: var(~'@{cv-color-primary}');
+    border-color: var(~'@{cv-color-primary}');
+    z-index: 2;
+
+    & + .@{B} {
+      border-left-color: var(~'@{cv-color-primary}');
+    }
+  }
+
+  // ========== 禁用状态 ==========
+  &.is-disabled {
+    cursor: not-allowed;
+    color: var(~'@{cv-text-color-disabled}');
+    background-color: var(~'@{cv-border-color-extra-light}');
+    border-color: var(~'@{cv-border-color-light}');
+
+    &:hover {
+      color: var(~'@{cv-text-color-disabled}');
+      border-color: var(~'@{cv-border-color-light}');
+
+      & + .@{B} {
+        border-left-color: var(~'@{cv-border-color-light}');
+      }
+    }
+
+    &.is-active {
+      color: var(~'@{cv-text-color-disabled}');
+      background-color: var(~'@{cv-border-color-extra-light}');
+      border-color: var(~'@{cv-border-color-light}');
+    }
+  }
+
+  // ========== 尺寸 ==========
+  &--large {
+    height: var(~'@{cv-component-size-large}');
+    padding: 0 20px;
+    font-size: var(~'@{cv-font-size-medium}');
+  }
+
+  &--small {
+    height: var(~'@{cv-component-size-small}');
+    padding: 0 12px;
+    font-size: var(~'@{cv-font-size-small}');
+  }
+}

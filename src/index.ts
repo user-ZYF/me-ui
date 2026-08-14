@@ -1,14 +1,16 @@
 import type { App } from 'vue';
 
 import { MeButton } from './components/button';
+import { MeCheckbox, MeCheckboxGroup } from './components/checkbox';
 import { MeConfigProvider } from './components/config-provider';
 import { MeForm, MeFormItem } from './components/form';
 import { MeIcon } from './components/icon';
 import { MeInput } from './components/input';
+import { MeRadio, MeRadioButton, MeRadioGroup } from './components/radio';
 
 import './setup';
 
-const components = [MeButton, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput];
+const components = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeRadio, MeRadioButton, MeRadioGroup];
 
 /**
  * Vue 插件安装入口
@@ -20,6 +22,6 @@ function install(app: App) {
   });
 }
 
-export { MeButton, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput };
+export { MeButton, MeCheckbox, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeRadio, MeRadioButton, MeRadioGroup };
 
 export default { install };

@@ -1,0 +1,142 @@
+@B: ~'@{namespace}-radio';
+
+.@{B} {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(~'@{cv-font-size-base}');
+  color: var(~'@{cv-text-color-regular}');
+  white-space: nowrap;
+  vertical-align: middle;
+  margin-right: 30px;
+
+  // ========== 隐藏原生 input ==========
+  &__input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+
+  // ========== 自定义单选框 ==========
+  &__box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    border: 1px solid var(~'@{cv-border-color}');
+    border-radius: 50%;
+    background-color: @color-white;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    overflow: hidden;
+
+    &:hover {
+      border-color: var(~'@{cv-color-primary}');
+    }
+  }
+
+  // ========== 选中时的内圆点 ==========
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(~'@{cv-color-primary}');
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    &.is-show {
+      opacity: 1;
+    }
+  }
+
+  // ========== 标签文本 ==========
+  &__label {
+    margin-left: 8px;
+    line-height: 1;
+  }
+
+  // ========== 选中状态 ==========
+  &.is-checked {
+    .@{B}__box {
+      border-color: var(~'@{cv-color-primary}');
+
+      &:hover {
+        border-color: var(~'@{cv-color-primary}');
+      }
+    }
+  }
+
+  // ========== 禁用状态 ==========
+  &.is-disabled {
+    cursor: not-allowed;
+
+    .@{B}__box {
+      background-color: var(~'@{cv-border-color-extra-light}');
+      border-color: var(~'@{cv-border-color-light}');
+      cursor: not-allowed;
+
+      &:hover {
+        border-color: var(~'@{cv-border-color-light}');
+      }
+    }
+
+    .@{B}__dot {
+      background-color: var(~'@{cv-text-color-disabled}');
+    }
+
+    .@{B}__label {
+      color: var(~'@{cv-text-color-disabled}');
+    }
+
+    &.is-checked {
+      .@{B}__box {
+        background-color: var(~'@{cv-border-color-extra-light}');
+        border-color: var(~'@{cv-border-color-light}');
+      }
+    }
+  }
+
+  // ========== 尺寸 ==========
+  &--large {
+    .@{B}__box {
+      width: 16px;
+      height: 16px;
+    }
+
+    .@{B}__dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    .@{B}__label {
+      font-size: var(~'@{cv-font-size-medium}');
+    }
+  }
+
+  &--small {
+    .@{B}__box {
+      width: 12px;
+      height: 12px;
+    }
+
+    .@{B}__dot {
+      width: 4px;
+      height: 4px;
+    }
+
+    .@{B}__label {
+      font-size: var(~'@{cv-font-size-small}');
+    }
+  }
+
+  // ========== 最后一个不加分隔间距 ==========
+  &:last-of-type {
+    margin-right: 0;
+  }
+}

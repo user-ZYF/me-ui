@@ -24,6 +24,10 @@
       "types": "./dist/button.d.ts",
       "import": "./dist/button.js"
     },
+    "./checkbox": {
+      "types": "./dist/checkbox.d.ts",
+      "import": "./dist/checkbox.js"
+    },
     "./config-provider": {
       "types": "./dist/config-provider.d.ts",
       "import": "./dist/config-provider.js"
@@ -31,6 +35,10 @@
     "./form": {
       "types": "./dist/form.d.ts",
       "import": "./dist/form.js"
+    },
+    "./radio": {
+      "types": "./dist/radio.d.ts",
+      "import": "./dist/radio.js"
     },
     "./styles": "./dist/index.css",
     "./dist/*": "./dist/*"
