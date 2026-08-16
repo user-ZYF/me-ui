@@ -92,7 +92,7 @@ provide(TOOLTIP_INJECTION_KEY, {
   onOpen: show,
   onClose: hide,
   onToggle: (e: Event) => {
-    const isOpen = controlled.value ? !!visibleModel.value : open.value;
+    const isOpen = controlled.value ? visibleModel.value : open.value;
     if (isOpen) {
       hide(e);
     } else {
