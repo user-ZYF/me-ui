@@ -8,11 +8,11 @@ import type { FormItemRule } from './types';
 /** 可被数组或单值包装的类型 */
 export type FormItemName = Arrayable<string>;
 
-/** FormItem 校验状态可选值 */
-export const formItemValidateStates = ['', 'error', 'validating', 'success'] as const;
-
 /** FormItem 校验状态 */
-export type FormItemValidateState = (typeof formItemValidateStates)[number];
+export type FormItemValidateState = '' | 'error' | 'validating' | 'success';
+
+/** FormItem 校验状态可选值 */
+export const formItemValidateStates: FormItemValidateState[] = ['', 'error', 'validating', 'success'];
 
 /** FormItem Props 定义 */
 export const formItemProps = {

@@ -27,6 +27,7 @@ export default defineConfig(({ command }) => ({
         'config-provider': resolve(__dirname, 'src/components/config-provider/index.ts'),
         'form': resolve(__dirname, 'src/components/form/index.ts'),
         'radio': resolve(__dirname, 'src/components/radio/index.ts'),
+        'tooltip': resolve(__dirname, 'src/components/tooltip/index.ts'),
       },
       name: 'MeUI',
     },

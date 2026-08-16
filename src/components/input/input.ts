@@ -4,13 +4,16 @@ import { componentSizes } from '@me-ui/constants/config';
 import type { ComponentSize } from '@me-ui/types/config';
 
 /** Input 组件类型 */
-export const inputTypes = ['text', 'password', 'textarea', 'number', 'email', 'tel', 'url'] as const;
+export type InputType = 'text' | 'password' | 'textarea' | 'number' | 'email' | 'tel' | 'url';
+
+/** Input 组件类型可选值 */
+export const inputTypes: InputType[] = ['text', 'password', 'textarea', 'number', 'email', 'tel', 'url'];
 
 /** Input Props 定义 */
 export const inputProps = {
   /** 输入框类型 */
   type: {
-    type: String as PropType<typeof inputTypes[number]>,
+    type: String as PropType<InputType>,
     values: inputTypes,
     default: 'text',
   },

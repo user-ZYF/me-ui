@@ -1,0 +1,80 @@
+@B: ~'@{namespace}-tooltip';
+
+.@{B} {
+  position: fixed;
+  padding: 8px 12px;
+  font-size: var(~'@{cv-font-size-base}');
+  line-height: 1.4;
+  border-radius: var(~'@{cv-border-radius-base}');
+  visibility: visible;
+
+  // 统一深色主题样式
+  color: @color-white;
+  background-color: #303133;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  // ========== 箭头 ==========
+  &__arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 4px;
+    pointer-events: none;
+  }
+
+  // ========== 各方向的箭头 ==========
+  &--top &__arrow,
+  &--top-start &__arrow,
+  &--top-end &__arrow {
+    border-top-color: #303133;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+  }
+
+  &--bottom &__arrow,
+  &--bottom-start &__arrow,
+  &--bottom-end &__arrow {
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: #303133;
+    border-left-color: transparent;
+  }
+
+  &--left &__arrow,
+  &--left-start &__arrow,
+  &--left-end &__arrow {
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: #303133;
+  }
+
+  &--right &__arrow,
+  &--right-start &__arrow,
+  &--right-end &__arrow {
+    border-top-color: transparent;
+    border-right-color: #303133;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+  }
+
+  // ========== 触发器 ==========
+  &__trigger {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+// ========== 过渡动画 ==========
+.@{B}-fade-enter-active,
+.@{B}-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.@{B}-fade-enter-from,
+.@{B}-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}

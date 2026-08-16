@@ -4,7 +4,10 @@ import { componentSizes, componentTypes } from '@me-ui/constants/config';
 import type { ComponentSize, ComponentType } from '@me-ui/types/config';
 
 /** Button 组件原生类型 */
-export const buttonNativeTypes = ['button', 'submit', 'reset'] as const;
+export type ButtonNativeType = 'button' | 'submit' | 'reset';
+
+/** Button 组件原生类型可选值 */
+export const buttonNativeTypes: ButtonNativeType[] = ['button', 'submit', 'reset'];
 
 /** Button Props 定义 */
 export const buttonProps = {
@@ -22,7 +25,7 @@ export const buttonProps = {
   },
   /** 原生 type 属性 */
   nativeType: {
-    type: String as PropType<typeof buttonNativeTypes[number]>,
+    type: String as PropType<ButtonNativeType>,
     values: buttonNativeTypes,
     default: 'button',
   },
