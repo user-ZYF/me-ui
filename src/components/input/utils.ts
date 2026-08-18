@@ -53,7 +53,7 @@ export type TextAreaHeight = CSSProperties & {
 
 /** 计算目标元素的样式信息 */
 function calculateNodeStyling(targetElement: Element): NodeStyle {
-  const style = window.getComputedStyle(targetElement);
+  const style = getComputedStyle(targetElement);
 
   const boxSizing = style.getPropertyValue('box-sizing');
 

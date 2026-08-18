@@ -2,14 +2,18 @@ import { ref, type Ref } from 'vue';
 
 import type { TooltipPlacement } from './tooltip';
 
+/** 箭头尺寸（px） */
+export const ARROW_SIZE = 10;
+
 /** 弹出层位置计算结果 */
 export interface PopperPosition {
   /** left 坐标 */
   left: number;
   /** top 坐标 */
   top: number;
-  /** 箭头位置 */
+  /** 箭头水平位置（仅 top/bottom 方向使用） */
   arrowLeft: number;
+  /** 箭头垂直位置（仅 left/right 方向使用） */
   arrowTop: number;
   /** 实际使用的 placement（可能因边界翻转） */
   placement: TooltipPlacement;
@@ -44,22 +48,18 @@ export function computePosition(
     case 'top':
       top = triggerRect.top - ph - offset;
       left = triggerRect.left;
-      arrowTop = ph - 1;
       break;
     case 'bottom':
       top = triggerRect.bottom + offset;
       left = triggerRect.left;
-      arrowTop = -arrowSize + 1;
       break;
     case 'left':
       left = triggerRect.left - pw - offset;
       top = triggerRect.top;
-      arrowLeft = pw - 1;
       break;
     case 'right':
       left = triggerRect.right + offset;
       top = triggerRect.top;
-      arrowLeft = -arrowSize + 1;
       break;
   }
 
@@ -89,22 +89,18 @@ export function computePosition(
   if (side === 'top' && top < margin) {
     // 翻转到 bottom
     top = triggerRect.bottom + offset;
-    arrowTop = -arrowSize + 1;
     actualPlacement = (`bottom${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
   } else if (side === 'bottom' && top + ph > window.innerHeight - margin) {
     // 翻转到 top
     top = triggerRect.top - ph - offset;
-    arrowTop = ph - 1;
     actualPlacement = (`top${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
   } else if (side === 'left' && left < margin) {
     // 翻转到 right
     left = triggerRect.right + offset;
-    arrowLeft = -arrowSize + 1;
     actualPlacement = (`right${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
   } else if (side === 'right' && left + pw > window.innerWidth - margin) {
     // 翻转到 left
     left = triggerRect.left - pw - offset;
-    arrowLeft = pw - 1;
     actualPlacement = (`left${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
   }
 
@@ -122,7 +118,7 @@ export function computePosition(
     top = window.innerHeight - ph - margin;
   }
 
-  // 计算箭头位置（居中于 trigger，放在溢出修正之后确保箭头跟随 tooltip 位移）
+  // 计算箭头副轴位置（居中于 trigger，主轴由 CSS bottom/top/left/right 控制）
   const actualSide = parsePlacement(actualPlacement).side;
   if (actualSide === 'top' || actualSide === 'bottom') {
     arrowLeft = triggerRect.left + tw / 2 - left - arrowSize / 2;
@@ -159,13 +155,12 @@ export function usePopper(
     if (!triggerEl || !popperEl) return;
 
     const triggerRect = triggerEl.getBoundingClientRect();
-    const arrowSize = 8;
 
     position.value = computePosition(
       triggerRect,
       { width: popperEl.offsetWidth, height: popperEl.offsetHeight },
       placement.value,
-      arrowSize,
+      ARROW_SIZE,
     );
   }
 

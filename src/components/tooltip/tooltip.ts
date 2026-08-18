@@ -21,6 +21,9 @@ export type TooltipPlacement =
   | 'right-start'
   | 'right-end';
 
+/** Tooltip 主题效果 */
+export type TooltipEffect = 'light' | 'dark';
+
 /** Tooltip Props 定义 */
 export const tooltipProps = {
   /** 是否禁用 */
@@ -43,10 +46,30 @@ export const tooltipProps = {
     type: [String, Array] as PropType<Arrayable<TooltipTriggerType>>,
     default: 'hover',
   },
+  /** 主题效果 */
+  effect: {
+    type: String as PropType<TooltipEffect>,
+    default: 'dark',
+  },
   /** z-index */
   zIndex: {
     type: Number,
     default: 2000,
+  },
+  /** 自定义弹出层类名 */
+  popperClass: {
+    type: String,
+    default: '',
+  },
+  /** hover 触发时显示延迟（毫秒） */
+  showAfter: {
+    type: Number,
+    default: 0,
+  },
+  /** hover 触发时隐藏延迟（毫秒） */
+  hideAfter: {
+    type: Number,
+    default: 0,
   },
 } as const;
 

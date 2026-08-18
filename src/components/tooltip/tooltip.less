@@ -8,56 +8,108 @@
   border-radius: var(~'@{cv-border-radius-base}');
   visibility: visible;
 
-  // 统一深色主题样式
-  color: @color-white;
-  background-color: #303133;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
-  // ========== 箭头 ==========
+  // ========== 箭头（旋转 45° 的方块，z-index: -1 放在背景之下） ==========
   &__arrow {
     position: absolute;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 4px;
+    width: 10px;
+    height: 10px;
+    z-index: -1;
     pointer-events: none;
+
+    &::before {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      z-index: -1;
+      content: '';
+      transform: rotate(45deg);
+      box-sizing: border-box;
+    }
   }
 
-  // ========== 各方向的箭头 ==========
+  // ========== 各方向箭头主轴定位（纯 CSS 控制，不通过 JS） ==========
   &--top &__arrow,
   &--top-start &__arrow,
   &--top-end &__arrow {
-    border-top-color: #303133;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
+    bottom: -5px;
   }
 
   &--bottom &__arrow,
   &--bottom-start &__arrow,
   &--bottom-end &__arrow {
-    border-top-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: #303133;
-    border-left-color: transparent;
+    top: -5px;
   }
 
   &--left &__arrow,
   &--left-start &__arrow,
   &--left-end &__arrow {
-    border-top-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
-    border-left-color: #303133;
+    right: -5px;
   }
 
   &--right &__arrow,
   &--right-start &__arrow,
   &--right-end &__arrow {
-    border-top-color: transparent;
-    border-right-color: #303133;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
+    left: -5px;
+  }
+
+  // ========== 各方向箭头 ::before（圆角 + 透明边框） ==========
+  &--top &__arrow::before,
+  &--top-start &__arrow::before,
+  &--top-end &__arrow::before {
+    border-bottom-right-radius: 2px;
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+  }
+
+  &--bottom &__arrow::before,
+  &--bottom-start &__arrow::before,
+  &--bottom-end &__arrow::before {
+    border-top-left-radius: 2px;
+    border-bottom-color: transparent !important;
+    border-right-color: transparent !important;
+  }
+
+  &--left &__arrow::before,
+  &--left-start &__arrow::before,
+  &--left-end &__arrow::before {
+    border-top-right-radius: 2px;
+    border-left-color: transparent !important;
+    border-bottom-color: transparent !important;
+  }
+
+  &--right &__arrow::before,
+  &--right-start &__arrow::before,
+  &--right-end &__arrow::before {
+    border-bottom-left-radius: 2px;
+    border-right-color: transparent !important;
+    border-top-color: transparent !important;
+  }
+
+  // ========== 深色主题 ==========
+  &--dark {
+    color: @color-white;
+    background-color: #303133;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    .@{B}__arrow::before {
+      background: #303133;
+      border: 1px solid #303133;
+      right: 0;
+    }
+  }
+
+  // ========== 浅色主题 ==========
+  &--light {
+    color: var(~'@{cv-text-color-primary}');
+    background-color: @color-white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    border: 1px solid var(~'@{cv-border-color-light}');
+
+    .@{B}__arrow::before {
+      background: @color-white;
+      border: 1px solid var(~'@{cv-border-color-light}');
+      right: 0;
+    }
   }
 
   // ========== 触发器 ==========

@@ -1,6 +1,6 @@
 import type { InjectionKey, Ref } from 'vue';
 
-import type { Arrayable, TooltipPlacement, TooltipTriggerType } from './tooltip';
+import type { Arrayable, TooltipEffect, TooltipPlacement, TooltipTriggerType } from './tooltip';
 
 /** Tooltip 注入上下文类型 */
 export interface TooltipContext {
@@ -14,8 +14,12 @@ export interface TooltipContext {
   trigger: Ref<Arrayable<TooltipTriggerType>>;
   /** 出现位置 */
   placement: Ref<TooltipPlacement>;
+  /** 主题效果 */
+  effect: Ref<TooltipEffect>;
   /** z-index */
   zIndex: Ref<number>;
+  /** 自定义弹出层类名 */
+  popperClass: Ref<string>;
   /** 打开 */
   onOpen: (e?: Event) => void;
   /** 关闭 */

@@ -40,6 +40,10 @@
       "types": "./dist/radio.d.ts",
       "import": "./dist/radio.js"
     },
+    "./tag": {
+      "types": "./dist/tag.d.ts",
+      "import": "./dist/tag.js"
+    },
     "./tooltip": {
       "types": "./dist/tooltip.d.ts",
       "import": "./dist/tooltip.js"

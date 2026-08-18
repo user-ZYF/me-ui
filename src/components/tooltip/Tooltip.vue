@@ -36,9 +36,6 @@ const visibleModel = defineModel<boolean | undefined>('visible', {
 /** 是否打开 */
 const open = ref(false);
 
-/** 触发原因 */
-const toggleReason = ref<Event>();
-
 /** 触发器组件引用 */
 const triggerCompRef = ref<InstanceType<typeof Trigger>>();
 
@@ -52,9 +49,20 @@ const triggerRef = computed(() => triggerCompRef.value?.triggerRef);
 const controlled = computed(() => typeof visibleModel.value === 'boolean');
 
 /** 显示 */
-function show(e?: Event) {
+function show(_e?: Event) {
   if (props.disabled) return;
-  toggleReason.value = e;
+  clearHideTimer();
+  if (props.showAfter > 0) {
+    showTimer = setTimeout(() => {
+      doShow();
+    }, props.showAfter);
+  } else {
+    doShow();
+  }
+}
+
+/** 实际执行显示 */
+function doShow() {
   if (controlled.value) {
     visibleModel.value = true;
   } else {
@@ -63,12 +71,44 @@ function show(e?: Event) {
 }
 
 /** 隐藏 */
-function hide(e?: Event) {
-  toggleReason.value = e;
+function hide(_e?: Event) {
+  clearShowTimer();
+  if (props.hideAfter > 0) {
+    hideTimer = setTimeout(() => {
+      doHide();
+    }, props.hideAfter);
+  } else {
+    doHide();
+  }
+}
+
+/** 实际执行隐藏 */
+function doHide() {
   if (controlled.value) {
     visibleModel.value = false;
   } else {
     open.value = false;
+  }
+}
+
+/** 显示延迟定时器 */
+let showTimer: ReturnType<typeof setTimeout> | undefined;
+/** 隐藏延迟定时器 */
+let hideTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** 清除显示定时器 */
+function clearShowTimer() {
+  if (showTimer !== undefined) {
+    clearTimeout(showTimer);
+    showTimer = undefined;
+  }
+}
+
+/** 清除隐藏定时器 */
+function clearHideTimer() {
+  if (hideTimer !== undefined) {
+    clearTimeout(hideTimer);
+    hideTimer = undefined;
   }
 }
 
@@ -88,7 +128,9 @@ provide(TOOLTIP_INJECTION_KEY, {
   disabled: toRef(props, 'disabled'),
   trigger: toRef(props, 'trigger'),
   placement: toRef(props, 'placement'),
+  effect: toRef(props, 'effect'),
   zIndex: toRef(props, 'zIndex'),
+  popperClass: toRef(props, 'popperClass'),
   onOpen: show,
   onClose: hide,
   onToggle: (e: Event) => {
@@ -110,9 +152,14 @@ provide(TOOLTIP_INJECTION_KEY, {
 watch(
   () => props.disabled,
   (disabled) => {
-    if (disabled && open.value) {
-      open.value = false;
-      visibleModel.value = false;
+    if (disabled) {
+      clearShowTimer();
+      clearHideTimer();
+      if (controlled.value) {
+        visibleModel.value = false;
+      } else {
+        open.value = false;
+      }
     }
   },
 );
@@ -166,6 +213,8 @@ onMounted(() => {
 });
 
 onDeactivated(() => {
+  clearShowTimer();
+  clearHideTimer();
   if (open.value) {
     hide();
   }
@@ -175,7 +224,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('scroll', onScroll, true);
   window.removeEventListener('resize', onScroll);
   if (scrollRafId !== undefined) cancelAnimationFrame(scrollRafId);
-  toggleReason.value = undefined;
+  clearShowTimer();
+  clearHideTimer();
 });
 
 defineExpose({

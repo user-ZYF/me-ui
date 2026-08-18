@@ -1,205 +1,194 @@
-<!-- ? Tooltip 组件示例 -->
+<!-- ? MeTag 标签组件使用示例 -->
 <template>
   <div class="play-root">
-    <h1>MeTooltip 示例</h1>
+    <h1>MeTag 标签组件示例</h1>
 
     <!-- 基础用法 -->
     <section class="play-section">
       <h2>基础用法</h2>
       <div class="play-row">
-        <me-tooltip content="这是提示内容">
-          <me-button>Hover 悬浮提示</me-button>
-        </me-tooltip>
+        <me-tag>标签一</me-tag>
+        <me-tag type="primary">Primary</me-tag>
+        <me-tag type="success">Success</me-tag>
+        <me-tag type="warning">Warning</me-tag>
+        <me-tag type="danger">Danger</me-tag>
+        <me-tag type="info">Info</me-tag>
       </div>
     </section>
 
-    <!-- 不同位置 -->
+    <!-- 主题效果 -->
     <section class="play-section">
-      <h2>不同位置</h2>
+      <h2>主题效果</h2>
       <div class="play-row">
-        <me-tooltip content="Top 提示" placement="top">
-          <me-button>Top</me-button>
-        </me-tooltip>
-        <me-tooltip content="Bottom 提示" placement="bottom">
-          <me-button>Bottom</me-button>
-        </me-tooltip>
-        <me-tooltip content="Left 提示" placement="left">
-          <me-button>Left</me-button>
-        </me-tooltip>
-        <me-tooltip content="Right 提示" placement="right">
-          <me-button>Right</me-button>
-        </me-tooltip>
+        <me-tag effect="dark">Dark Default</me-tag>
+        <me-tag type="primary" effect="dark">Dark Primary</me-tag>
+        <me-tag type="success" effect="dark">Dark Success</me-tag>
+        <me-tag type="danger" effect="dark">Dark Danger</me-tag>
+      </div>
+      <div class="play-row">
+        <me-tag effect="plain">Plain Default</me-tag>
+        <me-tag type="primary" effect="plain">Plain Primary</me-tag>
+        <me-tag type="success" effect="plain">Plain Success</me-tag>
+        <me-tag type="danger" effect="plain">Plain Danger</me-tag>
       </div>
     </section>
 
-    <!-- 对齐方式 - top/bottom -->
+    <!-- 尺寸 -->
     <section class="play-section">
-      <h2>对齐方式 - Top/Bottom</h2>
+      <h2>尺寸</h2>
       <div class="play-row">
-        <me-tooltip content="Top Start" placement="top-start">
-          <me-button>Top Start</me-button>
-        </me-tooltip>
-        <me-tooltip content="Top End" placement="top-end">
-          <me-button>Top End</me-button>
-        </me-tooltip>
-        <me-tooltip content="Bottom Start" placement="bottom-start">
-          <me-button>Bottom Start</me-button>
-        </me-tooltip>
-        <me-tooltip content="Bottom End" placement="bottom-end">
-          <me-button>Bottom End</me-button>
-        </me-tooltip>
+        <me-tag size="large">Large</me-tag>
+        <me-tag size="default">Default</me-tag>
+        <me-tag size="small">Small</me-tag>
+      </div>
+      <div class="play-row">
+        <me-tag type="primary" size="large">Large Primary</me-tag>
+        <me-tag type="primary" size="default">Default Primary</me-tag>
+        <me-tag type="primary" size="small">Small Primary</me-tag>
       </div>
     </section>
 
-    <!-- 对齐方式 - left/right -->
+    <!-- 可关闭 -->
     <section class="play-section">
-      <h2>对齐方式 - Left/Right</h2>
+      <h2>可关闭</h2>
       <div class="play-row">
-        <me-tooltip content="Left Start" placement="left-start">
-          <me-button>Left Start</me-button>
-        </me-tooltip>
-        <me-tooltip content="Left End" placement="left-end">
-          <me-button>Left End</me-button>
-        </me-tooltip>
-        <me-tooltip content="Right Start" placement="right-start">
-          <me-button>Right Start</me-button>
-        </me-tooltip>
-        <me-tooltip content="Right End" placement="right-end">
-          <me-button>Right End</me-button>
-        </me-tooltip>
-      </div>
-    </section>
-
-    <!-- 触发方式 -->
-    <section class="play-section">
-      <h2>触发方式</h2>
-      <div class="play-row">
-        <me-tooltip content="Click 触发" trigger="click">
-          <me-button>Click</me-button>
-        </me-tooltip>
-        <me-tooltip content="Focus 触发" trigger="focus">
-          <me-button>Focus</me-button>
-        </me-tooltip>
-        <me-tooltip content="Contextmenu 触发" trigger="contextmenu">
-          <me-button>右键菜单</me-button>
-        </me-tooltip>
-      </div>
-    </section>
-
-    <!-- 多触发方式组合 -->
-    <section class="play-section">
-      <h2>多触发方式组合</h2>
-      <div class="play-row">
-        <me-tooltip content="Hover 或 Click 均可触发" :trigger="['hover', 'click']">
-          <me-button>Hover + Click</me-button>
-        </me-tooltip>
-        <me-tooltip content="Focus 或 Click 均可触发" :trigger="['focus', 'click']">
-          <me-button>Focus + Click</me-button>
-        </me-tooltip>
-      </div>
-    </section>
-
-    <!-- 禁用 -->
-    <section class="play-section">
-      <h2>禁用</h2>
-      <div class="play-row">
-        <me-tooltip content="这个提示不会显示" disabled>
-          <me-button>Disabled Tooltip</me-button>
-        </me-tooltip>
-      </div>
-    </section>
-
-    <!-- 受控模式 -->
-    <section class="play-section">
-      <h2>受控模式（v-model:visible）</h2>
-      <div class="play-row">
-        <me-tooltip v-model:visible="controlledVisible" content="受控的提示">
-          <me-button>受控 Tooltip</me-button>
-        </me-tooltip>
-        <me-button type="primary" @click="controlledVisible = !controlledVisible">
-          {{ controlledVisible ? '关闭' : '打开' }}
-        </me-button>
-      </div>
-    </section>
-
-    <!-- 事件回调 -->
-    <section class="play-section">
-      <h2>事件回调</h2>
-      <div class="play-row">
-        <me-tooltip
-          content="观察控制台输出"
-          @before-show="onBeforeShow"
-          @before-hide="onBeforeHide"
-          @show="onShow"
-          @hide="onHide"
+        <me-tag
+          v-for="tag in closableTags"
+          :key="tag.id"
+          :type="tag.type"
+          closable
+          @close="handleClose(tag)"
         >
-          <me-button>事件回调</me-button>
-        </me-tooltip>
+          {{ tag.name }}
+        </me-tag>
       </div>
     </section>
 
-    <!-- z-index -->
+    <!-- 动态添加/删除 -->
     <section class="play-section">
-      <h2>z-index</h2>
+      <h2>动态添加/删除</h2>
       <div class="play-row">
-        <me-tooltip content="z-index: 3000" :z-index="3000">
-          <me-button>z-index 3000</me-button>
-        </me-tooltip>
-        <me-tooltip content="z-index: 5000" :z-index="5000">
-          <me-button>z-index 5000</me-button>
-        </me-tooltip>
+        <me-tag
+          v-for="tag in dynamicTags"
+          :key="tag.id"
+          :type="tag.type"
+          closable
+          @close="handleRemove(tag)"
+        >
+          {{ tag.name }}
+        </me-tag>
+        <me-input
+          v-if="inputVisible"
+          ref="inputRef"
+          v-model="inputValue"
+          class="play-input"
+          size="small"
+          @keyup.enter="handleInputConfirm"
+          @blur="handleInputConfirm"
+        />
+        <me-button v-else size="small" @click="showInput">+ 添加标签</me-button>
       </div>
     </section>
 
-    <!-- 自定义内容插槽 -->
+    <!-- 点击事件 -->
     <section class="play-section">
-      <h2>自定义内容插槽</h2>
+      <h2>点击事件</h2>
       <div class="play-row">
-        <me-tooltip>
-          <me-button>自定义内容</me-button>
-          <template #content>
-            <span style="color: #409eff; font-weight: bold;">自定义 HTML 内容</span>
-          </template>
-        </me-tooltip>
+        <me-tag type="primary" @click="onClickTag('Primary Tag')">Primary Tag</me-tag>
+        <me-tag type="success" @click="onClickTag('Success Tag')">Success Tag</me-tag>
+        <me-tag type="warning" @click="onClickTag('Warning Tag')">Warning Tag</me-tag>
       </div>
     </section>
 
-    <!-- 长内容 -->
+    <!-- 不同主题 + 尺寸组合 -->
     <section class="play-section">
-      <h2>长内容</h2>
+      <h2>不同主题 + 尺寸组合</h2>
       <div class="play-row">
-        <me-tooltip content="这是一段很长的提示内容，用来测试长文本在 tooltip 中的显示效果，看看是否会自动换行或者超出边界">
-          <me-button>长内容提示</me-button>
-        </me-tooltip>
+        <me-tag type="primary" effect="dark" size="large">Dark Large</me-tag>
+        <me-tag type="success" effect="plain" size="small">Plain Small</me-tag>
+        <me-tag type="danger" effect="dark" size="small">Dark Small</me-tag>
+        <me-tag type="info" effect="plain" size="large">Plain Large</me-tag>
       </div>
     </section>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 
-/** 受控模式 visible */
-const controlledVisible = ref(false);
+import type MeInput from '../src/components/input/Input.vue';
+import type { ComponentType } from '../src/types/config';
 
-/** 显示前回调 */
-function onBeforeShow() {
-  console.log('beforeShow');
+/** 可关闭标签项 */
+interface TagItem {
+  /** 唯一标识 */
+  id: number;
+  /** 标签名称 */
+  name: string;
+  /** 标签类型 */
+  type: ComponentType;
 }
 
-/** 隐藏前回调 */
-function onBeforeHide() {
-  console.log('beforeHide');
+/** 可关闭标签列表 */
+const closableTags = ref<TagItem[]>([
+  { id: 1, name: '标签一', type: 'default' },
+  { id: 2, name: '标签二', type: 'success' },
+  { id: 3, name: '标签三', type: 'info' },
+]);
+
+/** 关闭标签 */
+function handleClose(tag: TagItem) {
+  closableTags.value = closableTags.value.filter((item) => item.id !== tag.id);
 }
 
-/** 已显示回调 */
-function onShow() {
-  console.log('show');
+/** 动态标签列表 */
+const dynamicTags = ref<TagItem[]>([
+  { id: 1, name: 'HTML', type: 'default' },
+  { id: 2, name: 'CSS', type: 'success' },
+  { id: 3, name: 'JavaScript', type: 'warning' },
+]);
+
+/** 是否显示输入框 */
+const inputVisible = ref(false);
+
+/** 输入框值 */
+const inputValue = ref('');
+
+/** 输入框引用 */
+const inputRef = ref<InstanceType<typeof MeInput>>();
+
+/** 标签 ID 自增 */
+let tagId = 4;
+
+/** 显示输入框 */
+function showInput() {
+  inputVisible.value = true;
+  nextTick(() => {
+    inputRef.value?.focus();
+  });
 }
 
-/** 已隐藏回调 */
-function onHide() {
-  console.log('hide');
+/** 确认输入 */
+function handleInputConfirm() {
+  if (inputValue.value) {
+    dynamicTags.value.push({
+      id: tagId++,
+      name: inputValue.value,
+      type: 'primary',
+    });
+  }
+  inputVisible.value = false;
+  inputValue.value = '';
+}
+
+/** 移除动态标签 */
+function handleRemove(tag: TagItem) {
+  dynamicTags.value = dynamicTags.value.filter((item) => item.id !== tag.id);
+}
+
+/** 点击标签 */
+function onClickTag(name: string) {
+  console.log('click tag:', name);
 }
 </script>
 
@@ -238,5 +227,9 @@ function onHide() {
     margin-right: 12px;
     margin-bottom: 8px;
   }
+}
+
+.play-input {
+  width: 120px;
 }
 </style>

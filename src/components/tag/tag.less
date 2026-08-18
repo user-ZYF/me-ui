@@ -1,0 +1,191 @@
+@B: ~'@{namespace}-tag';
+
+.@{B} {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+  height: 24px;
+  padding: 0 9px;
+  font-size: var(~'@{cv-font-size-small}');
+  line-height: 1;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: var(~'@{cv-border-radius-base}');
+  box-sizing: border-box;
+  white-space: nowrap;
+
+  // ========== 默认主题（light） ==========
+  background-color: var(~'@{cv-border-color-extra-light}');
+  border-color: var(~'@{cv-border-color-lighter}');
+  color: var(~'@{cv-text-color-secondary}');
+
+  // ========== 类型颜色（light 模式） ==========
+  &--primary {
+    background-color: var(~'@{cv-color-primary}@{suffix-light-9}');
+    border-color: var(~'@{cv-color-primary}@{suffix-light-8}');
+    color: var(~'@{cv-color-primary}');
+  }
+
+  &--success {
+    background-color: var(~'@{cv-color-success}@{suffix-light-9}');
+    border-color: var(~'@{cv-color-success}@{suffix-light-8}');
+    color: var(~'@{cv-color-success}');
+  }
+
+  &--warning {
+    background-color: var(~'@{cv-color-warning}@{suffix-light-9}');
+    border-color: var(~'@{cv-color-warning}@{suffix-light-8}');
+    color: var(~'@{cv-color-warning}');
+  }
+
+  &--danger {
+    background-color: var(~'@{cv-color-danger}@{suffix-light-9}');
+    border-color: var(~'@{cv-color-danger}@{suffix-light-8}');
+    color: var(~'@{cv-color-danger}');
+  }
+
+  &--info {
+    background-color: var(~'@{cv-color-info}@{suffix-light-9}');
+    border-color: var(~'@{cv-color-info}@{suffix-light-8}');
+    color: var(~'@{cv-color-info}');
+  }
+
+  // ========== dark 主题 ==========
+  &--dark {
+    color: @color-white;
+
+    &.@{B}--default {
+      background-color: var(~'@{cv-text-color-secondary}');
+      border-color: var(~'@{cv-text-color-secondary}');
+    }
+
+    &.@{B}--primary {
+      background-color: var(~'@{cv-color-primary}');
+      border-color: var(~'@{cv-color-primary}');
+    }
+
+    &.@{B}--success {
+      background-color: var(~'@{cv-color-success}');
+      border-color: var(~'@{cv-color-success}');
+    }
+
+    &.@{B}--warning {
+      background-color: var(~'@{cv-color-warning}');
+      border-color: var(~'@{cv-color-warning}');
+    }
+
+    &.@{B}--danger {
+      background-color: var(~'@{cv-color-danger}');
+      border-color: var(~'@{cv-color-danger}');
+    }
+
+    &.@{B}--info {
+      background-color: var(~'@{cv-color-info}');
+      border-color: var(~'@{cv-color-info}');
+    }
+  }
+
+  // ========== plain 主题 ==========
+  &--plain {
+    background-color: @color-white;
+    border-color: var(~'@{cv-border-color-light}');
+
+    &.@{B}--primary {
+      color: var(~'@{cv-color-primary}');
+      border-color: var(~'@{cv-color-primary}@{suffix-light-5}');
+    }
+
+    &.@{B}--success {
+      color: var(~'@{cv-color-success}');
+      border-color: var(~'@{cv-color-success}@{suffix-light-5}');
+    }
+
+    &.@{B}--warning {
+      color: var(~'@{cv-color-warning}');
+      border-color: var(~'@{cv-color-warning}@{suffix-light-5}');
+    }
+
+    &.@{B}--danger {
+      color: var(~'@{cv-color-danger}');
+      border-color: var(~'@{cv-color-danger}@{suffix-light-5}');
+    }
+
+    &.@{B}--info {
+      color: var(~'@{cv-color-info}');
+      border-color: var(~'@{cv-color-info}@{suffix-light-5}');
+    }
+  }
+
+  // ========== 内容区域 ==========
+  &__content {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  // ========== 关闭按钮 ==========
+  &__close {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-left: 6px;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    outline: none;
+    cursor: pointer;
+    color: inherit;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      color: @color-white;
+      background-color: var(~'@{cv-text-color-secondary}');
+    }
+
+    .@{namespace}-icon {
+      display: flex;
+    }
+  }
+
+  // ========== 可关闭状态增加右侧 padding ==========
+  &.is-closable {
+    padding-right: 7px;
+  }
+
+  // ========== 尺寸 ==========
+  &--large {
+    height: 28px;
+    padding: 0 11px;
+    font-size: var(~'@{cv-font-size-base}');
+
+    .@{B}__close {
+      width: 18px;
+      height: 18px;
+      margin-left: 8px;
+    }
+
+    &.is-closable {
+      padding-right: 9px;
+    }
+  }
+
+  &--small {
+    height: 20px;
+    padding: 0 7px;
+    font-size: var(~'@{cv-font-size-extra-small}');
+
+    .@{B}__close {
+      width: 14px;
+      height: 14px;
+      margin-left: 4px;
+    }
+
+    &.is-closable {
+      padding-right: 5px;
+    }
+  }
+}
