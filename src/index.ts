@@ -7,12 +7,13 @@ import { MeForm, MeFormItem } from './components/form';
 import { MeIcon } from './components/icon';
 import { MeInput } from './components/input';
 import { MeRadio, MeRadioButton, MeRadioGroup } from './components/radio';
+import { MeScrollbar } from './components/scrollbar';
 import { MeTag } from './components/tag';
 import { MeTooltip } from './components/tooltip';
 
 import './setup';
 
-const components = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeRadio, MeRadioButton, MeRadioGroup, MeTag, MeTooltip];
+const components = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeRadio, MeRadioButton, MeRadioGroup, MeScrollbar, MeTag, MeTooltip];
 
 /**
  * Vue 插件安装入口
@@ -24,6 +25,6 @@ function install(app: App) {
   });
 }
 
-export { MeButton, MeCheckbox, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeRadio, MeRadioButton, MeRadioGroup, MeTag, MeTooltip };
+export { MeButton, MeCheckbox, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeRadio, MeRadioButton, MeRadioGroup, MeScrollbar, MeTag, MeTooltip };
 
 export default { install };

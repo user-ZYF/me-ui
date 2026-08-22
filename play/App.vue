@@ -1,194 +1,143 @@
-<!-- ? MeTag 标签组件使用示例 -->
+<!-- ? MeScrollbar 滚动条组件使用示例 -->
 <template>
   <div class="play-root">
-    <h1>MeTag 标签组件示例</h1>
+    <h1>MeScrollbar 滚动条组件示例</h1>
 
     <!-- 基础用法 -->
     <section class="play-section">
       <h2>基础用法</h2>
-      <div class="play-row">
-        <me-tag>标签一</me-tag>
-        <me-tag type="primary">Primary</me-tag>
-        <me-tag type="success">Success</me-tag>
-        <me-tag type="warning">Warning</me-tag>
-        <me-tag type="danger">Danger</me-tag>
-        <me-tag type="info">Info</me-tag>
+      <p class="play-desc">固定高度的滚动区域，内容超出时显示自定义滚动条</p>
+      <me-scrollbar height="200px">
+        <div class="play-content">
+          <p v-for="i in 20" :key="i">这是第 {{ i }} 行内容，用于演示垂直滚动效果。</p>
+        </div>
+      </me-scrollbar>
+    </section>
+
+    <!-- 最大高度 -->
+    <section class="play-section">
+      <h2>最大高度</h2>
+      <p class="play-desc">内容不超过 maxHeight 时不出现滚动条，超过后自动出现</p>
+      <me-scrollbar max-height="300px">
+        <div class="play-content">
+          <p v-for="i in dynamicCount" :key="i">动态内容第 {{ i }} 行。</p>
+        </div>
+      </me-scrollbar>
+      <div class="play-actions">
+        <me-button size="small" @click="dynamicCount = Math.max(1, dynamicCount - 5)">减少 5 行</me-button>
+        <me-button size="small" @click="dynamicCount += 5">增加 5 行</me-button>
+        <span class="play-label">当前行数：{{ dynamicCount }}</span>
       </div>
     </section>
 
-    <!-- 主题效果 -->
+    <!-- 始终显示 -->
     <section class="play-section">
-      <h2>主题效果</h2>
-      <div class="play-row">
-        <me-tag effect="dark">Dark Default</me-tag>
-        <me-tag type="primary" effect="dark">Dark Primary</me-tag>
-        <me-tag type="success" effect="dark">Dark Success</me-tag>
-        <me-tag type="danger" effect="dark">Dark Danger</me-tag>
-      </div>
-      <div class="play-row">
-        <me-tag effect="plain">Plain Default</me-tag>
-        <me-tag type="primary" effect="plain">Plain Primary</me-tag>
-        <me-tag type="success" effect="plain">Plain Success</me-tag>
-        <me-tag type="danger" effect="plain">Plain Danger</me-tag>
-      </div>
+      <h2>始终显示滚动条</h2>
+      <p class="play-desc">设置 always 属性，滚动条始终可见</p>
+      <me-scrollbar height="200px" always>
+        <div class="play-content">
+          <p v-for="i in 20" :key="i">always 模式第 {{ i }} 行。</p>
+        </div>
+      </me-scrollbar>
     </section>
 
-    <!-- 尺寸 -->
+    <!-- 原生滚动条 -->
     <section class="play-section">
-      <h2>尺寸</h2>
-      <div class="play-row">
-        <me-tag size="large">Large</me-tag>
-        <me-tag size="default">Default</me-tag>
-        <me-tag size="small">Small</me-tag>
-      </div>
-      <div class="play-row">
-        <me-tag type="primary" size="large">Large Primary</me-tag>
-        <me-tag type="primary" size="default">Default Primary</me-tag>
-        <me-tag type="primary" size="small">Small Primary</me-tag>
-      </div>
+      <h2>原生滚动条</h2>
+      <p class="play-desc">设置 native 属性，使用浏览器原生滚动条</p>
+      <me-scrollbar height="200px" native>
+        <div class="play-content">
+          <p v-for="i in 20" :key="i">native 模式第 {{ i }} 行。</p>
+        </div>
+      </me-scrollbar>
     </section>
 
-    <!-- 可关闭 -->
+    <!-- 水平滚动 -->
     <section class="play-section">
-      <h2>可关闭</h2>
-      <div class="play-row">
-        <me-tag
-          v-for="tag in closableTags"
-          :key="tag.id"
-          :type="tag.type"
-          closable
-          @close="handleClose(tag)"
-        >
-          {{ tag.name }}
-        </me-tag>
-      </div>
+      <h2>水平 + 垂直滚动</h2>
+      <p class="play-desc">内容宽度和高度均超出容器时，同时显示水平和垂直滚动条</p>
+      <me-scrollbar height="200px">
+        <div class="play-content-wide">
+          <div class="play-content-inner">
+            <p v-for="i in 15" :key="i">行 {{ i }} —— 这是一段较长的内容用于演示水平滚动效果，请向右滚动查看。</p>
+          </div>
+        </div>
+      </me-scrollbar>
     </section>
 
-    <!-- 动态添加/删除 -->
+    <!-- 自定义样式 -->
     <section class="play-section">
-      <h2>动态添加/删除</h2>
-      <div class="play-row">
-        <me-tag
-          v-for="tag in dynamicTags"
-          :key="tag.id"
-          :type="tag.type"
-          closable
-          @close="handleRemove(tag)"
-        >
-          {{ tag.name }}
-        </me-tag>
-        <me-input
-          v-if="inputVisible"
-          ref="inputRef"
-          v-model="inputValue"
-          class="play-input"
-          size="small"
-          @keyup.enter="handleInputConfirm"
-          @blur="handleInputConfirm"
-        />
-        <me-button v-else size="small" @click="showInput">+ 添加标签</me-button>
-      </div>
+      <h2>自定义容器样式</h2>
+      <p class="play-desc">通过 wrap-class / view-class 自定义容器样式</p>
+      <me-scrollbar
+        height="200px"
+        wrap-class="play-custom-wrap"
+        view-class="play-custom-view"
+      >
+        <div class="play-content">
+          <p v-for="i in 20" :key="i">自定义样式第 {{ i }} 行。</p>
+        </div>
+      </me-scrollbar>
     </section>
 
-    <!-- 点击事件 -->
+    <!-- API 演示 -->
     <section class="play-section">
-      <h2>点击事件</h2>
-      <div class="play-row">
-        <me-tag type="primary" @click="onClickTag('Primary Tag')">Primary Tag</me-tag>
-        <me-tag type="success" @click="onClickTag('Success Tag')">Success Tag</me-tag>
-        <me-tag type="warning" @click="onClickTag('Warning Tag')">Warning Tag</me-tag>
+      <h2>API 演示</h2>
+      <p class="play-desc">通过 ref 调用 setScrollTop / update 等方法</p>
+      <div class="play-actions">
+        <me-button size="small" @click="handleScrollToTop">滚动到顶部</me-button>
+        <me-button size="small" @click="handleScrollToBottom">滚动到底部</me-button>
+        <me-button size="small" @click="handleUpdate">手动更新</me-button>
+        <span class="play-label">scrollTop: {{ scrollTopValue }}</span>
       </div>
-    </section>
-
-    <!-- 不同主题 + 尺寸组合 -->
-    <section class="play-section">
-      <h2>不同主题 + 尺寸组合</h2>
-      <div class="play-row">
-        <me-tag type="primary" effect="dark" size="large">Dark Large</me-tag>
-        <me-tag type="success" effect="plain" size="small">Plain Small</me-tag>
-        <me-tag type="danger" effect="dark" size="small">Dark Small</me-tag>
-        <me-tag type="info" effect="plain" size="large">Plain Large</me-tag>
-      </div>
+      <me-scrollbar
+        ref="apiScrollbarRef"
+        height="200px"
+        @scroll="onScrollEvent"
+      >
+        <div class="play-content">
+          <p v-for="i in 30" :key="i">API 演示第 {{ i }} 行。</p>
+        </div>
+      </me-scrollbar>
     </section>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { nextTick, ref } from 'vue';
+import { ref } from 'vue';
 
-import type MeInput from '../src/components/input/Input.vue';
-import type { ComponentType } from '../src/types/config';
+import type Scrollbar from '../src/components/scrollbar/Scrollbar.vue';
 
-/** 可关闭标签项 */
-interface TagItem {
-  /** 唯一标识 */
-  id: number;
-  /** 标签名称 */
-  name: string;
-  /** 标签类型 */
-  type: ComponentType;
+/** 动态行数 */
+const dynamicCount = ref(10);
+
+/** API 演示滚动条引用 */
+const apiScrollbarRef = ref<InstanceType<typeof Scrollbar>>();
+
+/** 当前 scrollTop 值 */
+const scrollTopValue = ref(0);
+
+/** 滚动事件 */
+function onScrollEvent(scrollTop: number, scrollLeft: number) {
+  scrollTopValue.value = Math.round(scrollTop);
 }
 
-/** 可关闭标签列表 */
-const closableTags = ref<TagItem[]>([
-  { id: 1, name: '标签一', type: 'default' },
-  { id: 2, name: '标签二', type: 'success' },
-  { id: 3, name: '标签三', type: 'info' },
-]);
-
-/** 关闭标签 */
-function handleClose(tag: TagItem) {
-  closableTags.value = closableTags.value.filter((item) => item.id !== tag.id);
+/** 滚动到顶部 */
+function handleScrollToTop() {
+  apiScrollbarRef.value?.setScrollTop(0);
 }
 
-/** 动态标签列表 */
-const dynamicTags = ref<TagItem[]>([
-  { id: 1, name: 'HTML', type: 'default' },
-  { id: 2, name: 'CSS', type: 'success' },
-  { id: 3, name: 'JavaScript', type: 'warning' },
-]);
-
-/** 是否显示输入框 */
-const inputVisible = ref(false);
-
-/** 输入框值 */
-const inputValue = ref('');
-
-/** 输入框引用 */
-const inputRef = ref<InstanceType<typeof MeInput>>();
-
-/** 标签 ID 自增 */
-let tagId = 4;
-
-/** 显示输入框 */
-function showInput() {
-  inputVisible.value = true;
-  nextTick(() => {
-    inputRef.value?.focus();
-  });
-}
-
-/** 确认输入 */
-function handleInputConfirm() {
-  if (inputValue.value) {
-    dynamicTags.value.push({
-      id: tagId++,
-      name: inputValue.value,
-      type: 'primary',
-    });
+/** 滚动到底部 */
+function handleScrollToBottom() {
+  const wrap = apiScrollbarRef.value?.wrapRef;
+  if (wrap) {
+    apiScrollbarRef.value?.setScrollTop(wrap.scrollHeight);
   }
-  inputVisible.value = false;
-  inputValue.value = '';
 }
 
-/** 移除动态标签 */
-function handleRemove(tag: TagItem) {
-  dynamicTags.value = dynamicTags.value.filter((item) => item.id !== tag.id);
-}
-
-/** 点击标签 */
-function onClickTag(name: string) {
-  console.log('click tag:', name);
+/** 手动更新滚动条 */
+function handleUpdate() {
+  apiScrollbarRef.value?.update();
 }
 </script>
 
@@ -218,18 +167,61 @@ function onClickTag(name: string) {
   border-radius: 8px;
 }
 
-.play-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+.play-desc {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #909399;
+}
 
-  > * {
-    margin-right: 12px;
-    margin-bottom: 8px;
+.play-content {
+  padding: 12px;
+
+  p {
+    margin: 0 0 12px;
+    line-height: 1.6;
   }
 }
 
-.play-input {
-  width: 120px;
+.play-content-wide {
+  width: 600px;
+  padding: 12px;
+}
+
+.play-content-inner {
+  width: 800px;
+
+  p {
+    margin: 0 0 12px;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+}
+
+.play-actions {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+
+  > * {
+    margin-right: 12px;
+  }
+}
+
+.play-label {
+  font-size: 13px;
+  color: #909399;
+}
+</style>
+
+<style lang="less">
+/* 自定义 wrap / view 样式（非 scoped） */
+.play-custom-wrap {
+  border: 2px dashed #409eff;
+  border-radius: 6px;
+}
+
+.play-custom-view {
+  padding: 16px;
+  background-color: #f0f7ff;
 }
 </style>
