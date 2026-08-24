@@ -3,10 +3,7 @@
   <Trigger ref="triggerCompRef">
     <slot></slot>
   </Trigger>
-  <Content
-    ref="contentRef"
-    :position="position"
-  >
+  <Content ref="contentRef" :position="position">
     <slot name="content">
       <span>{{ content }}</span>
     </slot>
@@ -14,23 +11,36 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeUnmount, onDeactivated, onMounted, provide, readonly, ref, toRef, watch } from 'vue';
+import {
+  computed,
+  onBeforeUnmount,
+  onDeactivated,
+  provide,
+  readonly,
+  ref,
+  toRef,
+  watch,
+} from "vue";
 
-import { TOOLTIP_INJECTION_KEY } from './constants';
-import { tooltipEmits, tooltipProps } from './tooltip';
-import { usePopper } from './use-popper';
+import { useEventListener, useResizeObserver } from "@vueuse/core";
 
-import Content from './Content.vue';
-import Trigger from './Trigger.vue';
+import { useRafThrottle } from "@me-ui/hooks/use-raf-throttle";
 
-defineOptions({ name: 'MeTooltip' });
+import { TOOLTIP_INJECTION_KEY } from "./constants";
+import { tooltipEmits, tooltipProps } from "./tooltip";
+import { usePopper } from "./use-popper";
+
+import Content from "./Content.vue";
+import Trigger from "./Trigger.vue";
+
+defineOptions({ name: "MeTooltip" });
 
 const props = defineProps(tooltipProps);
 const emit = defineEmits(tooltipEmits);
 
 /** v-model:visible 双向绑定 */
-const visibleModel = defineModel<boolean | undefined>('visible', {
-  default: undefined
+const visibleModel = defineModel<boolean | undefined>("visible", {
+  default: undefined,
 });
 
 /** 是否打开 */
@@ -46,7 +56,7 @@ const contentRef = ref<InstanceType<typeof Content>>();
 const triggerRef = computed(() => triggerCompRef.value?.triggerRef);
 
 /** 是否受外部控制 */
-const controlled = computed(() => typeof visibleModel.value === 'boolean');
+const controlled = computed(() => typeof visibleModel.value === "boolean");
 
 /** 显示 */
 function show(_e?: Event) {
@@ -119,18 +129,19 @@ const popperRef = computed(() => contentRef.value?.popperRef);
 const { position, updatePopper } = usePopper(
   triggerRef as any,
   popperRef as any,
-  toRef(props, 'placement'),
+  toRef(props, "placement"),
 );
 
 provide(TOOLTIP_INJECTION_KEY, {
   controlled,
   open: readonly(open),
-  disabled: toRef(props, 'disabled'),
-  trigger: toRef(props, 'trigger'),
-  placement: toRef(props, 'placement'),
-  effect: toRef(props, 'effect'),
-  zIndex: toRef(props, 'zIndex'),
-  popperClass: toRef(props, 'popperClass'),
+  disabled: toRef(props, "disabled"),
+  trigger: toRef(props, "trigger"),
+  placement: toRef(props, "placement"),
+  effect: toRef(props, "effect"),
+  zIndex: toRef(props, "zIndex"),
+  popperClass: toRef(props, "popperClass"),
+  transition: toRef(props, "transition"),
   onOpen: show,
   onClose: hide,
   onToggle: (e: Event) => {
@@ -141,10 +152,10 @@ provide(TOOLTIP_INJECTION_KEY, {
       show(e);
     }
   },
-  onBeforeShow: () => emit('beforeShow'),
-  onBeforeHide: () => emit('beforeHide'),
-  onShow: () => emit('show'),
-  onHide: () => emit('hide'),
+  onBeforeShow: () => emit("beforeShow"),
+  onBeforeHide: () => emit("beforeHide"),
+  onShow: () => emit("show"),
+  onHide: () => emit("hide"),
   updatePopper,
 });
 
@@ -165,11 +176,15 @@ watch(
 );
 
 /** 监听 visible 受控变化 */
-watch(visibleModel, (val) => {
-  if (typeof val === 'boolean') {
-    open.value = val;
-  }
-}, { immediate: true });
+watch(
+  visibleModel,
+  (val) => {
+    if (typeof val === "boolean") {
+      open.value = val;
+    }
+  },
+  { immediate: true },
+);
 
 /** 监听 open 变化，更新位置 */
 watch(
@@ -178,11 +193,11 @@ watch(
     if (val) {
       // 等待两帧确保 v-show 切换后 DOM 布局完成
       requestAnimationFrame(() => {
-          updatePopper();
+        updatePopper();
       });
     }
   },
-  { flush: 'post' },
+  { flush: "post" },
 );
 
 /** 监听 placement 变化，打开状态下自动更新位置 */
@@ -195,35 +210,36 @@ watch(
   },
 );
 
-/** 监听窗口滚动和 resize，更新位置（rAF 节流） */
-let scrollRafId: number | undefined;
-
-function onScroll() {
-  if (!open.value) return;
-  if (scrollRafId !== undefined) cancelAnimationFrame(scrollRafId);
-  scrollRafId = requestAnimationFrame(() => {
-    updatePopper();
-    scrollRafId = undefined;
-  });
-}
-
-onMounted(() => {
-  window.addEventListener('scroll', onScroll, true);
-  window.addEventListener('resize', onScroll);
+/** 滚动/resize 回调：rAF 节流，弹出层不可见时跳过 */
+const { throttled: onScroll } = useRafThrottle(() => {
+  const popperEl = popperRef.value;
+  // 不使用 open.value 判断：页面滚动时 mouseleave 会先于 scroll 将 open 置为 false，
+  // 但此时 tooltip 仍处于淡出过渡中（v-show → display:none 尚未生效），
+  // 若跳过更新会导致 tooltip 在淡出期间停留在旧视口位置不跟随 trigger 滚动。
+  // 改用 offsetWidth === 0 判断实际可见性，过渡期间 offsetWidth > 0 仍会更新位置。
+  if (!popperEl || popperEl.offsetWidth === 0) return;
+  updatePopper();
 });
+
+// capture: true 捕获阶段监听，确保在子元素滚动时也能触发位置更新
+useEventListener(window, "scroll", onScroll, { capture: true });
+useEventListener(window, "resize", onScroll);
+
+/** trigger 尺寸变化回调：rAF 节流，tooltip 未打开时跳过 */
+const { throttled: onTriggerResize } = useRafThrottle(() => {
+  if (!open.value) return;
+  updatePopper();
+});
+
+useResizeObserver(triggerRef, onTriggerResize);
 
 onDeactivated(() => {
   clearShowTimer();
   clearHideTimer();
-  if (open.value) {
-    hide();
-  }
+  doHide();
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('scroll', onScroll, true);
-  window.removeEventListener('resize', onScroll);
-  if (scrollRafId !== undefined) cancelAnimationFrame(scrollRafId);
   clearShowTimer();
   clearHideTimer();
 });
@@ -235,5 +251,8 @@ defineExpose({
   show,
   /** 关闭 */
   hide,
+  /** 判断焦点是否在弹出层内部 */
+  isFocusInsideContent: (event?: FocusEvent) =>
+    contentRef.value?.isFocusInsideContent(event),
 });
 </script>

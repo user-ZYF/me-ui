@@ -15,14 +15,13 @@
     height: 10px;
     z-index: -1;
     pointer-events: none;
+    transform: rotate(45deg);
 
     &::before {
       position: absolute;
-      width: 10px;
-      height: 10px;
+      inset: 0;
       z-index: -1;
       content: '';
-      transform: rotate(45deg);
       box-sizing: border-box;
     }
   }
@@ -94,7 +93,6 @@
     .@{B}__arrow::before {
       background: #303133;
       border: 1px solid #303133;
-      right: 0;
     }
   }
 
@@ -108,7 +106,6 @@
     .@{B}__arrow::before {
       background: @color-white;
       border: 1px solid var(~'@{cv-border-color-light}');
-      right: 0;
     }
   }
 
@@ -122,11 +119,11 @@
 // ========== 过渡动画 ==========
 .@{B}-fade-enter-active,
 .@{B}-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .@{B}-fade-enter-from,
 .@{B}-fade-leave-to {
   opacity: 0;
-  transform: scale(0.95);
 }
+  

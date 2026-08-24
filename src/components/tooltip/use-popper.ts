@@ -104,22 +104,9 @@ export function computePosition(
     actualPlacement = (`left${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
   }
 
-  // 防止水平方向溢出
-  if (left < margin) {
-    left = margin;
-  } else if (left + pw > window.innerWidth - margin) {
-    left = window.innerWidth - pw - margin;
-  }
-
-  // 防止垂直方向溢出
-  if (top < margin) {
-    top = margin;
-  } else if (top + ph > window.innerHeight - margin) {
-    top = window.innerHeight - ph - margin;
-  }
-
-  // 计算箭头副轴位置（居中于 trigger，主轴由 CSS bottom/top/left/right 控制）
   const actualSide = parsePlacement(actualPlacement).side;
+  
+  // 计算箭头副轴位置（居中于 trigger，主轴由 CSS bottom/top/left/right 控制）
   if (actualSide === 'top' || actualSide === 'bottom') {
     arrowLeft = triggerRect.left + tw / 2 - left - arrowSize / 2;
     // clamp 箭头不超出 tooltip 水平边界

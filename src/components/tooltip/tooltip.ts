@@ -71,6 +71,11 @@ export const tooltipProps = {
     type: Number,
     default: 0,
   },
+  /** 过渡动画名称 */
+  transition: {
+    type: String,
+    default: '',
+  },
 } as const;
 
 /** Tooltip Props 类型 */

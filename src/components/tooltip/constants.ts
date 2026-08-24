@@ -20,6 +20,8 @@ export interface TooltipContext {
   zIndex: Ref<number>;
   /** 自定义弹出层类名 */
   popperClass: Ref<string>;
+  /** 过渡动画名称 */
+  transition: Ref<string>;
   /** 打开 */
   onOpen: (e?: Event) => void;
   /** 关闭 */

@@ -2,7 +2,7 @@
 <template>
   <teleport to="body">
     <transition :name="transitionName" @after-leave="onAfterLeave" @before-enter="onBeforeEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave">
-      <div v-show="shouldShow" ref="popperRef" :class="contentClass" :style="popperStyle" role="tooltip" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+      <div v-show="shouldShow" ref="popperRef" :class="contentClass" :style="popperStyle" :data-popper-placement="props.position.placement" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <slot></slot>
         <span :class="ns.e('arrow')" :style="arrowStyle"></span>
       </div>
@@ -18,7 +18,6 @@ import { computed, inject, ref } from 'vue';
 import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { TOOLTIP_INJECTION_KEY } from './constants';
-import { ARROW_SIZE } from './use-popper';
 import type { TooltipPlacement } from './tooltip';
 import { isTriggerType } from './utils';
 
@@ -34,7 +33,7 @@ const props = defineProps({
 
 const ns = useNamespace('tooltip');
 
-const { controlled, open, trigger, effect, zIndex, popperClass, onOpen, onClose, onShow, onHide, onBeforeShow, onBeforeHide } = inject(TOOLTIP_INJECTION_KEY)!;
+const { controlled, open, trigger, effect, zIndex, popperClass, transition, onOpen, onClose, onShow, onHide, onBeforeShow, onBeforeHide } = inject(TOOLTIP_INJECTION_KEY)!;
 
 /** 弹出层元素引用 */
 const popperRef = ref<HTMLElement>();
@@ -43,7 +42,7 @@ const popperRef = ref<HTMLElement>();
 const shouldShow = computed(() => open.value);
 
 /** 过渡动画名称 */
-const transitionName = computed(() => `${ns.namespace}-tooltip-fade`);
+const transitionName = computed(() => transition.value || `${ns.namespace}-tooltip-fade`);
 
 /** 弹出层类名 */
 const contentClass = computed(() => [
@@ -61,20 +60,13 @@ const popperStyle = computed<CSSProperties>(() => ({
   zIndex: zIndex.value,
 }));
 
-/** 箭头样式（主轴 + 副轴均由 JS 计算） */
+/** 箭头样式（仅副轴由 JS 计算，主轴由 CSS 控制） */
 const arrowStyle = computed<CSSProperties>(() => {
   const placement = props.position.placement;
-  const offset = `${-ARROW_SIZE / 2}px`;
-  if (placement.startsWith('top')) {
-    return { left: `${props.position.arrowLeft}px`, bottom: offset };
+  if (placement.startsWith('top') || placement.startsWith('bottom')) {
+    return { left: `${props.position.arrowLeft}px` };
   }
-  if (placement.startsWith('bottom')) {
-    return { left: `${props.position.arrowLeft}px`, top: offset };
-  }
-  if (placement.startsWith('left')) {
-    return { top: `${props.position.arrowTop}px`, right: offset };
-  }
-  return { top: `${props.position.arrowTop}px`, left: offset };
+  return { top: `${props.position.arrowTop}px` };
 });
 
 /** 受控时跳过 */
@@ -118,8 +110,16 @@ function onAfterLeave() {
   onHide();
 }
 
+/** 判断焦点是否在弹出层内部 */
+function isFocusInsideContent(event?: FocusEvent) {
+  const activeElement = (event?.relatedTarget as Node) || document.activeElement;
+  return popperRef.value?.contains(activeElement);
+}
+
 defineExpose({
   /** 弹出层元素引用 */
   popperRef,
+  /** 判断焦点是否在弹出层内部 */
+  isFocusInsideContent,
 });
 </script>
