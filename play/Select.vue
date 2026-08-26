@@ -54,6 +54,32 @@
       </div>
     </section>
 
+    <!-- 自定义筛选 -->
+    <section class="play-section">
+      <h2>自定义筛选</h2>
+      <p class="play-desc">通过 filterMethod 自定义筛选逻辑，支持按城市名或拼音首字母搜索（如输入 "bj" 匹配北京）</p>
+      <div class="play-select-row">
+        <me-select
+          v-model="customFilterValue"
+          filterable
+          :filter-method="customFilterMethod"
+          placeholder="输入城市名或拼音首字母"
+        >
+          <me-option value="beijing" label="北京" />
+          <me-option value="shanghai" label="上海" />
+          <me-option value="guangzhou" label="广州" />
+          <me-option value="shenzhen" label="深圳" />
+          <me-option value="hangzhou" label="杭州" />
+          <me-option value="nanjing" label="南京" />
+          <me-option value="chengdu" label="成都" />
+          <me-option value="wuhan" label="武汉" />
+          <me-option value="xian" label="西安" />
+          <me-option value="chongqing" label="重庆" />
+        </me-select>
+        <span class="play-label">当前值：{{ customFilterValue || '--' }}</span>
+      </div>
+    </section>
+
     <!-- 多选 -->
     <section class="play-section">
       <h2>多选</h2>
@@ -104,25 +130,6 @@
           <me-option value="cpp" label="C++" />
         </me-select>
         <span class="play-label">当前值：{{ maxTagValue.length ? maxTagValue.join(', ') : '--' }}</span>
-      </div>
-    </section>
-
-    <!-- 最大标签数 + 自定义折叠内容 -->
-    <section class="play-section">
-      <h2>最大标签数 + 自定义折叠内容</h2>
-      <p class="play-desc">通过 maxTagPlaceholder 插槽自定义折叠标签的展示内容，插槽接收 { count, items } 作用域参数</p>
-      <div class="play-select-row">
-        <me-select v-model="maxTagSlotValue" multiple :max-tag-count="2" placeholder="最多显示 2 个标签">
-          <me-option value="apple" label="苹果" />
-          <me-option value="banana" label="香蕉" />
-          <me-option value="orange" label="橙子" />
-          <me-option value="grape" label="葡萄" />
-          <me-option value="pear" label="梨" />
-          <template #maxTagPlaceholder="{ count, items }">
-            <span class="play-max-tag-placeholder">还有 {{ count }} 项（{{ items.map((i: any) => i.label).join('、') }}）</span>
-          </template>
-        </me-select>
-        <span class="play-label">当前值：{{ maxTagSlotValue.length ? maxTagSlotValue.join(', ') : '--' }}</span>
       </div>
     </section>
 
@@ -251,41 +258,6 @@
           </me-select>
         </div>
         <span class="play-label">当前值：{{ responsiveFilterValue.length ? responsiveFilterValue.join(', ') : '--' }}</span>
-      </div>
-    </section>
-
-    <!-- 响应式 + 自定义折叠内容 -->
-    <section class="play-section">
-      <h2>响应式 + 自定义折叠内容</h2>
-      <p class="play-desc">responsive 模式下同样支持 maxTagPlaceholder 插槽自定义折叠标签内容</p>
-      <div class="play-responsive-area">
-        <div class="play-responsive-controls">
-          <me-button size="small" @click="responsiveSlotWidth = 200">200px</me-button>
-          <me-button size="small" @click="responsiveSlotWidth = 350">350px</me-button>
-          <me-button size="small" @click="responsiveSlotWidth = 500">500px</me-button>
-          <span class="play-label">当前宽度：{{ responsiveSlotWidth }}px</span>
-        </div>
-        <div class="play-responsive-wrapper" :style="{ width: `${responsiveSlotWidth}px` }">
-          <me-select
-            v-model="responsiveSlotValue"
-            multiple
-            clearable
-            max-tag-count="responsive"
-            placeholder="响应式 + 自定义折叠"
-          >
-            <me-option value="apple" label="苹果" />
-            <me-option value="banana" label="香蕉" />
-            <me-option value="orange" label="橙子" />
-            <me-option value="grape" label="葡萄" />
-            <me-option value="pear" label="梨" />
-            <me-option value="cherry" label="樱桃" />
-            <me-option value="mango" label="芒果" />
-            <template #maxTagPlaceholder="{ count }">
-              <span class="play-max-tag-placeholder">+{{ count }} 水果</span>
-            </template>
-          </me-select>
-        </div>
-        <span class="play-label">当前值：{{ responsiveSlotValue.length ? responsiveSlotValue.join(', ') : '--' }}</span>
       </div>
     </section>
 
@@ -573,14 +545,37 @@ const singleValue = ref('');
 const defaultValue = ref('b');
 /** 可搜索 */
 const filterValue = ref('');
+/** 自定义筛选 */
+const customFilterValue = ref('');
+/** 城市拼音首字母映射 */
+const pinyinMap: Record<string, string> = {
+  beijing: 'bj',
+  shanghai: 'sh',
+  guangzhou: 'gz',
+  shenzhen: 'sz',
+  hangzhou: 'hz',
+  nanjing: 'nj',
+  chengdu: 'cd',
+  wuhan: 'wh',
+  xian: 'xa',
+  chongqing: 'cq',
+};
+
+/** 自定义筛选函数：按城市名或拼音首字母匹配 */
+function customFilterMethod(query: string, option: { value: OptionValue; label: string | number }): boolean {
+  const q = query.toLowerCase();
+  const labelStr = String(option.label).toLowerCase();
+  const valueStr = String(option.value).toLowerCase();
+  const pinyin = pinyinMap[String(option.value)] ?? '';
+  return labelStr.includes(q) || valueStr.includes(q) || pinyin.includes(q);
+}
+
 /** 多选 */
 const multiValue = ref<string[]>(['ts']);
 /** 多选 + 可搜索 */
 const multiFilterValue = ref<string[]>([]);
 /** 最大标签数 */
 const maxTagValue = ref<string[]>(['ts', 'py', 'go', 'rust']);
-/** 最大标签数 + 自定义折叠内容 */
-const maxTagSlotValue = ref<string[]>(['apple', 'banana', 'orange', 'grape']);
 /** 最大标签数为 0 */
 const maxTagZeroValue = ref<string[]>(['ts', 'py', 'go']);
 /** 最大标签数 + 可搜索 */
@@ -595,10 +590,6 @@ const responsiveWidth = ref(300);
 const responsiveFilterValue = ref<string[]>(['react', 'vue', 'angular', 'svelte', 'solid']);
 /** 响应式 + 可搜索容器宽度 */
 const responsiveFilterWidth = ref(350);
-/** 响应式 + 自定义折叠内容 */
-const responsiveSlotValue = ref<string[]>(['apple', 'banana', 'orange', 'grape', 'pear', 'cherry']);
-/** 响应式 + 自定义折叠内容容器宽度 */
-const responsiveSlotWidth = ref(350);
 /** 可清空 */
 const clearValue = ref('');
 /** 禁用 */
@@ -784,11 +775,6 @@ function onRemoveTagEvent(value: OptionValue) {
 
 .play-prefix-text {
   font-size: 13px;
-  color: #909399;
-}
-
-.play-max-tag-placeholder {
-  font-size: 12px;
   color: #909399;
 }
 

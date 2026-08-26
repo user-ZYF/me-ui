@@ -221,16 +221,17 @@ const { throttled: onScroll } = useRafThrottle(() => {
   updatePopper();
 });
 
-// capture: true 捕获阶段监听，确保在子元素滚动时也能触发位置更新
+// capture: true 捕获阶段监听，确保在子元素滚动时也能触发位置更新，useEventListener 不保证每帧最多触发一次回调
 useEventListener(window, "scroll", onScroll, { capture: true });
 useEventListener(window, "resize", onScroll);
 
-/** trigger 尺寸变化回调：rAF 节流，tooltip 未打开时跳过 */
-const { throttled: onTriggerResize } = useRafThrottle(() => {
+/** trigger 尺寸变化回调：tooltip 未打开时跳过 */
+function onTriggerResize() {
   if (!open.value) return;
   updatePopper();
-});
+}
 
+// ResizeObserver 保证每帧最多触发一次回调
 useResizeObserver(triggerRef, onTriggerResize);
 
 onDeactivated(() => {

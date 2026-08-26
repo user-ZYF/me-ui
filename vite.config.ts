@@ -27,6 +27,7 @@ export default defineConfig(({ command }) => ({
         'config-provider': resolve(__dirname, 'src/components/config-provider/index.ts'),
         'form': resolve(__dirname, 'src/components/form/index.ts'),
         'radio': resolve(__dirname, 'src/components/radio/index.ts'),
+        'select': resolve(__dirname, 'src/components/select/index.ts'),
         'scrollbar': resolve(__dirname, 'src/components/scrollbar/index.ts'),
         'tooltip': resolve(__dirname, 'src/components/tooltip/index.ts'),
       },

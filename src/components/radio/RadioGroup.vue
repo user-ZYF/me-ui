@@ -1,6 +1,6 @@
 <!-- ? RadioGroup 单选框组 -->
 <template>
-  <div :class="ns.b.value" role="radiogroup">
+  <div :class="ns.b.value">
     <slot />
   </div>
 </template>

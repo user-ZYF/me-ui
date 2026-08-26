@@ -1,0 +1,341 @@
+@B: ~'@{namespace}-select';
+@BD: ~'@{namespace}-select-dropdown';
+
+// ========== Select 触发器 ==========
+.@{B} {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  width: 100%;
+
+  // 让 Tooltip 的 trigger span 撑满宽度
+  .@{namespace}-tooltip__trigger {
+    display: block;
+    width: 100%;
+  }
+
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    box-sizing: border-box;
+    cursor: pointer;
+    text-align: left;
+    font-size: var(~'@{cv-font-size-base}');
+    padding: 0 12px;
+    min-height: var(~'@{cv-component-size-default}');
+    line-height: var(~'@{cv-component-size-default}');
+    border-radius: var(~'@{cv-border-radius-base}');
+    background-color: @color-white;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transform: translateZ(0);
+    box-shadow: 0 0 0 1px var(~'@{cv-border-color}') inset;
+
+    &.is-filterable {
+      cursor: text;
+    }
+
+    &.is-focused {
+      box-shadow: 0 0 0 1px var(~'@{cv-color-primary}') inset;
+    }
+
+    &.is-hovering:not(.is-focused) {
+      box-shadow: 0 0 0 1px var(~'@{cv-border-color-light}') inset;
+    }
+
+    &.is-disabled {
+      cursor: not-allowed;
+      background-color: var(~'@{cv-border-color-extra-light}');
+      color: var(~'@{cv-text-color-placeholder}');
+      box-shadow: 0 0 0 1px var(~'@{cv-border-color-lighter}') inset;
+
+      .@{B}__caret {
+        cursor: not-allowed;
+      }
+
+      .@{B}__prefix,
+      .@{B}__suffix {
+        pointer-events: none;
+      }
+    }
+  }
+
+  &__prefix {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-right: 8px;
+    color: var(~'@{cv-text-color-secondary}');
+  }
+
+  &__suffix {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: 8px;
+    color: var(~'@{cv-text-color-secondary}');
+  }
+
+  &__caret {
+    color: var(~'@{cv-text-color-secondary}');
+    font-size: var(~'@{cv-font-size-base}');
+    transition: transform 0.2s ease;
+    transform: rotateZ(0deg);
+    cursor: pointer;
+
+    &.is-reverse {
+      transform: rotateZ(180deg);
+    }
+  }
+
+  &__clear {
+    cursor: pointer;
+
+    &:hover {
+      color: var(~'@{cv-text-color-regular}');
+    }
+  }
+
+  &__selection {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    min-height: var(~'@{cv-component-size-default}');
+    padding: 4px 0 0 0;
+
+    .@{namespace}-tag {
+      cursor: pointer;
+      border-color: transparent;
+    }
+
+    &.is-responsive {
+      flex-wrap: nowrap;
+      overflow: hidden;
+
+      .@{B}__selected-item {
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  &__selected-item {
+    display: flex;
+    flex-wrap: wrap;
+    user-select: none;
+    margin: 0 4px 4px 0;
+  }
+
+  &__tags-text {
+    display: block;
+    line-height: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__tag-overflow {
+    .@{namespace}-tag {
+      cursor: default;
+    }
+  }
+
+  &__measure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 4px 0 0 0;
+  }
+
+  &__placeholder {
+    position: absolute;
+    z-index: -1;
+    display: block;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(~'@{cv-text-color-regular}');
+
+    &.is-transparent {
+      user-select: none;
+      color: var(~'@{cv-text-color-placeholder}');
+    }
+  }
+
+  &__input-wrapper {
+    flex: 1;
+    min-width: 0;
+
+    &.is-hidden {
+      position: absolute;
+      opacity: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+  }
+
+  &__input {
+    border: none;
+    outline: none;
+    padding: 0;
+    color: var(~'@{cv-text-color-regular}');
+    font-size: inherit;
+    font-family: inherit;
+    appearance: none;
+    height: 24px;
+    width: 100%;
+    background-color: transparent;
+
+    &::placeholder {
+      color: var(~'@{cv-text-color-placeholder}');
+    }
+  }
+
+  // ========== 尺寸 ==========
+  &--large {
+    .@{B}__wrapper {
+      min-height: var(~'@{cv-component-size-large}');
+      line-height: var(~'@{cv-component-size-large}');
+      font-size: var(~'@{cv-font-size-medium}');
+    }
+
+    .@{B}__selection {
+      min-height: var(~'@{cv-component-size-large}');
+    }
+
+    .@{B}__input {
+      height: 28px;
+    }
+  }
+
+  &--small {
+    .@{B}__wrapper {
+      min-height: var(~'@{cv-component-size-small}');
+      line-height: var(~'@{cv-component-size-small}');
+      font-size: var(~'@{cv-font-size-small}');
+    }
+
+    .@{B}__selection {
+      min-height: var(~'@{cv-component-size-small}');
+    }
+
+    .@{B}__input {
+      height: 20px;
+    }
+  }
+}
+
+// ========== Select 下拉菜单（通过 popperClass 添加到 Tooltip 弹出层） ==========
+.@{B}__popper {
+  // 覆盖 Tooltip 默认的 tooltip 样式
+  padding: 0;
+  font-size: var(~'@{cv-font-size-base}');
+  line-height: normal;
+  border-radius: var(~'@{cv-border-radius-base}');
+  box-sizing: border-box;
+  background-color: @color-white;
+  border: 1px solid var(~'@{cv-border-color-light}');
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.@{BD} {
+  &__list {
+    padding: 6px 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  &__empty {
+    padding: 10px 0;
+    margin: 0;
+    text-align: center;
+    color: var(~'@{cv-text-color-placeholder}');
+    font-size: var(~'@{cv-font-size-base}');
+  }
+
+  &__item {
+    font-size: var(~'@{cv-font-size-base}');
+    padding: 0 32px 0 20px;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(~'@{cv-text-color-regular}');
+    height: 34px;
+    line-height: 34px;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    &:hover:not(.is-disabled) {
+      background-color: var(~'@{cv-border-color-extra-light}');
+    }
+
+    &.is-selected {
+      color: var(~'@{cv-color-primary}');
+      font-weight: 700;
+    }
+
+    &.is-disabled {
+      color: var(~'@{cv-text-color-disabled}');
+      cursor: not-allowed;
+      background-color: unset;
+    }
+  }
+
+  // 多选模式选中项的对勾
+  &.is-multiple {
+    .@{BD}__item.is-selected {
+      padding-right: 20px;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        width: 8px;
+        height: 4px;
+        border-left: 2px solid var(~'@{cv-color-primary}');
+        border-bottom: 2px solid var(~'@{cv-color-primary}');
+        border-right: none;
+        border-top: none;
+        background: none;
+        mask: none;
+        -webkit-mask: none;
+        transform: translateY(-65%) rotate(-45deg);
+        transform-origin: center;
+      }
+    }
+  }
+}
+
+// ========== zoom-in-top 过渡动画（与 Element Plus 官方一致） ==========
+.@{namespace}-zoom-in-top-enter-active,
+.@{namespace}-zoom-in-top-leave-active {
+  opacity: 1;
+  transform: scaleY(1);
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-origin: center top;
+
+  &[data-popper-placement^='top'] {
+    transform-origin: center bottom;
+  }
+}
+
+.@{namespace}-zoom-in-top-enter-from,
+.@{namespace}-zoom-in-top-leave-active {
+  opacity: 0;
+  transform: scaleY(0);
+}

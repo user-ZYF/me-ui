@@ -1,6 +1,6 @@
 <!-- ? CheckboxGroup 多选框组 -->
 <template>
-  <div :class="ns.b.value" role="group">
+  <div :class="ns.b.value">
     <slot />
   </div>
 </template>
