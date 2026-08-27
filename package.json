@@ -82,6 +82,7 @@
     "@typescript-eslint/parser": "^8.67.0",
     "@vitejs/plugin-vue": "^5.1.0",
     "@vue/test-utils": "^2.4.6",
+    "ant-design-vue": "^4.2.6",
     "eslint": "^10.9.0",
     "eslint-plugin-vue": "^10.10.0",
     "jsdom": "^24.1.0",
@@ -97,6 +98,7 @@
     "@vueuse/core": "^14.4.0",
     "async-validator": "^4.2.5",
     "element-plus": "^2.14.4",
+    "js-easing-functions": "^1.0.3",
     "lodash": "^4.18.1",
     "lodash-unified": "^1.0.3",
     "uuid": "^14.0.1"

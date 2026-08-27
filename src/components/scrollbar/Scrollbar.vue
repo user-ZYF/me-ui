@@ -95,6 +95,8 @@ function update() {
   const scrollHeight = wrap.scrollHeight;
   const scrollWidth = wrap.scrollWidth;
 
+  if (scrollHeight === 0 || scrollWidth === 0) return;
+
   // 计算垂直滚动条滑块高度百分比
   const heightRatio = offsetHeight / scrollHeight;
   const thumbHeight = Math.max(heightRatio * 100, MIN_THUMB_SIZE);
@@ -104,6 +106,9 @@ function update() {
   const widthRatio = offsetWidth / scrollWidth;
   const thumbWidth = Math.max(widthRatio * 100, MIN_THUMB_SIZE);
   sizeWidth.value = thumbWidth < 100 ? `${thumbWidth}%` : '';
+
+  // 同步更新滑块位置，避免内容尺寸变化后位置突变
+  setScrollPosition();
 }
 
 /** 更新滑块移动位置 */
@@ -154,16 +159,24 @@ function onHorizontalScroll(scrollPercentage: number) {
 }
 
 /** 设置滚动位置到顶部 */
-function setScrollTop(value: number) {
+function setScrollTop(value: number, smooth = false) {
   if (wrapRef.value) {
-    wrapRef.value.scrollTop = value;
+    if (smooth) {
+      wrapRef.value.scrollTo({ top: value, behavior: 'smooth' });
+    } else {
+      wrapRef.value.scrollTop = value;
+    }
   }
 }
 
 /** 设置滚动位置到左侧 */
-function setScrollLeft(value: number) {
+function setScrollLeft(value: number, smooth = false) {
   if (wrapRef.value) {
-    wrapRef.value.scrollLeft = value;
+    if (smooth) {
+      wrapRef.value.scrollTo({ left: value, behavior: 'smooth' });
+    } else {
+      wrapRef.value.scrollLeft = value;
+    }
   }
 }
 
@@ -172,10 +185,7 @@ onBeforeUnmount(() => {
 });
 
 onMounted(() => {
-  nextTick(() => {
-    update();
-    setScrollPosition();
-  });
+  nextTick(update);
 });
 
 defineExpose({

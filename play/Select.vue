@@ -531,6 +531,89 @@
         <span class="play-label">当前值：{{ largeValue ?? '--' }}</span>
       </div>
     </section>
+
+    <!-- 虚拟滚动：options prop + option 插槽 -->
+    <section class="play-section">
+      <h2>虚拟滚动 - options + option 插槽</h2>
+      <p class="play-desc">通过 options 传入 10000 条数据，启用 virtual 虚拟滚动，使用 #option 插槽自定义渲染</p>
+      <div class="play-select-row">
+        <me-select
+          v-model="virtualDataValue"
+          :options="virtualOptions"
+          virtual
+          filterable
+          :list-height="274"
+          :list-item-height="34"
+          style="width: 400px"
+          placeholder="请选择（10000 项虚拟滚动）"
+        >
+          <template #option="{ item }">
+            <div class="play-virtual-option">
+              <span class="play-virtual-option-icon">{{ String(item.label).charAt(0) }}</span>
+              <span class="play-virtual-option-text">{{ item.label }}</span>
+              <span class="play-virtual-option-id">#{{ item.value }}</span>
+            </div>
+          </template>
+        </me-select>
+        <span class="play-label">当前值：{{ virtualDataValue ?? '--' }}</span>
+      </div>
+    </section>
+
+    <!-- 虚拟滚动：me-option 子组件 + 自定义内容 -->
+    <section class="play-section">
+      <h2>虚拟滚动 - me-option 子组件</h2>
+      <p class="play-desc">使用 me-option 子组件传入选项，自定义内容渲染（普通滚动模式）</p>
+      <div class="play-select-row">
+        <me-select
+          v-model="virtualSlotValue"
+          filterable
+          style="width: 400px"
+          placeholder="请选择（me-option 自定义内容）"
+        >
+          <me-option
+            v-for="item in virtualSlotOptions"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          >
+            <div class="play-virtual-option">
+              <span class="play-virtual-option-icon">{{ String(item.label).charAt(0) }}</span>
+              <span class="play-virtual-option-text">{{ item.label }}</span>
+              <span class="play-virtual-option-id">#{{ item.value }}</span>
+            </div>
+          </me-option>
+        </me-select>
+        <span class="play-label">当前值：{{ virtualSlotValue ?? '--' }}</span>
+      </div>
+    </section>
+
+    <!-- 虚拟滚动：多选 -->
+    <section class="play-section">
+      <h2>虚拟滚动 - 多选</h2>
+      <p class="play-desc">多选模式 + 虚拟滚动 + option 插槽自定义渲染</p>
+      <div class="play-select-row">
+        <me-select
+          v-model="virtualMultiValue"
+          :options="virtualOptions"
+          virtual
+          multiple
+          filterable
+          :list-height="274"
+          :list-item-height="34"
+          style="width: 500px"
+          placeholder="请选择（多选 + 虚拟滚动）"
+        >
+          <template #option="{ item }">
+            <div class="play-virtual-option">
+              <span class="play-virtual-option-icon">{{ String(item.label).charAt(0) }}</span>
+              <span class="play-virtual-option-text">{{ item.label }}</span>
+              <span class="play-virtual-option-id">#{{ item.value }}</span>
+            </div>
+          </template>
+        </me-select>
+        <span class="play-label">当前值：{{ virtualMultiValue.length ? virtualMultiValue.join(', ') : '--' }}</span>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -614,6 +697,34 @@ const popperValue = ref('');
 const eventValue = ref<string[]>([]);
 /** 大数据量 */
 const largeValue = ref<number | undefined>(undefined);
+
+/** 虚拟滚动选项数据类型 */
+interface VirtualOption {
+  value: number;
+  label: string;
+  disabled?: boolean;
+}
+
+/** 生成虚拟滚动测试数据 */
+function generateVirtualOptions(count: number): VirtualOption[] {
+  return Array.from({ length: count }, (_, i) => ({
+    value: i + 1,
+    label: `选项 ${String(i + 1).padStart(5, '0')}`,
+    disabled: (i + 1) % 100 === 0,
+  }));
+}
+
+/** 虚拟滚动 - options 模式数据（10000 条） */
+const virtualOptions = ref(generateVirtualOptions(10000));
+/** 虚拟滚动 - options 模式选中值 */
+const virtualDataValue = ref<number | undefined>(undefined);
+/** 虚拟滚动 - me-option 子组件模式数据（100 条） */
+const virtualSlotOptions = ref(generateVirtualOptions(100));
+/** 虚拟滚动 - me-option 子组件模式选中值 */
+const virtualSlotValue = ref<number | undefined>(undefined);
+/** 虚拟滚动 - 多选模式选中值 */
+const virtualMultiValue = ref<number[]>([]);
+
 /** placement - top */
 const placementTopValue = ref('');
 /** placement - top-start */
@@ -819,6 +930,38 @@ function onRemoveTagEvent(value: OptionValue) {
 
 .play-event-log-empty {
   color: #c0c4cc;
+}
+
+.play-virtual-option {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.play-virtual-option-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  border-radius: 4px;
+  background: #e6f4ff;
+  color: #1677ff;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.play-virtual-option-text {
+  flex: 1;
+  font-size: 14px;
+}
+
+.play-virtual-option-id {
+  color: #bbb;
+  font-size: 12px;
+  font-family: monospace;
 }
 </style>
 
