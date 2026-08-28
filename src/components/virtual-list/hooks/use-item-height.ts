@@ -1,11 +1,23 @@
 import { ref, watch } from 'vue';
-import type { Ref, ShallowRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 
 import { useRafThrottle } from '@me-ui/hooks/use-raf-throttle';
 import type { ItemKey } from '../types';
 
 /** 高度缓存 */
 export type HeightCache = Map<any, number>;
+
+/** 高度变化信息 */
+export interface HeightChange {
+  /** 项目索引 */
+  index: number;
+  /** 项目 key */
+  key: any;
+  /** 旧高度 */
+  oldHeight: number;
+  /** 新高度 */
+  newHeight: number;
+}
 
 /** 高度收集返回值 */
 export interface HeightCollection<T> {
@@ -15,6 +27,10 @@ export interface HeightCollection<T> {
   collectHeight: (sync?: boolean) => void;
   /** 高度缓存 */
   heights: HeightCache;
+  /** 获取项高度，未缓存时回退到 itemHeight */
+  getItemHeight: (key: any) => number;
+  /** 判断项高度是否已缓存 */
+  isHeightCached: (key: any) => boolean;
   /** 更新标记（变化时触发重新计算） */
   heightUpdateMark: Ref<symbol>;
 }
@@ -25,21 +41,28 @@ export interface HeightCollection<T> {
  * @param getItemKey 获取项 key 的函数
  */
 export function useItemHeights<T>(
-  data: ShallowRef<any[]>,
+  data: ComputedRef<any[]>,
   getItemKey: ItemKey<T>,
+  itemHeight: number,
+  onResize: (changes: HeightChange[]) => void,
 ): HeightCollection<T> {
   /** DOM 实例缓存 */
   const itemRefs = new Map<any, HTMLElement>();
   /** 高度缓存 */
   const heights = new Map<any, number>();
+  /** key → index 映射 */
+  const keyToIndex = new Map<any, number>();
   /** 更新标记 */
   const heightUpdateMark = ref(Symbol('height-update'));
 
   watch(data, () => {
-    /** 清理不再存在的高度缓存和 DOM 引用，避免 key 复用时使用过期缓存 */
+    // 清理不再存在的高度缓存和 DOM 引用，避免 key 复用时使用过期缓存
     const currentKeys = new Set<any>();
-    for (const item of data.value) {
-      currentKeys.add(getItemKey(item));
+    keyToIndex.clear();
+    for (let i = 0; i < data.value.length; i++) {
+      const key = getItemKey(data.value[i]);
+      currentKeys.add(key);
+      keyToIndex.set(key, i);
     }
     /** 删除过期的高度缓存 */
     for (const key of heights.keys()) {
@@ -54,20 +77,30 @@ export function useItemHeights<T>(
       }
     }
     heightUpdateMark.value = Symbol('height-update');
-  });
+  }, { immediate: true });
 
   /** 遍历 DOM 实例，收集实际高度 */
   function doCollectHeight() {
+    // 批量收集高度变化，避免逐项回调导致 O(n²)
+    const changes: HeightChange[] = [];
     itemRefs.forEach((el, key) => {
       if (el && el.isConnected) {
         const { offsetHeight } = el;
+        const prevHeight = heights.get(key);
         // TODO: 增加 dirty 标记，仅在 item 挂载/卸载时标记为脏，避免无变化时遍历所有可见 DOM 读取 offsetHeight 导致重排
-        if (heights.get(key) !== offsetHeight) {
+        if (prevHeight !== offsetHeight) {
           heightUpdateMark.value = Symbol('height-update');
           heights.set(key, offsetHeight);
+          const index = keyToIndex.get(key);
+          if (index !== undefined) {
+            changes.push({ index, key, oldHeight: prevHeight ?? itemHeight, newHeight: offsetHeight });
+          }
         }
       }
     });
+    if (changes.length > 0) {
+      onResize(changes);
+    }
   }
 
   /** rAF 节流版本，用于异步收集 */
@@ -100,10 +133,22 @@ export function useItemHeights<T>(
     }
   }
 
+  /** 获取项高度，未缓存时回退到 itemHeight */
+  function getItemHeight(key: any): number {
+    return heights.get(key) ?? itemHeight;
+  }
+
+  /** 判断项高度是否已缓存 */
+  function isHeightCached(key: any): boolean {
+    return heights.has(key);
+  }
+
   return {
     setItemRef,
     collectHeight,
     heights,
+    getItemHeight,
+    isHeightCached,
     heightUpdateMark,
   };
 }

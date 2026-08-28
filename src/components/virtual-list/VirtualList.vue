@@ -29,6 +29,7 @@ import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { virtualListEmits, virtualListProps } from './virtual-list';
 import { useItemHeights } from './hooks/use-item-height';
+import type { HeightChange } from './hooks/use-item-height';
 import { useScrollTo } from './hooks/use-scroll-to';
 import type { ItemKey, ScrollTo, VisibleRange } from './types';
 
@@ -61,17 +62,7 @@ const scrollTop = ref(0);
 const isAtBottom = ref(false);
 
 /** 数据源 */
-const items = shallowRef<any[]>([]);
-
-watch(
-  () => props.data,
-  () => {
-    items.value = props.data ?? [];
-    // 数据变化后重置滚动位置，避免旧 scrollTop 与新内容高度不匹配导致滚动条瞬移
-    setScrollTop(0);
-  },
-  { immediate: true },
-);
+const items = computed(() => props.data);
 
 /** itemKey 解析函数 */
 const resolveKey = shallowRef<ItemKey>((_item: Record<string, any>) => undefined as any);
@@ -97,8 +88,37 @@ function getItemKey(item: Record<string, any>) {
   return key;
 }
 
+/** 是否正在执行补偿，用于过滤补偿引起的假滚动事件 */
+let isCompensating = false;
+
+/** 待消费的 jump 值（上方项目高度差累积，用于补偿 scrollTop） */
+let pendingJump = 0;
+
+/** 高度变化时批量计算 jump：只对顶部在可视区域上方的项目累积高度差 */
+function onResize(changes: HeightChange[]) {
+  /** 按 index 排序，复用已计算的 itemTop 作为起点 */
+  const sorted = [...changes].sort((a, b) => a.index - b.index);
+  let prevIndex = 0;
+  let itemTop = 0;
+  for (const change of sorted) {
+    for (let i = prevIndex; i < change.index; i += 1) {
+      const key = getItemKey(items.value[i]);
+      itemTop += getItemHeight(key);
+    }
+    prevIndex = change.index;
+    if (itemTop < scrollTop.value) {
+      pendingJump += change.newHeight - change.oldHeight;
+    }
+  }
+}
+
 /** 高度收集 */
-const { setItemRef, collectHeight, heights, heightUpdateMark } = useItemHeights(items, getItemKey);
+const { setItemRef, collectHeight, getItemHeight, isHeightCached, heightUpdateMark } = useItemHeights(
+  items,
+  getItemKey,
+  props.itemHeight ?? 0,
+  onResize,
+);
 
 /** 可见区间计算结果 */
 const visibleRange = reactive<VisibleRange>({
@@ -169,10 +189,7 @@ watch(
       const item = data[i];
       const key = getItemKey(item);
 
-      let cachedHeight = heights.get(key);
-      if (cachedHeight === undefined) {
-        cachedHeight = itemHeight!;
-      }
+      const cachedHeight = getItemHeight(key);
       const itemBottom = itemTop + cachedHeight;
 
       if (startIndex === undefined && itemBottom >= visibleTop) {
@@ -198,6 +215,13 @@ watch(
 
     endIndex = Math.min(endIndex, itemCount - 1);
 
+    // 消费pendingJump，补偿scrollTop，避免跳变
+    if (pendingJump !== 0) {
+      isCompensating = true;
+      setScrollTop(scrollTop.value + pendingJump);
+      pendingJump = 0;
+    }
+
     Object.assign(visibleRange, {
       totalHeight: itemTop,
       startIndex,
@@ -210,6 +234,11 @@ watch(
 
 /** 滚动事件处理 */
 function onScroll(top: number) {
+  // 补偿引起的假滚动，不向外部抛出事件
+  if (isCompensating) {
+    isCompensating = false;
+    return;
+  }
   scrollTop.value = top;
   const wrap = scrollbarRef.value?.wrapRef;
   if (wrap) {
@@ -248,8 +277,8 @@ function setScrollTop(top: number) {
 const scrollTo: ScrollTo = useScrollTo({
   containerRef: scrollbarRef,
   data: items,
-  heights,
-  itemHeight: props.itemHeight ?? 0,
+  getItemHeight,
+  isHeightCached,
   getItemKey: getItemKey,
   collectHeight,
   setScrollTop,

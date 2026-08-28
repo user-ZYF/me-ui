@@ -1,11 +1,10 @@
-import type { Ref, ShallowRef } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
 import { onBeforeUnmount } from 'vue';
 import { easeOutQuint } from 'js-easing-functions';
 
 import type { MeScrollbar } from '@me-ui/components/scrollbar';
 import { isScrollToIndex, isScrollToKey } from '../types';
 import type { ItemKey, ScrollAlign, ScrollConfig, ScrollTo } from '../types';
-import type { HeightCache } from './use-item-height';
 
 /** 目标项位置计算结果 */
 export interface ItemPosition {
@@ -22,11 +21,11 @@ export interface ScrollToOptions {
   /** MeScrollbar 组件实例引用 */
   containerRef: Ref<InstanceType<typeof MeScrollbar> | undefined>;
   /** 数据源 */
-  data: ShallowRef<any[]>;
-  /** 高度缓存 */
-  heights: HeightCache;
-  /** 每项预估高度 */
-  itemHeight: number;
+  data: ComputedRef<any[]>;
+  /** 获取项高度，未缓存时回退到 itemHeight */
+  getItemHeight: (key: any) => number;
+  /** 判断项高度是否已缓存 */
+  isHeightCached: (key: any) => boolean;
   /** 获取项 key 的函数 */
   getItemKey: ItemKey<any>;
   /** 收集高度函数 */
@@ -39,7 +38,7 @@ export interface ScrollToOptions {
  * 创建 scrollTo 函数，支持滚动到指定索引或 key
  */
 export function useScrollTo(options: ScrollToOptions): ScrollTo {
-  const { containerRef, data, heights, itemHeight, getItemKey, collectHeight, setScrollTop } = options;
+  const { containerRef, data, getItemHeight, isHeightCached, getItemKey, collectHeight, setScrollTop } = options;
 
   let rafId: number | undefined;
   /** 平滑滚动动画 ID */
@@ -65,10 +64,9 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
     for (let i = 0; i <= maxLen; i += 1) {
       const key = getItemKey(items[i]);
       itemTop = itemBottom;
-      const cachedHeight = heights.get(key);
-      itemBottom = itemTop + (cachedHeight === undefined ? itemHeight : cachedHeight);
+      itemBottom = itemTop + getItemHeight(key);
 
-      if (i === index && cachedHeight === undefined) {
+      if (i === index && !isHeightCached(key)) {
         hasUncachedHeight = true;
       }
     }
@@ -229,8 +227,11 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
     }
 
     if (arg && typeof arg === 'object') {
-      /** itemHeight 为 0 时（非虚拟模式），高度全部依赖缓存，无需预估回退 */
-      if (!itemHeight) {
+      if (items.length === 0) return;
+
+      /** itemHeight 为 0 时（非虚拟模式），高度全部依赖缓存，需同步收集 */
+      const firstKey = getItemKey(items[0]);
+      if (!isHeightCached(firstKey) && !getItemHeight(firstKey)) {
         collectHeight(true);
       }
 

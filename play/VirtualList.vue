@@ -202,6 +202,7 @@
           :height="400"
           :item-height="100"
           item-key="id"
+          @scroll="onVariableScrollEvent"
         >
           <template #default="{ item, index }">
             <div
@@ -221,6 +222,7 @@
           </template>
         </me-virtual-list>
       </div>
+      <p class="play-label">当前 scrollTop：{{ variableScrollTop }}px</p>
     </section>
   </div>
 </template>
@@ -397,6 +399,14 @@ const variableData = ref(generateVariableData(500));
 
 /** 可变高度列表引用 */
 const variableListRef = ref<InstanceType<typeof MeVirtualList>>();
+
+/** 可变高度列表当前 scrollTop */
+const variableScrollTop = ref(0);
+
+/** 可变高度列表滚动事件 */
+function onVariableScrollEvent(scrollTop: number) {
+  variableScrollTop.value = scrollTop;
+}
 
 /**
  * 定位到指定索引（可变高度）
