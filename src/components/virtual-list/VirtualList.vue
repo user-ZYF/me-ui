@@ -1,15 +1,14 @@
 <!-- ? 虚拟列表组件 -->
 <template>
   <div :class="ns.b.value">
-    <me-scrollbar
-      ref="scrollbarRef"
-      :height="height"
-      @scroll="onScroll"
-    >
+    <me-scrollbar ref="scrollbarRef" :height="height" @scroll="onScroll">
       <!-- 填充层：撑开虚拟总高度，可见项通过 translateY 偏移 -->
       <div :style="fillerStyle">
         <div :style="contentStyle" :class="ns.e('content')">
-          <template v-for="(item, index) in visibleItems" :key="getItemKey(item)">
+          <template
+            v-for="(item, index) in visibleItems"
+            :key="getItemKey(item)"
+          >
             <div :ref="(el) => setItemRef(item, el as HTMLElement | null)">
               <slot :item="item" :index="startIndex + index"></slot>
             </div>
@@ -21,24 +20,24 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref, shallowRef, watch } from 'vue';
-import type { CSSProperties } from 'vue';
+import { computed, reactive, ref, shallowRef, watch } from "vue";
+import type { CSSProperties } from "vue";
 
-import MeScrollbar from '@me-ui/components/scrollbar';
-import { useNamespace } from '@me-ui/hooks/use-namespace';
+import MeScrollbar from "@me-ui/components/scrollbar";
+import { useNamespace } from "@me-ui/hooks/use-namespace";
 
-import { virtualListEmits, virtualListProps } from './virtual-list';
-import { useItemHeights } from './hooks/use-item-height';
-import type { HeightChange } from './hooks/use-item-height';
-import { useScrollTo } from './hooks/use-scroll-to';
-import type { ItemKey, ScrollTo, VisibleRange } from './types';
+import { virtualListEmits, virtualListProps } from "./virtual-list";
+import { useItemHeights } from "./hooks/use-item-height";
+import type { HeightChange } from "./hooks/use-item-height";
+import { useScrollTo } from "./hooks/use-scroll-to";
+import type { ItemKey, ScrollTo, VisibleRange } from "./types";
 
-defineOptions({ name: 'MeVirtualList', inheritAttrs: false });
+defineOptions({ name: "MeVirtualList", inheritAttrs: false });
 
 const props = defineProps(virtualListProps);
 const emit = defineEmits(virtualListEmits);
 
-const ns = useNamespace('virtual-list');
+const ns = useNamespace("virtual-list");
 
 /** MeScrollbar 引用 */
 const scrollbarRef = ref<InstanceType<typeof MeScrollbar>>();
@@ -52,7 +51,13 @@ const isVirtual = computed(() => {
 /** 是否真正进入虚拟模式（数据量超过容器高度） */
 const isVirtualActive = computed(() => {
   const { height, itemHeight, data } = props;
-  return isVirtual.value && data && itemHeight && data.length > 0 && itemHeight * data.length > (height || 0);
+  return (
+    isVirtual.value &&
+    data &&
+    itemHeight &&
+    data.length > 0 &&
+    itemHeight * data.length > (height || 0)
+  );
 });
 
 /** 当前滚动位置 */
@@ -65,12 +70,14 @@ const isAtBottom = ref(false);
 const items = computed(() => props.data);
 
 /** itemKey 解析函数 */
-const resolveKey = shallowRef<ItemKey>((_item: Record<string, any>) => undefined as any);
+const resolveKey = shallowRef<ItemKey>(
+  (_item: Record<string, any>) => undefined as any,
+);
 
 watch(
   () => props.itemKey,
   (val) => {
-    if (typeof val === 'function') {
+    if (typeof val === "function") {
       resolveKey.value = val;
     } else {
       resolveKey.value = (item: Record<string, any>) => item?.[val];
@@ -82,8 +89,14 @@ watch(
 /** 获取列表项 key */
 function getItemKey(item: Record<string, any>) {
   const key = resolveKey.value(item);
-  if (key === undefined || key === null || (typeof key === 'number' && Number.isNaN(key))) {
-    throw new Error('[me-virtual-list] getItemKey 返回了无效值（undefined / null / NaN），请检查 itemKey 配置是否正确');
+  if (
+    key === undefined ||
+    key === null ||
+    (typeof key === "number" && Number.isNaN(key))
+  ) {
+    throw new Error(
+      "[me-virtual-list] getItemKey 返回了无效值（undefined / null / NaN），请检查 itemKey 配置是否正确",
+    );
   }
   return key;
 }
@@ -113,12 +126,13 @@ function onResize(changes: HeightChange[]) {
 }
 
 /** 高度收集 */
-const { setItemRef, collectHeight, getItemHeight, isHeightCached, heightUpdateMark } = useItemHeights(
-  items,
-  getItemKey,
-  props.itemHeight ?? 0,
-  onResize,
-);
+const {
+  setItemRef,
+  collectHeight,
+  getItemHeight,
+  isHeightCached,
+  heightUpdateMark,
+} = useItemHeights(items, getItemKey, props.itemHeight ?? 0, onResize);
 
 /** 可见区间计算结果 */
 const visibleRange = reactive<VisibleRange>({
@@ -162,7 +176,14 @@ watch(
 
 /** 虚拟模式核心计算：根据 scrollTop 计算可见区间 */
 watch(
-  [isVirtualActive, isVirtual, () => scrollTop.value, items, heightUpdateMark, () => props.height],
+  [
+    isVirtualActive,
+    isVirtual,
+    scrollTop,
+    items,
+    heightUpdateMark,
+    () => props.height,
+  ],
   () => {
     if (!isVirtual.value || !isVirtualActive.value) return;
 
@@ -234,31 +255,33 @@ watch(
 
 /** 滚动事件处理 */
 function onScroll(top: number) {
-  // 补偿引起的假滚动，不向外部抛出事件
+  scrollTop.value = top;
+  // 补偿引起的假滚动，不向外部抛出事件，也不更新 isAtBottom（此时 DOM scrollHeight 尚未更新）
   if (isCompensating) {
     isCompensating = false;
     return;
   }
-  scrollTop.value = top;
   const wrap = scrollbarRef.value?.wrapRef;
   if (wrap) {
-    /** 2px 容差，应对浏览器浮点数精度和亚像素渲染导致的误差 */
+    // 2px 容差，应对浏览器浮点数精度和亚像素渲染导致的误差
     isAtBottom.value = top + wrap.clientHeight >= wrap.scrollHeight - 2;
   }
-  emit('scroll', top);
+  emit("scroll", top);
 }
 
 /** 底部修正：高度收集导致 totalHeight 变化时，若用户在底部则同步修正 scrollTop */
 watch(
   () => visibleRange.totalHeight,
   (newTotal) => {
-    if (!isVirtualActive.value || !isAtBottom.value || newTotal === undefined) return;
+    if (!isVirtualActive.value || !isAtBottom.value || newTotal === undefined)
+      return;
     const wrap = scrollbarRef.value?.wrapRef;
     if (!wrap) return;
     const maxScrollTop = newTotal - wrap.clientHeight;
     if (maxScrollTop <= 0) return;
     /** 差距超过 1px 才修正，避免亚像素级变化导致不必要的滚动和 watch 循环 */
     if (Math.abs(scrollTop.value - maxScrollTop) > 1) {
+      isCompensating = true;
       setScrollTop(maxScrollTop);
     }
   },
@@ -271,6 +294,10 @@ function setScrollTop(top: number) {
   const wrap = scrollbarRef.value?.wrapRef;
   // 读取DOM实际scrollTop，避免传入的top值越界
   scrollTop.value = wrap ? wrap.scrollTop : top;
+  // 兜底：如果 DOM 未触发 scroll 事件（值被裁剪或无变化），手动重置补偿标记
+  if (isCompensating) {
+    isCompensating = false;
+  }
 }
 
 /** scrollTo 方法 */
@@ -279,7 +306,7 @@ const scrollTo: ScrollTo = useScrollTo({
   data: items,
   getItemHeight,
   isHeightCached,
-  getItemKey: getItemKey,
+  getItemKey,
   collectHeight,
   setScrollTop,
 });
