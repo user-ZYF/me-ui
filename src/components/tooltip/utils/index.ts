@@ -1,4 +1,4 @@
-import type { Arrayable, TooltipTriggerType } from './tooltip';
+import type { Arrayable, TooltipTriggerType } from '../tooltip';
 import type { Ref } from 'vue';
 
 /** 判断触发方式是否包含指定类型 */

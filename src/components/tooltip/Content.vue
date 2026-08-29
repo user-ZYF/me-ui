@@ -19,7 +19,7 @@ import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { TOOLTIP_INJECTION_KEY } from './constants';
 import { isTriggerType } from './utils';
-import type { PopperPosition } from './use-popper';
+import type { PopperPosition } from './hooks/use-popper';
 
 defineOptions({ name: 'MeTooltipContent', inheritAttrs: false });
 

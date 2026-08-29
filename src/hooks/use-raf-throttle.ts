@@ -1,4 +1,4 @@
-import { onBeforeUnmount } from 'vue';
+import { onBeforeUnmount, onDeactivated } from 'vue';
 
 /**
  * rAF 节流函数工厂
@@ -31,6 +31,7 @@ export function useRafThrottle<T extends (...args: any[]) => any>(fn: T) {
   }
 
   onBeforeUnmount(cancel);
+  onDeactivated(cancel);
 
   return {
     /** 节流后的函数 */

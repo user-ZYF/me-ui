@@ -4,11 +4,60 @@ import { componentSizes } from '@me-ui/constants/config';
 import type { ComponentSize } from '@me-ui/types/config';
 import type { TooltipPlacement } from '@me-ui/components/tooltip/tooltip';
 
-/** Select 选项值类型 */
-export type OptionValue = string | number | boolean;
+import type { OptionValue, FilterMethod, SelectOption } from './types';
+import { DEFAULT_ITEM_HEIGHT, DEFAULT_LIST_HEIGHT } from './constants';
 
-/** 自定义筛选函数 */
-export type FilterMethod = (query: string, option: { value: OptionValue; label: string | number }) => boolean;
+/** SelectDropdown Props 定义 */
+export const selectDropdownProps = {
+  /** 过滤后的选项数量 */
+  optionsCount: {
+    type: Number,
+    default: 0,
+  },
+  /** 下拉框最大高度 */
+  maxHeight: {
+    type: String,
+    default: '',
+  },
+  /** 是否为虚拟滚动模式 */
+  isVirtualMode: {
+    type: Boolean,
+    default: false,
+  },
+  /** 过滤后的选项数据（options prop 模式） */
+  options: {
+    type: Array as PropType<SelectOption[]>,
+    default: () => [],
+  },
+  /** 虚拟列表高度（px） */
+  listHeight: {
+    type: Number,
+    default: DEFAULT_LIST_HEIGHT,
+  },
+  /** 虚拟列表每项高度（px） */
+  itemHeight: {
+    type: Number,
+    default: DEFAULT_ITEM_HEIGHT,
+  },
+  /** 是否多选 */
+  multiple: {
+    type: Boolean,
+    default: false,
+  },
+} as const;
+
+/** SelectDropdown Props 类型 */
+export type SelectDropdownProps = ExtractPropTypes<typeof selectDropdownProps>;
+
+/** SelectDropdown Emits 定义 */
+export const selectDropdownEmits = {
+  /** 选择选项 */
+  select: (_option: SelectOption) => true,
+} as const;
+
+/** SelectDropdown Emits 类型 */
+export type SelectDropdownEmits = typeof selectDropdownEmits;
+
 
 /** Select Props 定义 */
 export const selectProps = {
@@ -63,6 +112,26 @@ export const selectProps = {
     type: [Number, String] as PropType<number | 'responsive'>,
     default: undefined,
   },
+  /** 选项数据，传入后使用 options 模式渲染（支持虚拟滚动） */
+  options: {
+    type: Array as PropType<SelectOption[]>,
+    default: () => [],
+  },
+  /** 是否启用虚拟滚动（需配合 options 使用） */
+  virtual: {
+    type: Boolean,
+    default: false,
+  },
+  /** 虚拟列表高度（px） */
+  listHeight: {
+    type: Number,
+    default: DEFAULT_LIST_HEIGHT,
+  },
+  /** 虚拟列表每项预估高度（px） */
+  itemHeight: {
+    type: Number,
+    default: DEFAULT_ITEM_HEIGHT,
+  },
 } as const;
 
 /** Select Props 类型 */
@@ -86,25 +155,3 @@ export const selectEmits = {
 
 /** Select Emits 类型 */
 export type SelectEmits = typeof selectEmits;
-
-/** Option Props 定义 */
-export const optionProps = {
-  /** 选项值 */
-  value: {
-    type: [String, Number, Boolean] as PropType<OptionValue>,
-    required: true as const,
-  },
-  /** 选项标签，省略时同 value */
-  label: {
-    type: [String, Number] as PropType<string | number>,
-    default: '',
-  },
-  /** 是否禁用 */
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-} as const;
-
-/** Option Props 类型 */
-export type OptionProps = ExtractPropTypes<typeof optionProps>;

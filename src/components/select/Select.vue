@@ -13,7 +13,7 @@
       :placement="placement"
       effect="light"
       :popper-class="
-        [ns.e('popper'), popperUniqueId, props.popperClass].join(' ')
+        [ns.e('popper'), popperUniqueId, popperClass].join(' ')
       "
       trigger="click"
       :transition="`${ns.namespace}-zoom-in-top`"
@@ -130,9 +130,17 @@
       <template #content>
         <me-select-dropdown
           :options-count="filteredOptionsCount"
-          :max-height="MAX_DROPDOWN_HEIGHT"
+          :max-height="dropdownMaxHeight"
+          :is-virtual-mode="isVirtualMode"
+          :options="filteredOptions"
+          :list-height="listHeight"
+          :item-height="itemHeight"
+          :multiple="multiple"
+          @select="selectPropOption"
         >
-          <slot></slot>
+          <template v-if="$slots.option" #option="{ item }">
+            <slot name="option" :item="item" />
+          </template>
         </me-select-dropdown>
       </template>
     </me-tooltip>
@@ -160,7 +168,6 @@ import {
   onMounted,
   provide,
   ref,
-  shallowRef,
   watch,
 } from "vue";
 import { ArrowDown, CircleClose } from "@element-plus/icons-vue";
@@ -179,9 +186,9 @@ import {
 import { useNamespace } from "@me-ui/hooks/use-namespace";
 import { useFocusController } from "@me-ui/hooks/use-focus-controller";
 
-import { selectEmits, selectProps, type OptionValue } from "./select";
-import { MAX_DROPDOWN_HEIGHT, selectKey } from "./constants";
-import type { OptionInstance } from "./types";
+import { selectEmits, selectProps } from "./select";
+import { DEFAULT_LIST_HEIGHT, selectKey } from "./constants";
+import type { OptionItem, OptionValue, SelectOption } from "./types";
 
 defineOptions({ name: "MeSelect" });
 
@@ -222,9 +229,6 @@ const isHovering = ref(false);
 const filterQuery = ref("");
 /** 是否正在输入法组合 */
 const isComposing = ref(false);
-/** 自定义筛选函数 */
-const filterMethod = computed(() => props.filterMethod);
-
 /** 触发器 wrapper 引用 */
 const wrapperRef = ref<HTMLElement>();
 
@@ -244,8 +248,30 @@ const { isFocused } = useFocusController(inputRef, wrapperRef, {
   },
 });
 
-/** 选项列表（使用 shallowRef 避免 ref 深层解包 ComputedRef/Ref） */
-const options = shallowRef<OptionInstance[]>([]);
+/** 是否为虚拟滚动模式 */
+const isVirtualMode = computed(() => props.virtual);
+
+/** 过滤后的选项 */
+const filteredOptions = computed<SelectOption[]>(() => {
+  const query = filterQuery.value;
+  if (!query || isComposing.value) return props.options;
+  const q = query.toLowerCase();
+  const customMethod = props.filterMethod;
+  if (customMethod) {
+    return props.options.filter((opt) =>
+      customMethod(query, { value: opt.value, label: opt.label }),
+    );
+  }
+  return props.options.filter((opt) =>
+    String(opt.label).toLowerCase().includes(q),
+  );
+});
+
+/** 下拉框最大高度 */
+const dropdownMaxHeight = computed(() => {
+  if (isVirtualMode.value) return `${props.listHeight}px`;
+  return `${DEFAULT_LIST_HEIGHT}px`;
+});
 
 /** 是否有值 */
 const hasValue = computed(() => {
@@ -257,16 +283,12 @@ const hasValue = computed(() => {
 });
 
 /** 选中项列表（多选） */
-const selectedItems = computed<OptionInstance[]>(() => {
+const selectedItems = computed<OptionItem[]>(() => {
   if (!props.multiple) return [];
   const val = modelValue.value;
   if (!Array.isArray(val)) return [];
-  const result: OptionInstance[] = [];
-  val.forEach((v) => {
-    const opt = options.value.find((o) => o.value === v);
-    if (opt) result.push(opt);
-  });
-  return result;
+  const valSet = new Set(val);
+  return props.options.filter((o) => valSet.has(o.value));
 });
 
 /** 选中标签（单选） */
@@ -274,8 +296,8 @@ const selectedLabel = computed(() => {
   if (props.multiple) return "";
   const val = modelValue.value;
   if (val === undefined || val === null) return "";
-  const opt = options.value.find((o) => o.value === val);
-  return opt ? String(opt.label.value) : String(val);
+  const opt = props.options.find((o) => o.value === val);
+  return opt ? String(opt.label) : String(val);
 });
 
 /** 是否为响应式最大标签数 */
@@ -295,7 +317,7 @@ const effectiveMaxCount = computed<number>(() => {
 });
 
 /** 多选模式下实际展示的标签列表（受 maxTagCount 限制） */
-const displayTags = computed<OptionInstance[]>(() => {
+const displayTags = computed<OptionItem[]>(() => {
   if (!props.multiple) return [];
   return selectedItems.value.slice(0, effectiveMaxCount.value);
 });
@@ -330,22 +352,11 @@ const showClearIcon = computed(() => {
 });
 
 /** 过滤后的选项数量 */
-const filteredOptionsCount = computed(() => {
-  return options.value.filter((o) => o.visible.value).length;
-});
-
-/** 添加选项 */
-function addOption(option: OptionInstance) {
-  options.value = [...options.value, option];
-}
-
-/** 移除选项 */
-function removeOption(value: OptionValue) {
-  options.value = options.value.filter((o) => o.value !== value);
-}
+const filteredOptionsCount = computed(() => filteredOptions.value.length);
 
 /** 选择选项 */
-function selectOption(option: OptionInstance) {
+function selectPropOption(option: SelectOption) {
+  if (option.disabled) return;
   if (props.multiple) {
     const val = Array.isArray(modelValue.value) ? [...modelValue.value] : [];
     const index = val.indexOf(option.value);
@@ -370,7 +381,11 @@ function selectOption(option: OptionInstance) {
 /** 点击箭头图标 */
 function handleArrowClick() {
   if (actualDisabled.value) return;
-  tooltipVisible.value = !expanded.value;
+  if (expanded.value) {
+    tooltipVisible.value = false;
+  } else {
+    openDropdown();
+  }
 }
 
 /** 切换菜单 */
@@ -397,7 +412,7 @@ function handleClear() {
 }
 
 /** 删除标签 */
-function deleteTag(option: OptionInstance) {
+function deleteTag(option: OptionItem) {
   if (actualDisabled.value) return;
   const val = Array.isArray(modelValue.value) ? [...modelValue.value] : [];
   const index = val.indexOf(option.value);
@@ -541,10 +556,8 @@ useResizeObserver(selectRef, (entries) => {
 onMounted(() => {
   if (isResponsive.value) {
     /**
-     * 父组件初始 render — 此时 options 为空，selectedItems 为空，测量层渲染 0 个元素
-     * 子组件 setup — 调用 addOption，options 变更，触发父组件重新渲染（调度为微任务）
-     * 子组件 mounted
-     * 父组件 mounted — onMounted 同步触发，但此时步骤 2 调度的重渲染还未刷新到 DOM
+     * 初始 render 时 selectedItems 可能已有值（v-model 初始值），但 DOM 尚未完成布局
+     * 使用 nextTick 确保 DOM 更新后再测量标签宽度和计算响应式标签数
      */
     nextTick(() => {
       measureTagWidths();
@@ -556,13 +569,6 @@ onMounted(() => {
 /** 提供上下文 */
 provide(selectKey, {
   modelValue,
-  multiple: computed(() => props.multiple),
-  filterQuery,
-  filterMethod,
-  isComposing,
-  addOption,
-  removeOption,
-  selectOption,
 });
 
 defineExpose({

@@ -8,13 +8,7 @@
       <h2>基础用法</h2>
       <p class="play-desc">单选下拉选择器，适用各种文本选项场景</p>
       <div class="play-select-row">
-        <me-select v-model="singleValue" placeholder="请选择水果">
-          <me-option value="apple" label="苹果" />
-          <me-option value="banana" label="香蕉" />
-          <me-option value="orange" label="橙子" />
-          <me-option value="grape" label="葡萄" />
-          <me-option value="pear" label="梨" />
-        </me-select>
+        <me-select v-model="singleValue" :options="fruitOptions" placeholder="请选择水果" />
         <span class="play-label">当前值：{{ singleValue || '--' }}</span>
       </div>
     </section>
@@ -24,11 +18,7 @@
       <h2>默认选中</h2>
       <p class="play-desc">通过 v-model 设置初始值，组件挂载即显示选中项</p>
       <div class="play-select-row">
-        <me-select v-model="defaultValue" placeholder="请选择">
-          <me-option value="a" label="选项 A" />
-          <me-option value="b" label="选项 B" />
-          <me-option value="c" label="选项 C" />
-        </me-select>
+        <me-select v-model="defaultValue" :options="abcOptions" placeholder="请选择" />
         <span class="play-label">当前值：{{ defaultValue }}</span>
       </div>
     </section>
@@ -38,18 +28,7 @@
       <h2>可搜索</h2>
       <p class="play-desc">设置 filterable 开启搜索功能，输入时实时过滤选项</p>
       <div class="play-select-row">
-        <me-select v-model="filterValue" filterable placeholder="输入城市名搜索">
-          <me-option value="beijing" label="北京" />
-          <me-option value="shanghai" label="上海" />
-          <me-option value="guangzhou" label="广州" />
-          <me-option value="shenzhen" label="深圳" />
-          <me-option value="hangzhou" label="杭州" />
-          <me-option value="nanjing" label="南京" />
-          <me-option value="chengdu" label="成都" />
-          <me-option value="wuhan" label="武汉" />
-          <me-option value="xian" label="西安" />
-          <me-option value="chongqing" label="重庆" />
-        </me-select>
+        <me-select v-model="filterValue" :options="cityOptions" filterable placeholder="输入城市名搜索" />
         <span class="play-label">当前值：{{ filterValue || '--' }}</span>
       </div>
     </section>
@@ -61,21 +40,11 @@
       <div class="play-select-row">
         <me-select
           v-model="customFilterValue"
+          :options="cityOptions"
           filterable
           :filter-method="customFilterMethod"
           placeholder="输入城市名或拼音首字母"
-        >
-          <me-option value="beijing" label="北京" />
-          <me-option value="shanghai" label="上海" />
-          <me-option value="guangzhou" label="广州" />
-          <me-option value="shenzhen" label="深圳" />
-          <me-option value="hangzhou" label="杭州" />
-          <me-option value="nanjing" label="南京" />
-          <me-option value="chengdu" label="成都" />
-          <me-option value="wuhan" label="武汉" />
-          <me-option value="xian" label="西安" />
-          <me-option value="chongqing" label="重庆" />
-        </me-select>
+        />
         <span class="play-label">当前值：{{ customFilterValue || '--' }}</span>
       </div>
     </section>
@@ -85,15 +54,7 @@
       <h2>多选</h2>
       <p class="play-desc">设置 multiple 开启多选模式，选中项以标签形式展示，点击标签可取消选中</p>
       <div class="play-select-row">
-        <me-select v-model="multiValue" multiple placeholder="请选择编程语言">
-          <me-option value="js" label="JavaScript" />
-          <me-option value="ts" label="TypeScript" />
-          <me-option value="py" label="Python" />
-          <me-option value="go" label="Go" />
-          <me-option value="rust" label="Rust" />
-          <me-option value="java" label="Java" />
-          <me-option value="cpp" label="C++" />
-        </me-select>
+        <me-select v-model="multiValue" :options="langOptions" multiple placeholder="请选择编程语言" />
         <span class="play-label">当前值：{{ multiValue.length ? multiValue.join(', ') : '--' }}</span>
       </div>
     </section>
@@ -103,14 +64,7 @@
       <h2>多选 + 可搜索</h2>
       <p class="play-desc">同时开启 multiple 和 filterable，输入关键词过滤后多选</p>
       <div class="play-select-row">
-        <me-select v-model="multiFilterValue" multiple filterable placeholder="搜索并多选">
-          <me-option value="react" label="React" />
-          <me-option value="vue" label="Vue" />
-          <me-option value="angular" label="Angular" />
-          <me-option value="svelte" label="Svelte" />
-          <me-option value="solid" label="SolidJS" />
-          <me-option value="qwik" label="Qwik" />
-        </me-select>
+        <me-select v-model="multiFilterValue" :options="frameworkOptions" multiple filterable placeholder="搜索并多选" />
         <span class="play-label">当前值：{{ multiFilterValue.length ? multiFilterValue.join(', ') : '--' }}</span>
       </div>
     </section>
@@ -120,15 +74,7 @@
       <h2>最大标签数</h2>
       <p class="play-desc">设置 max-tag-count 限制多选模式下显示的标签数量，超出部分折叠为 +N</p>
       <div class="play-select-row">
-        <me-select v-model="maxTagValue" multiple :max-tag-count="3" placeholder="最多显示 3 个标签">
-          <me-option value="js" label="JavaScript" />
-          <me-option value="ts" label="TypeScript" />
-          <me-option value="py" label="Python" />
-          <me-option value="go" label="Go" />
-          <me-option value="rust" label="Rust" />
-          <me-option value="java" label="Java" />
-          <me-option value="cpp" label="C++" />
-        </me-select>
+        <me-select v-model="maxTagValue" :options="langOptions" multiple :max-tag-count="3" placeholder="最多显示 3 个标签" />
         <span class="play-label">当前值：{{ maxTagValue.length ? maxTagValue.join(', ') : '--' }}</span>
       </div>
     </section>
@@ -138,13 +84,7 @@
       <h2>最大标签数为 0</h2>
       <p class="play-desc">设置 max-tag-count 为 0 时，所有选中项都折叠为 +N 标签</p>
       <div class="play-select-row">
-        <me-select v-model="maxTagZeroValue" multiple :max-tag-count="0" placeholder="全部折叠">
-          <me-option value="js" label="JavaScript" />
-          <me-option value="ts" label="TypeScript" />
-          <me-option value="py" label="Python" />
-          <me-option value="go" label="Go" />
-          <me-option value="rust" label="Rust" />
-        </me-select>
+        <me-select v-model="maxTagZeroValue" :options="langOptions.slice(0, 5)" multiple :max-tag-count="0" placeholder="全部折叠" />
         <span class="play-label">当前值：{{ maxTagZeroValue.length ? maxTagZeroValue.join(', ') : '--' }}</span>
       </div>
     </section>
@@ -156,18 +96,12 @@
       <div class="play-select-row">
         <me-select
           v-model="maxTagFilterValue"
+          :options="frameworkOptions"
           multiple
           filterable
           :max-tag-count="2"
           placeholder="搜索并多选（最多显示 2 个标签）"
-        >
-          <me-option value="react" label="React" />
-          <me-option value="vue" label="Vue" />
-          <me-option value="angular" label="Angular" />
-          <me-option value="svelte" label="Svelte" />
-          <me-option value="solid" label="SolidJS" />
-          <me-option value="qwik" label="Qwik" />
-        </me-select>
+        />
         <span class="play-label">当前值：{{ maxTagFilterValue.length ? maxTagFilterValue.join(', ') : '--' }}</span>
       </div>
     </section>
@@ -179,18 +113,12 @@
       <div class="play-select-row">
         <me-select
           v-model="maxTagClearValue"
+          :options="fruitOptions"
           multiple
           clearable
           :max-tag-count="2"
           placeholder="可清空（最多显示 2 个标签）"
-        >
-          <me-option value="apple" label="苹果" />
-          <me-option value="banana" label="香蕉" />
-          <me-option value="orange" label="橙子" />
-          <me-option value="grape" label="葡萄" />
-          <me-option value="pear" label="梨" />
-          <me-option value="cherry" label="樱桃" />
-        </me-select>
+        />
         <span class="play-label">当前值：{{ maxTagClearValue.length ? maxTagClearValue.join(', ') : '--' }}</span>
       </div>
     </section>
@@ -210,19 +138,11 @@
         <div class="play-responsive-wrapper" :style="{ width: `${responsiveWidth}px` }">
           <me-select
             v-model="responsiveValue"
+            :options="langOptionsExt"
             multiple
             max-tag-count="responsive"
             placeholder="响应式标签数"
-          >
-            <me-option value="js" label="JavaScript" />
-            <me-option value="ts" label="TypeScript" />
-            <me-option value="py" label="Python" />
-            <me-option value="go" label="Go" />
-            <me-option value="rust" label="Rust" />
-            <me-option value="java" label="Java" />
-            <me-option value="cpp" label="C++" />
-            <me-option value="csharp" label="C#" />
-          </me-select>
+          />
         </div>
         <span class="play-label">当前值：{{ responsiveValue.length ? responsiveValue.join(', ') : '--' }}</span>
       </div>
@@ -242,20 +162,12 @@
         <div class="play-responsive-wrapper" :style="{ width: `${responsiveFilterWidth}px` }">
           <me-select
             v-model="responsiveFilterValue"
+            :options="frameworkOptionsExt"
             multiple
             filterable
             max-tag-count="responsive"
             placeholder="搜索并多选（响应式）"
-          >
-            <me-option value="react" label="React" />
-            <me-option value="vue" label="Vue" />
-            <me-option value="angular" label="Angular" />
-            <me-option value="svelte" label="Svelte" />
-            <me-option value="solid" label="SolidJS" />
-            <me-option value="qwik" label="Qwik" />
-            <me-option value="lit" label="Lit" />
-            <me-option value="astro" label="Astro" />
-          </me-select>
+          />
         </div>
         <span class="play-label">当前值：{{ responsiveFilterValue.length ? responsiveFilterValue.join(', ') : '--' }}</span>
       </div>
@@ -266,11 +178,7 @@
       <h2>可清空</h2>
       <p class="play-desc">设置 clearable，选中后悬停组件显示清除按钮，点击可清空选中值</p>
       <div class="play-select-row">
-        <me-select v-model="clearValue" clearable placeholder="请选择">
-          <me-option value="1" label="选项一" />
-          <me-option value="2" label="选项二" />
-          <me-option value="3" label="选项三" />
-        </me-select>
+        <me-select v-model="clearValue" :options="simpleOptions" clearable placeholder="请选择" />
         <span class="play-label">当前值：{{ clearValue || '--' }}</span>
       </div>
     </section>
@@ -280,10 +188,7 @@
       <h2>禁用</h2>
       <p class="play-desc">设置 disabled 禁用整个选择器，无法展开和操作</p>
       <div class="play-select-row">
-        <me-select v-model="disabledValue" disabled placeholder="禁用状态">
-          <me-option value="1" label="选项一" />
-          <me-option value="2" label="选项二" />
-        </me-select>
+        <me-select v-model="disabledValue" :options="simpleOptions" disabled placeholder="禁用状态" />
         <span class="play-label">当前值：{{ disabledValue || '--' }}</span>
       </div>
     </section>
@@ -291,15 +196,9 @@
     <!-- 禁用选项 -->
     <section class="play-section">
       <h2>禁用选项</h2>
-      <p class="play-desc">单个 Option 设置 disabled，该选项可见但不可选</p>
+      <p class="play-desc">单个选项设置 disabled，该选项可见但不可选</p>
       <div class="play-select-row">
-        <me-select v-model="disabledOptValue" placeholder="请选择">
-          <me-option value="1" label="选项一" />
-          <me-option value="2" label="选项二（禁用）" disabled />
-          <me-option value="3" label="选项三" />
-          <me-option value="4" label="选项四（禁用）" disabled />
-          <me-option value="5" label="选项五" />
-        </me-select>
+        <me-select v-model="disabledOptValue" :options="disabledOptions" placeholder="请选择" />
         <span class="play-label">当前值：{{ disabledOptValue || '--' }}</span>
       </div>
     </section>
@@ -311,24 +210,15 @@
       <div class="play-select-sizes">
         <div class="play-select-sizes-item">
           <span class="play-label">large</span>
-          <me-select v-model="sizeLarge" size="large" placeholder="large">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-          </me-select>
+          <me-select v-model="sizeLarge" :options="simpleOptions" size="large" placeholder="large" />
         </div>
         <div class="play-select-sizes-item">
           <span class="play-label">default</span>
-          <me-select v-model="sizeDefault" size="default" placeholder="default">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-          </me-select>
+          <me-select v-model="sizeDefault" :options="simpleOptions" size="default" placeholder="default" />
         </div>
         <div class="play-select-sizes-item">
           <span class="play-label">small</span>
-          <me-select v-model="sizeSmall" size="small" placeholder="small">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-          </me-select>
+          <me-select v-model="sizeSmall" :options="simpleOptions" size="small" placeholder="small" />
         </div>
       </div>
     </section>
@@ -338,12 +228,7 @@
       <h2>数字值</h2>
       <p class="play-desc">Option 的 value 支持数字类型，适用于 ID 选择等场景</p>
       <div class="play-select-row">
-        <me-select v-model="numberValue" placeholder="请选择用户">
-          <me-option :value="1" label="张三" />
-          <me-option :value="2" label="李四" />
-          <me-option :value="3" label="王五" />
-          <me-option :value="4" label="赵六" />
-        </me-select>
+        <me-select v-model="numberValue" :options="numberOptions" placeholder="请选择用户" />
         <span class="play-label">当前值：{{ numberValue ?? '--' }}（类型：{{ typeof numberValue }}）</span>
       </div>
     </section>
@@ -351,27 +236,15 @@
     <!-- 自定义选项内容 -->
     <section class="play-section">
       <h2>自定义选项内容</h2>
-      <p class="play-desc">通过 Option 的默认插槽自定义下拉项内容</p>
+      <p class="play-desc">通过 #option 插槽自定义下拉项内容</p>
       <div class="play-select-row">
-        <me-select v-model="customValue" placeholder="请选择">
-          <me-option value="vip1" label="VIP 1">
+        <me-select v-model="customValue" :options="vipOptions" placeholder="请选择">
+          <template #option="{ item }">
             <span class="play-option-custom">
-              <span class="play-option-custom-label">VIP 1</span>
-              <span class="play-option-custom-tag">月费 ¥30</span>
+              <span class="play-option-custom-label">{{ item.label }}</span>
+              <span class="play-option-custom-tag">{{ item.price }}</span>
             </span>
-          </me-option>
-          <me-option value="vip2" label="VIP 2">
-            <span class="play-option-custom">
-              <span class="play-option-custom-label">VIP 2</span>
-              <span class="play-option-custom-tag">月费 ¥68</span>
-            </span>
-          </me-option>
-          <me-option value="vip3" label="VIP 3">
-            <span class="play-option-custom">
-              <span class="play-option-custom-label">VIP 3</span>
-              <span class="play-option-custom-tag">月费 ¥128</span>
-            </span>
-          </me-option>
+          </template>
         </me-select>
         <span class="play-label">当前值：{{ customValue || '--' }}</span>
       </div>
@@ -382,14 +255,10 @@
       <h2>前缀插槽</h2>
       <p class="play-desc">通过 prefix 插槽在触发器左侧添加自定义内容</p>
       <div class="play-select-row">
-        <me-select v-model="prefixValue" placeholder="请选择">
+        <me-select v-model="prefixValue" :options="deptOptions" placeholder="请选择">
           <template #prefix>
             <span class="play-prefix-text">部门</span>
           </template>
-          <me-option value="tech" label="技术部" />
-          <me-option value="product" label="产品部" />
-          <me-option value="design" label="设计部" />
-          <me-option value="market" label="市场部" />
         </me-select>
         <span class="play-label">当前值：{{ prefixValue || '--' }}</span>
       </div>
@@ -400,11 +269,7 @@
       <h2>下拉框自定义类名</h2>
       <p class="play-desc">通过 popper-class 为下拉框添加自定义类名，实现样式定制</p>
       <div class="play-select-row">
-        <me-select v-model="popperValue" popper-class="play-custom-popper" placeholder="请选择">
-          <me-option value="1" label="选项一" />
-          <me-option value="2" label="选项二" />
-          <me-option value="3" label="选项三" />
-        </me-select>
+        <me-select v-model="popperValue" :options="simpleOptions" popper-class="play-custom-popper" placeholder="请选择" />
         <span class="play-label">当前值：{{ popperValue || '--' }}</span>
       </div>
     </section>
@@ -416,6 +281,7 @@
       <div class="play-select-row">
         <me-select
           v-model="eventValue"
+          :options="eventOptions"
           multiple
           clearable
           filterable
@@ -426,12 +292,7 @@
           @focus="onFocusEvent"
           @blur="onBlurEvent"
           @remove-tag="onRemoveTagEvent"
-        >
-          <me-option value="a" label="选项 A" />
-          <me-option value="b" label="选项 B" />
-          <me-option value="c" label="选项 C" />
-          <me-option value="d" label="选项 D" />
-        </me-select>
+        />
       </div>
       <div class="play-event-log">
         <span class="play-label">事件日志：</span>
@@ -450,67 +311,35 @@
       <div class="play-placement-grid">
         <div class="play-placement-item">
           <span class="play-label">top</span>
-          <me-select v-model="placementTopValue" placement="top" placeholder="top">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-            <me-option value="3" label="选项三" />
-          </me-select>
+          <me-select v-model="placementTopValue" :options="simpleOptions" placement="top" placeholder="top" />
         </div>
         <div class="play-placement-item">
           <span class="play-label">top-start</span>
-          <me-select v-model="placementTopStartValue" placement="top-start" placeholder="top-start">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-            <me-option value="3" label="选项三" />
-          </me-select>
+          <me-select v-model="placementTopStartValue" :options="simpleOptions" placement="top-start" placeholder="top-start" />
         </div>
         <div class="play-placement-item">
           <span class="play-label">top-end</span>
-          <me-select v-model="placementTopEndValue" placement="top-end" placeholder="top-end">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-            <me-option value="3" label="选项三" />
-          </me-select>
+          <me-select v-model="placementTopEndValue" :options="simpleOptions" placement="top-end" placeholder="top-end" />
         </div>
         <div class="play-placement-item">
           <span class="play-label">bottom（默认）</span>
-          <me-select v-model="placementBottomValue" placement="bottom" placeholder="bottom">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-            <me-option value="3" label="选项三" />
-          </me-select>
+          <me-select v-model="placementBottomValue" :options="simpleOptions" placement="bottom" placeholder="bottom" />
         </div>
         <div class="play-placement-item">
           <span class="play-label">bottom-start</span>
-          <me-select v-model="placementBottomStartValue" placement="bottom-start" placeholder="bottom-start">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-            <me-option value="3" label="选项三" />
-          </me-select>
+          <me-select v-model="placementBottomStartValue" :options="simpleOptions" placement="bottom-start" placeholder="bottom-start" />
         </div>
         <div class="play-placement-item">
           <span class="play-label">bottom-end</span>
-          <me-select v-model="placementBottomEndValue" placement="bottom-end" placeholder="bottom-end">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-            <me-option value="3" label="选项三" />
-          </me-select>
+          <me-select v-model="placementBottomEndValue" :options="simpleOptions" placement="bottom-end" placeholder="bottom-end" />
         </div>
         <div class="play-placement-item">
           <span class="play-label">left</span>
-          <me-select v-model="placementLeftValue" placement="left" placeholder="left">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-            <me-option value="3" label="选项三" />
-          </me-select>
+          <me-select v-model="placementLeftValue" :options="simpleOptions" placement="left" placeholder="left" />
         </div>
         <div class="play-placement-item">
           <span class="play-label">right</span>
-          <me-select v-model="placementRightValue" placement="right" placeholder="right">
-            <me-option value="1" label="选项一" />
-            <me-option value="2" label="选项二" />
-            <me-option value="3" label="选项三" />
-          </me-select>
+          <me-select v-model="placementRightValue" :options="simpleOptions" placement="right" placeholder="right" />
         </div>
       </div>
     </section>
@@ -520,14 +349,7 @@
       <h2>大数据量</h2>
       <p class="play-desc">100 条选项的性能与滚动测试，可配合 filterable 搜索</p>
       <div class="play-select-row">
-        <me-select v-model="largeValue" filterable placeholder="请选择（共 100 项）">
-          <me-option
-            v-for="i in 100"
-            :key="i"
-            :value="i"
-            :label="`选项 ${i}`"
-          />
-        </me-select>
+        <me-select v-model="largeValue" :options="largeOptions" filterable placeholder="请选择（共 100 项）" />
         <span class="play-label">当前值：{{ largeValue ?? '--' }}</span>
       </div>
     </section>
@@ -543,7 +365,7 @@
           virtual
           filterable
           :list-height="274"
-          :list-item-height="34"
+          :item-height="34"
           style="width: 400px"
           placeholder="请选择（10000 项虚拟滚动）"
         >
@@ -559,34 +381,6 @@
       </div>
     </section>
 
-    <!-- 虚拟滚动：me-option 子组件 + 自定义内容 -->
-    <section class="play-section">
-      <h2>虚拟滚动 - me-option 子组件</h2>
-      <p class="play-desc">使用 me-option 子组件传入选项，自定义内容渲染（普通滚动模式）</p>
-      <div class="play-select-row">
-        <me-select
-          v-model="virtualSlotValue"
-          filterable
-          style="width: 400px"
-          placeholder="请选择（me-option 自定义内容）"
-        >
-          <me-option
-            v-for="item in virtualSlotOptions"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-          >
-            <div class="play-virtual-option">
-              <span class="play-virtual-option-icon">{{ String(item.label).charAt(0) }}</span>
-              <span class="play-virtual-option-text">{{ item.label }}</span>
-              <span class="play-virtual-option-id">#{{ item.value }}</span>
-            </div>
-          </me-option>
-        </me-select>
-        <span class="play-label">当前值：{{ virtualSlotValue ?? '--' }}</span>
-      </div>
-    </section>
-
     <!-- 虚拟滚动：多选 -->
     <section class="play-section">
       <h2>虚拟滚动 - 多选</h2>
@@ -599,7 +393,7 @@
           multiple
           filterable
           :list-height="274"
-          :list-item-height="34"
+          :item-height="34"
           style="width: 500px"
           placeholder="请选择（多选 + 虚拟滚动）"
         >
@@ -620,16 +414,126 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-import type { OptionValue } from '../src/components/select/select';
+import type { OptionValue, SelectOption } from '../src/components/select/types';
 
-/** 基础用法 */
-const singleValue = ref('');
-/** 默认选中 */
-const defaultValue = ref('b');
-/** 可搜索 */
-const filterValue = ref('');
-/** 自定义筛选 */
-const customFilterValue = ref('');
+/** 水果选项 */
+const fruitOptions: SelectOption[] = [
+  { value: 'apple', label: '苹果' },
+  { value: 'banana', label: '香蕉' },
+  { value: 'orange', label: '橙子' },
+  { value: 'grape', label: '葡萄' },
+  { value: 'pear', label: '梨' },
+  { value: 'cherry', label: '樱桃' },
+];
+
+/** ABC 选项 */
+const abcOptions: SelectOption[] = [
+  { value: 'a', label: '选项 A' },
+  { value: 'b', label: '选项 B' },
+  { value: 'c', label: '选项 C' },
+];
+
+/** 城市选项 */
+const cityOptions: SelectOption[] = [
+  { value: 'beijing', label: '北京' },
+  { value: 'shanghai', label: '上海' },
+  { value: 'guangzhou', label: '广州' },
+  { value: 'shenzhen', label: '深圳' },
+  { value: 'hangzhou', label: '杭州' },
+  { value: 'nanjing', label: '南京' },
+  { value: 'chengdu', label: '成都' },
+  { value: 'wuhan', label: '武汉' },
+  { value: 'xian', label: '西安' },
+  { value: 'chongqing', label: '重庆' },
+];
+
+/** 编程语言选项 */
+const langOptions: SelectOption[] = [
+  { value: 'js', label: 'JavaScript' },
+  { value: 'ts', label: 'TypeScript' },
+  { value: 'py', label: 'Python' },
+  { value: 'go', label: 'Go' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'java', label: 'Java' },
+  { value: 'cpp', label: 'C++' },
+];
+
+/** 编程语言选项（含 C#） */
+const langOptionsExt: SelectOption[] = [
+  ...langOptions,
+  { value: 'csharp', label: 'C#' },
+];
+
+/** 前端框架选项 */
+const frameworkOptions: SelectOption[] = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'angular', label: 'Angular' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'SolidJS' },
+  { value: 'qwik', label: 'Qwik' },
+];
+
+/** 前端框架选项（含 Lit、Astro） */
+const frameworkOptionsExt: SelectOption[] = [
+  ...frameworkOptions,
+  { value: 'lit', label: 'Lit' },
+  { value: 'astro', label: 'Astro' },
+];
+
+/** 简单选项 */
+const simpleOptions: SelectOption[] = [
+  { value: '1', label: '选项一' },
+  { value: '2', label: '选项二' },
+  { value: '3', label: '选项三' },
+];
+
+/** 禁用选项 */
+const disabledOptions: SelectOption[] = [
+  { value: '1', label: '选项一' },
+  { value: '2', label: '选项二（禁用）', disabled: true },
+  { value: '3', label: '选项三' },
+  { value: '4', label: '选项四（禁用）', disabled: true },
+  { value: '5', label: '选项五' },
+];
+
+/** 数字值选项 */
+const numberOptions: SelectOption[] = [
+  { value: 1, label: '张三' },
+  { value: 2, label: '李四' },
+  { value: 3, label: '王五' },
+  { value: 4, label: '赵六' },
+];
+
+/** VIP 选项（含自定义属性） */
+const vipOptions: SelectOption[] = [
+  { value: 'vip1', label: 'VIP 1', price: '月费 ¥30' },
+  { value: 'vip2', label: 'VIP 2', price: '月费 ¥68' },
+  { value: 'vip3', label: 'VIP 3', price: '月费 ¥128' },
+];
+
+/** 部门选项 */
+const deptOptions: SelectOption[] = [
+  { value: 'tech', label: '技术部' },
+  { value: 'product', label: '产品部' },
+  { value: 'design', label: '设计部' },
+  { value: 'market', label: '市场部' },
+];
+
+/** 事件演示选项 */
+const eventOptions: SelectOption[] = [
+  { value: 'a', label: '选项 A' },
+  { value: 'b', label: '选项 B' },
+  { value: 'c', label: '选项 C' },
+  { value: 'd', label: '选项 D' },
+];
+
+/** 大数据量选项（100 条） */
+const largeOptions: SelectOption[] = Array.from({ length: 100 }, (_, i) => ({
+  value: i + 1,
+  label: `选项 ${i + 1}`,
+}));
+
 /** 城市拼音首字母映射 */
 const pinyinMap: Record<string, string> = {
   beijing: 'bj',
@@ -653,6 +557,14 @@ function customFilterMethod(query: string, option: { value: OptionValue; label: 
   return labelStr.includes(q) || valueStr.includes(q) || pinyin.includes(q);
 }
 
+/** 基础用法 */
+const singleValue = ref('');
+/** 默认选中 */
+const defaultValue = ref('b');
+/** 可搜索 */
+const filterValue = ref('');
+/** 自定义筛选 */
+const customFilterValue = ref('');
 /** 多选 */
 const multiValue = ref<string[]>(['ts']);
 /** 多选 + 可搜索 */
@@ -698,15 +610,8 @@ const eventValue = ref<string[]>([]);
 /** 大数据量 */
 const largeValue = ref<number | undefined>(undefined);
 
-/** 虚拟滚动选项数据类型 */
-interface VirtualOption {
-  value: number;
-  label: string;
-  disabled?: boolean;
-}
-
 /** 生成虚拟滚动测试数据 */
-function generateVirtualOptions(count: number): VirtualOption[] {
+function generateVirtualOptions(count: number): SelectOption[] {
   return Array.from({ length: count }, (_, i) => ({
     value: i + 1,
     label: `选项 ${String(i + 1).padStart(5, '0')}`,
@@ -718,10 +623,6 @@ function generateVirtualOptions(count: number): VirtualOption[] {
 const virtualOptions = ref(generateVirtualOptions(10000));
 /** 虚拟滚动 - options 模式选中值 */
 const virtualDataValue = ref<number | undefined>(undefined);
-/** 虚拟滚动 - me-option 子组件模式数据（100 条） */
-const virtualSlotOptions = ref(generateVirtualOptions(100));
-/** 虚拟滚动 - me-option 子组件模式选中值 */
-const virtualSlotValue = ref<number | undefined>(undefined);
 /** 虚拟滚动 - 多选模式选中值 */
 const virtualMultiValue = ref<number[]>([]);
 
@@ -935,7 +836,6 @@ function onRemoveTagEvent(value: OptionValue) {
 .play-virtual-option {
   display: flex;
   align-items: center;
-  padding: 4px 0;
 }
 
 .play-virtual-option-icon {

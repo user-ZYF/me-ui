@@ -26,9 +26,9 @@ import {
 import { useResizeObserver } from "@vueuse/core";
 
 import { TOOLTIP_INJECTION_KEY } from "./constants";
-import { addScrollSubscriber, removeScrollSubscriber } from "./use-scroll-subscriber";
+import { addScrollSubscriber, removeScrollSubscriber } from "./scroll-subscriber";
 import { tooltipEmits, tooltipProps } from "./tooltip";
-import { usePopper } from "./use-popper";
+import { usePopper } from "./hooks/use-popper";
 
 import Content from "./Content.vue";
 import Trigger from "./Trigger.vue";
@@ -209,7 +209,6 @@ watch(
       isLeaving.value = true;
     }
   },
-  // { flush: "post" }, // ❌️
 );
 
 /** 监听 placement 变化，打开状态下自动更新位置 */
@@ -234,8 +233,15 @@ function onTriggerResize() {
   updatePopper();
 }
 
+/** popper 内容尺寸变化回调：弹出层不可见时跳过 */
+function onPopperResize() {
+  if (!open.value && !isLeaving.value) return;
+  updatePopper();
+}
+
 // ResizeObserver 保证每帧最多触发一次回调
 useResizeObserver(triggerRef, onTriggerResize);
+useResizeObserver(popperRef, onPopperResize);
 
 onDeactivated(() => {
   clearShowTimer();

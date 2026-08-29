@@ -1,6 +1,6 @@
 import { ref, type Ref } from 'vue';
 
-import type { TooltipPlacement } from './tooltip';
+import type { TooltipPlacement } from '../tooltip';
 
 /** 箭头尺寸（px） */
 export const ARROW_SIZE = 10;

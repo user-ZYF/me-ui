@@ -5,7 +5,7 @@ let rafId: number | undefined;
 /** 是否已注册全局监听 */
 let initialized = false;
 
-/** 全局 scroll/resize 事件处理（raf节流hooks依赖setup环境，此处无法直接使用） */
+/** 全局 scroll/resize 事件处理（模块级单例，不依赖 setup 环境） */
 function onGlobalScroll() {
   if (rafId !== undefined) return;
   rafId = requestAnimationFrame(()=>{
