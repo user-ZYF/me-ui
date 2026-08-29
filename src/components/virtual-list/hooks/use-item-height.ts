@@ -146,11 +146,16 @@ export function useItemHeights<T>(
     /** 待应用的高度更新 */
     const updates: Array<{ key: any; height: number }> = [];
     itemRefs.forEach((el, key) => {
-      if (el && el.isConnected) {
+      // offsetParent 为 null 表示元素未挂载或 display:none，此时 offsetHeight 无意义，跳过测量
+      if (el && el.offsetParent) {
         const { offsetHeight } = el;
         const prevHeight = heights.get(key);
-        // TODO: 增加 dirty 标记，仅在 item 挂载/卸载时标记为脏，避免无变化时遍历所有可见 DOM 读取 offsetHeight 导致重排
         if (prevHeight !== offsetHeight) {
+          // 首次测量且实际高度等于预估高度时，静默更新缓存，不触发前缀和重建
+          if (prevHeight === undefined && offsetHeight === itemHeight) {
+            heights.set(key, offsetHeight);
+            return;
+          }
           const index = keyToIndex.get(key);
           if (index !== undefined) {
             changes.push({
