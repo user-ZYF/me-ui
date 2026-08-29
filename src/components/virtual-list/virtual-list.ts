@@ -29,6 +29,12 @@ export const virtualListProps = {
     type: [String, Number, Function] as PropType<string | number | ItemKey>,
     required: true as const,
   },
+  /** 视口外额外渲染的项数，缓解快速滚动时的空白 */
+  overscan: {
+    type: Number,
+    default: 5,
+    validator: (val: number) => val >= 0,
+  },
 } as const;
 
 /** VirtualList Props 类型 */

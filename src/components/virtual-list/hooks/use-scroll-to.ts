@@ -32,13 +32,17 @@ export interface ScrollToOptions {
   collectHeight: (sync?: boolean) => void;
   /** 设置滚动位置函数（同步更新 DOM 和组件状态） */
   setScrollTop: (top: number) => void;
+  /** 获取指定索引项的顶部偏移量 O(1) */
+  getItemTop: (index: number) => number;
+  /** 获取指定索引项的底部偏移量 O(1) */
+  getItemBottom: (index: number) => number;
 }
 
 /**
  * 创建 scrollTo 函数，支持滚动到指定索引或 key
  */
 export function useScrollTo(options: ScrollToOptions): ScrollTo {
-  const { containerRef, data, getItemHeight, isHeightCached, getItemKey, collectHeight, setScrollTop } = options;
+  const { containerRef, data, getItemHeight, isHeightCached, getItemKey, collectHeight, setScrollTop, getItemTop, getItemBottom } = options;
 
   let rafId: number | undefined;
   /** 平滑滚动动画 ID */
@@ -56,20 +60,10 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
 
   /** 计算目标项的顶部和底部位置（基于当前高度缓存） */
   function getItemPosition(items: any[], index: number): ItemPosition {
-    let itemTop = 0;
-    let itemBottom = 0;
-    let hasUncachedHeight = false;
-
-    const maxLen = Math.min(items.length, index);
-    for (let i = 0; i <= maxLen; i += 1) {
-      const key = getItemKey(items[i]);
-      itemTop = itemBottom;
-      itemBottom = itemTop + getItemHeight(key);
-
-      if (i === index && !isHeightCached(key)) {
-        hasUncachedHeight = true;
-      }
-    }
+    const itemTop = getItemTop(index);
+    const itemBottom = getItemBottom(index);
+    const key = getItemKey(items[index]);
+    const hasUncachedHeight = !isHeightCached(key);
 
     return { itemTop, itemBottom, hasUncachedHeight };
   }

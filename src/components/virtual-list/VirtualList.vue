@@ -109,17 +109,8 @@ let pendingJump = 0;
 
 /** 高度变化时批量计算 jump：只对顶部在可视区域上方的项目累积高度差 */
 function onResize(changes: HeightChange[]) {
-  /** 按 index 排序，复用已计算的 itemTop 作为起点 */
-  const sorted = [...changes].sort((a, b) => a.index - b.index);
-  let prevIndex = 0;
-  let itemTop = 0;
-  for (const change of sorted) {
-    for (let i = prevIndex; i < change.index; i += 1) {
-      const key = getItemKey(items.value[i]);
-      itemTop += getItemHeight(key);
-    }
-    prevIndex = change.index;
-    if (itemTop < scrollTop.value) {
+  for (const change of changes) {
+    if (change.prevItemTop < scrollTop.value) {
       pendingJump += change.newHeight - change.oldHeight;
     }
   }
@@ -132,6 +123,10 @@ const {
   getItemHeight,
   isHeightCached,
   heightUpdateMark,
+  getItemTop,
+  getItemBottom,
+  findIndexAtOffset,
+  getTotalHeight,
 } = useItemHeights(items, getItemKey, props.itemHeight ?? 0, onResize);
 
 /** 可见区间计算结果 */
@@ -183,58 +178,31 @@ watch(
     items,
     heightUpdateMark,
     () => props.height,
+    () => props.overscan,
   ],
   () => {
     if (!isVirtual.value || !isVirtualActive.value) return;
 
-    /** 当前项的顶部位置（累加器） */
-    let itemTop = 0;
-    /** 可见区间起始索引 */
-    let startIndex: number | undefined;
-    /** 可见区间起始项的垂直偏移量 */
-    let startOffset: number | undefined;
-    /** 可见区间结束索引 */
-    let endIndex: number | undefined;
     /** 数据总量 */
     const itemCount = items.value.length;
-    /** 数据源引用 */
-    const data = items.value;
     /** 可见区域顶部（当前滚动位置） */
     const visibleTop = scrollTop.value;
     /** 预估高度和容器高度 */
-    const { itemHeight, height } = props;
+    const { height, overscan } = props;
     /** 可见区域底部（scrollTop + 容器高度） */
     const visibleBottom = visibleTop + height!;
 
-    for (let i = 0; i < itemCount; i += 1) {
-      const item = data[i];
-      const key = getItemKey(item);
+    // O(log n) 二分查找可见区间
+    const rawStartIndex = findIndexAtOffset(visibleTop);
+    const rawEndIndex = findIndexAtOffset(visibleBottom);
 
-      const cachedHeight = getItemHeight(key);
-      const itemBottom = itemTop + cachedHeight;
-
-      if (startIndex === undefined && itemBottom >= visibleTop) {
-        startIndex = i;
-        startOffset = itemTop;
-      }
-
-      if (endIndex === undefined && itemBottom > visibleBottom) {
-        endIndex = i;
-      }
-
-      itemTop = itemBottom;
-    }
-
-    if (startIndex === undefined) {
-      startIndex = 0;
-      startOffset = 0;
-      endIndex = Math.ceil(height! / itemHeight!);
-    }
-    if (endIndex === undefined) {
-      endIndex = itemCount - 1;
-    }
-
-    endIndex = Math.min(endIndex, itemCount - 1);
+    // 添加 overscan 缓冲区
+    const startIndex = Math.max(0, rawStartIndex - overscan);
+    const endIndex = Math.min(itemCount - 1, rawEndIndex + overscan);
+    /** 起始偏移量 O(1) */
+    const startOffset = getItemTop(startIndex);
+    /** 列表总高度 O(1) */
+    const totalHeight = getTotalHeight();
 
     // 消费pendingJump，补偿scrollTop，避免跳变
     if (pendingJump !== 0) {
@@ -244,7 +212,7 @@ watch(
     }
 
     Object.assign(visibleRange, {
-      totalHeight: itemTop,
+      totalHeight,
       startIndex,
       endIndex,
       offset: startOffset,
@@ -309,6 +277,8 @@ const scrollTo: ScrollTo = useScrollTo({
   getItemKey,
   collectHeight,
   setScrollTop,
+  getItemTop,
+  getItemBottom,
 });
 
 /** 起始索引 */
