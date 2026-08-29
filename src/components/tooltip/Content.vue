@@ -2,7 +2,7 @@
 <template>
   <teleport to="body">
     <transition :name="transitionName" @after-leave="onAfterLeave" @before-enter="onBeforeEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave">
-      <div v-show="shouldShow" ref="popperRef" :class="contentClass" :style="popperStyle" :data-popper-placement="props.position.placement" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+      <div v-show="open" ref="popperRef" :class="contentClass" :style="popperStyle" :data-popper-placement="props.position.placement" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <slot></slot>
         <span :class="ns.e('arrow')" :style="arrowStyle"></span>
       </div>
@@ -18,15 +18,15 @@ import { computed, inject, ref } from 'vue';
 import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { TOOLTIP_INJECTION_KEY } from './constants';
-import type { TooltipPlacement } from './tooltip';
 import { isTriggerType } from './utils';
+import type { PopperPosition } from './use-popper';
 
 defineOptions({ name: 'MeTooltipContent', inheritAttrs: false });
 
 const props = defineProps({
   /** 位置信息 */
   position: {
-    type: Object as PropType<{ left: number; top: number; arrowLeft: number; arrowTop: number; placement: TooltipPlacement }>,
+    type: Object as PropType<PopperPosition>,
     required: true,
   },
 });
@@ -37,9 +37,6 @@ const { controlled, open, trigger, effect, zIndex, popperClass, transition, onOp
 
 /** 弹出层元素引用 */
 const popperRef = ref<HTMLElement>();
-
-/** 是否应该显示 */
-const shouldShow = computed(() => open.value);
 
 /** 过渡动画名称 */
 const transitionName = computed(() => transition.value || `${ns.namespace}-tooltip-fade`);

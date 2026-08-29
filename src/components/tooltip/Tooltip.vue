@@ -13,6 +13,7 @@
 <script lang="ts" setup>
 import {
   computed,
+  nextTick,
   onBeforeUnmount,
   onDeactivated,
   provide,
@@ -22,11 +23,10 @@ import {
   watch,
 } from "vue";
 
-import { useEventListener, useResizeObserver } from "@vueuse/core";
-
-import { useRafThrottle } from "@me-ui/hooks/use-raf-throttle";
+import { useResizeObserver } from "@vueuse/core";
 
 import { TOOLTIP_INJECTION_KEY } from "./constants";
+import { addScrollSubscriber, removeScrollSubscriber } from "./use-scroll-subscriber";
 import { tooltipEmits, tooltipProps } from "./tooltip";
 import { usePopper } from "./use-popper";
 
@@ -45,6 +45,9 @@ const visibleModel = defineModel<boolean | undefined>("visible", {
 
 /** 是否打开 */
 const open = ref(false);
+
+/** 是否处于关闭过渡中 */
+const isLeaving = ref(false);
 
 /** 触发器组件引用 */
 const triggerCompRef = ref<InstanceType<typeof Trigger>>();
@@ -155,7 +158,12 @@ provide(TOOLTIP_INJECTION_KEY, {
   onBeforeShow: () => emit("beforeShow"),
   onBeforeHide: () => emit("beforeHide"),
   onShow: () => emit("show"),
-  onHide: () => emit("hide"),
+  onHide: () => {
+    emit("hide");
+    isLeaving.value = false;
+    // 完全隐藏后才删除事件监听
+    removeScrollSubscriber(onScrollUpdate);
+  },
   updatePopper,
 });
 
@@ -191,13 +199,17 @@ watch(
   open,
   (val) => {
     if (val) {
-      // 等待两帧确保 v-show 切换后 DOM 布局完成
-      requestAnimationFrame(() => {
+      isLeaving.value = false;
+      addScrollSubscriber(onScrollUpdate);
+      // nextTick能确保弹出层容器的display不再为none，之后才能获取到尺寸信息
+      nextTick(() => {
         updatePopper();
       });
+    } else {
+      isLeaving.value = true;
     }
   },
-  { flush: "post" },
+  // { flush: "post" }, // ❌️
 );
 
 /** 监听 placement 变化，打开状态下自动更新位置 */
@@ -210,20 +222,11 @@ watch(
   },
 );
 
-/** 滚动/resize 回调：rAF 节流，弹出层不可见时跳过 */
-const { throttled: onScroll } = useRafThrottle(() => {
-  const popperEl = popperRef.value;
-  // 不使用 open.value 判断：页面滚动时 mouseleave 会先于 scroll 将 open 置为 false，
-  // 但此时 tooltip 仍处于淡出过渡中（v-show → display:none 尚未生效），
-  // 若跳过更新会导致 tooltip 在淡出期间停留在旧视口位置不跟随 trigger 滚动。
-  // 改用 offsetWidth === 0 判断实际可见性，过渡期间 offsetWidth > 0 仍会更新位置。
-  if (!popperEl || popperEl.offsetWidth === 0) return;
+/** scroll/resize 回调：弹出层不可见时跳过 */
+function onScrollUpdate() {
+  if (!open.value && !isLeaving.value) return;
   updatePopper();
-});
-
-// capture: true 捕获阶段监听，确保在子元素滚动时也能触发位置更新，useEventListener 不保证每帧最多触发一次回调
-useEventListener(window, "scroll", onScroll, { capture: true });
-useEventListener(window, "resize", onScroll);
+}
 
 /** trigger 尺寸变化回调：tooltip 未打开时跳过 */
 function onTriggerResize() {
@@ -238,11 +241,13 @@ onDeactivated(() => {
   clearShowTimer();
   clearHideTimer();
   doHide();
+  removeScrollSubscriber(onScrollUpdate);
 });
 
 onBeforeUnmount(() => {
   clearShowTimer();
   clearHideTimer();
+  removeScrollSubscriber(onScrollUpdate);
 });
 
 defineExpose({
