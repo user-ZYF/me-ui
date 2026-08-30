@@ -35,7 +35,7 @@
         :rows="rows"
         :autofocus="autofocus"
         :name="name"
-        :autocomplete="autocomplete"
+        autocomplete="off"
         :form="form"
         @input="handleInput"
         @change="handleValueChange"
@@ -86,7 +86,7 @@
           :minlength="minlength"
           :autofocus="autofocus"
           :name="name"
-          :autocomplete="autocomplete"
+          autocomplete="off"
           :form="form"
           @input="handleInput"
           @change="handleValueChange"
@@ -194,7 +194,7 @@ const actualType = computed(() => {
 const showClearIcon = computed(() => {
   if (!props.clearable || actualDisabled.value || props.readonly) return false;
   if (!value.value && value.value !== 0) return false;
-  return props.clearOnFocus ? isFocused.value : isFocused.value || isHovering.value;
+  return isFocused.value || isHovering.value;
 });
 
 /** 是否显示密码切换图标 */

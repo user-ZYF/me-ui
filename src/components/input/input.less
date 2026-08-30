@@ -238,6 +238,25 @@
       &.is-clearable {
         padding-right: 26px;
       }
+
+      // 滚动条美化
+      &::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-color: var(~'@{cv-border-color}');
+        border-radius: 3px;
+
+        &:hover {
+          background-color: var(~'@{cv-border-color-dark}');
+        }
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: transparent;
+      }
     }
 
     // 清除按钮绝对定位浮在 textarea 右上角 

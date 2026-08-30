@@ -9,6 +9,14 @@ export type InputType = 'text' | 'password' | 'textarea' | 'number' | 'email' | 
 /** Input 组件类型可选值 */
 export const inputTypes: InputType[] = ['text', 'password', 'textarea', 'number', 'email', 'tel', 'url'];
 
+/** Input textarea 自适应高度配置 */
+export interface InputAutosizeOptions {
+  /** 最小行数 */
+  minRows?: number;
+  /** 最大行数 */
+  maxRows?: number;
+}
+
 /** Input Props 定义 */
 export const inputProps = {
   /** 输入框类型 */
@@ -63,11 +71,6 @@ export const inputProps = {
     type: Boolean,
     default: false,
   },
-  /** 是否在输入框聚焦时显示清除按钮 */
-  clearOnFocus: {
-    type: Boolean,
-    default: false,
-  },
   /** 前缀图标组件 */
   prefixIcon: {
     type: [String, Object, Function] as PropType<string | Component>,
@@ -85,18 +88,13 @@ export const inputProps = {
   },
   /** 是否自适应高度（textarea） */
   autosize: {
-    type: [Boolean, Object] as PropType<boolean | { minRows?: number; maxRows?: number }>,
+    type: [Boolean, Object] as PropType<boolean | InputAutosizeOptions>,
     default: false,
   },
   /** 原生 name 属性 */
   name: {
     type: String,
     default: '',
-  },
-  /** 原生 autocomplete 属性 */
-  autocomplete: {
-    type: String,
-    default: 'off',
   },
   /** 原生 form 属性 */
   form: {
