@@ -138,7 +138,7 @@
           :multiple="multiple"
           @select="selectPropOption"
         >
-          <template v-if="$slots.option" #option="{ item }">
+          <template #option="{ item }">
             <slot name="option" :item="item" />
           </template>
         </me-select-dropdown>

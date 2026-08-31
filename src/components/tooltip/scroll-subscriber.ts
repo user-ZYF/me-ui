@@ -1,11 +1,11 @@
 /** scroll/resize 订阅回调集合 */
 const subscribers = new Set<() => void>();
-/** rAF ID */
+/** 公用 rAF */
 let rafId: number | undefined;
 /** 是否已注册全局监听 */
 let initialized = false;
 
-/** 全局 scroll/resize 事件处理（模块级单例，不依赖 setup 环境） */
+/** 全局 scroll/resize 事件处理 */
 function onGlobalScroll() {
   if (rafId !== undefined) return;
   rafId = requestAnimationFrame(()=>{
