@@ -37,23 +37,17 @@ export type ScrollbarEmits = typeof scrollbarEmits;
 
 /** Bar Props 定义（内部子组件，不对外暴露） */
 export const barProps = {
-  /**
-   * 是否为垂直方向
-   */
+  /** 是否为垂直方向 */
   vertical: {
     type: Boolean,
     default: false,
   },
-  /**
-   * 滑块的尺寸百分比
-   */
+  /** 滑块的尺寸百分比 */
   size: {
     type: String,
     default: '',
   },
-  /**
-   * 滑块的移动距离百分比
-   */
+  /** 滑块的移动距离百分比 */
   move: {
     type: Number,
     default: 0,

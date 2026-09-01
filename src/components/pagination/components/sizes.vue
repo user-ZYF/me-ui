@@ -18,7 +18,7 @@ import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { mePaginationKey } from '../constants';
 import { paginationSizesProps } from './sizes';
-import type { SelectOption } from '@me-ui/components/select/types';
+import type { OptionValue, SelectOption } from '@me-ui/components/select/types';
 
 defineOptions({ name: 'MePaginationSizes' });
 
@@ -47,9 +47,9 @@ const sizeOptions = computed<SelectOption[]>(() =>
 );
 
 /** 值变化时同步通知父组件 */
-function onChange(val: number | undefined) {
-  if (val !== undefined) {
-    pagination.handleSizeChange(Number(val));
+function onChange(val: OptionValue | OptionValue[] | undefined) {
+  if (typeof val === 'number') {
+    pagination.handleSizeChange(val);
   }
 }
 </script>
