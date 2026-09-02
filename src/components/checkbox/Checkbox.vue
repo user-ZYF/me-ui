@@ -97,7 +97,8 @@ function onChange() {
     return;
   }
 
-  model.value = !model.value;
-  emit('change', model.value);
+  const newValue = !model.value;
+  model.value = newValue;
+  emit('change', newValue);
 }
 </script>

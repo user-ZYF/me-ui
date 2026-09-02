@@ -35,7 +35,7 @@
       >
         <!-- 前缀 -->
         <div v-if="$slots.prefix" :class="ns.e('prefix')">
-          <slot name="prefix" />
+          <slot name="prefix"></slot>
         </div>
 
         <!-- 选择区域 -->
@@ -139,7 +139,7 @@
           @select="selectPropOption"
         >
           <template #option="{ item }">
-            <slot name="option" :item="item" />
+            <slot name="option" :item="item"></slot>
           </template>
         </me-select-dropdown>
       </template>

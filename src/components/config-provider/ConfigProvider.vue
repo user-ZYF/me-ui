@@ -1,7 +1,7 @@
 <!-- ? ConfigProvider 全局配置 -->
 <template>
   <div :class="ns.b.value" :style="cssVarsStyle">
-    <slot />
+    <slot></slot>
   </div>
 </template>
 

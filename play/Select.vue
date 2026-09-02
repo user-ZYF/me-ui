@@ -656,7 +656,7 @@ function addLog(message: string) {
 }
 
 /** change 事件 */
-function onChangeEvent(value: OptionValue | OptionValue[]) {
+function onChangeEvent(value: OptionValue | OptionValue[] | undefined) {
   addLog(`change: ${JSON.stringify(value)}`);
 }
 

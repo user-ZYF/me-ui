@@ -16,7 +16,7 @@
   >
     <!-- 前置内容 -->
     <div v-if="$slots.prepend" :class="ns.e('prepend')">
-      <slot name="prepend" />
+      <slot name="prepend"></slot>
     </div>
 
     <!-- textarea 模式：textarea 和 clear 图标作为容器直接子元素 -->
@@ -69,7 +69,7 @@
           :class="ns.e('prefix')"
           :size="14"
         >
-          <slot v-if="$slots.prefix" name="prefix" />
+          <slot v-if="$slots.prefix" name="prefix"></slot>
           <component :is="prefixIcon" v-else />
         </me-icon>
 
@@ -125,7 +125,7 @@
           :class="ns.e('suffix')"
           :size="14"
         >
-          <slot v-if="$slots.suffix" name="suffix" />
+          <slot v-if="$slots.suffix" name="suffix"></slot>
           <component :is="suffixIcon" v-else />
         </me-icon>
       </div>
@@ -133,7 +133,7 @@
 
     <!-- 后置内容 -->
     <div v-if="$slots.append" :class="ns.e('append')">
-      <slot name="append" />
+      <slot name="append"></slot>
     </div>
   </div>
 </template>

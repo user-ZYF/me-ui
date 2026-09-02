@@ -1,7 +1,7 @@
 <!-- ? RadioGroup 单选框组 -->
 <template>
   <div :class="ns.b.value">
-    <slot />
+    <slot></slot>
   </div>
 </template>
 

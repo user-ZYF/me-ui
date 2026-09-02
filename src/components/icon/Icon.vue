@@ -1,7 +1,7 @@
 <!-- ? Icon 图标 -->
 <template>
   <i v-bind="$attrs" :class="ns.b.value" :style="iconStyle">
-    <slot />
+    <slot></slot>
   </i>
 </template>
 

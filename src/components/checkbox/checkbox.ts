@@ -10,14 +10,14 @@ export const checkboxProps = {
     type: Boolean,
     default: undefined,
   },
-  /** 是否为半选状态（indeterminate） */
+  /** 是否为半选状态 */
   indeterminate: {
     type: Boolean,
     default: false,
   },
   /** 尺寸 */
   size: {
-    type: String as PropType<ComponentSize | undefined>,
+    type: String as PropType<ComponentSize>,
     values: componentSizes,
     default: undefined,
   },

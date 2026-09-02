@@ -17,13 +17,13 @@
   >
     <!-- loading图标 -->
     <template v-if="loading">
-      <slot v-if="$slots.loading" name="loading" />
+      <slot v-if="$slots.loading" name="loading"></slot>
       <me-icon v-else :class="ns.e('loading-icon')" :size="14">
         <Loading />
       </me-icon>
     </template>
     <!-- 默认插槽，始终显示 -->
-    <slot />
+    <slot></slot>
   </button>
 </template>
 
