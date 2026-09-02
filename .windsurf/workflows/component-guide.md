@@ -207,7 +207,25 @@ export const componentEmits = {
 export type ComponentEmits = typeof componentEmits;
 ```
 
-## 8. 命名规范
+## 8. 注释规范
+
+- **函数和变量定义**：如果有注释，必须使用 JSDoc 注释（`/** ... */`）
+- **作用域内的注释**：函数体内部的注释使用单行注释（`// ...`），不使用 JSDoc
+
+```typescript
+/** 用户名称 */
+const userName = ref('');
+
+/** 获取用户数据 */
+function fetchUserData() {
+  // 发起请求
+  const res = await api.getUser();
+  // 处理返回结果
+  userName.value = res.name;
+}
+```
+
+## 9. 命名规范
 
 - **组件名称**：`Me` 前缀 + `PascalCase`，如 `MeButton`、`MeSelect`
 - **组件文件**：`PascalCase`，如 `Button.vue`、`Select.vue`

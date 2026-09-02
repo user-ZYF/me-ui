@@ -13,7 +13,8 @@ import { useConfigProvider } from '@me-ui/components/config-provider/hooks/use-c
 
 import { formContextKey } from './constants';
 import { formEmits, formProps } from './form';
-import { cloneDeep, ensureArray, filterFields, getProp, isArray, isFunction } from './utils';
+import { isFunction } from '@me-ui/utils/types';
+import { cloneDeep, ensureArray, filterFields, getProp, isArray } from './utils';
 
 import type { ValidateFieldsError } from 'async-validator';
 import type { Arrayable } from './utils';

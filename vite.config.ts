@@ -31,11 +31,11 @@ export default defineConfig(({ command }) => ({
         'pagination': resolve(__dirname, 'src/components/pagination/index.ts'),
         'radio': resolve(__dirname, 'src/components/radio/index.ts'),
         'select': resolve(__dirname, 'src/components/select/index.ts'),
+        'table': resolve(__dirname, 'src/components/table/index.ts'),
         'tag': resolve(__dirname, 'src/components/tag/index.ts'),
         'scrollbar': resolve(__dirname, 'src/components/scrollbar/index.ts'),
         'tooltip': resolve(__dirname, 'src/components/tooltip/index.ts'),
         'virtual-list': resolve(__dirname, 'src/components/virtual-list/index.ts'),
-
       },
       name: 'MeUI',
     },

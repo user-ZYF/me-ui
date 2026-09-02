@@ -36,6 +36,18 @@
       "types": "./dist/form.d.ts",
       "import": "./dist/form.js"
     },
+    "./icon": {
+      "types": "./dist/icon.d.ts",
+      "import": "./dist/icon.js"
+    },
+    "./input": {
+      "types": "./dist/input.d.ts",
+      "import": "./dist/input.js"
+    },
+    "./pagination": {
+      "types": "./dist/pagination.d.ts",
+      "import": "./dist/pagination.js"
+    },
     "./radio": {
       "types": "./dist/radio.d.ts",
       "import": "./dist/radio.js"
@@ -48,9 +60,21 @@
       "types": "./dist/tag.d.ts",
       "import": "./dist/tag.js"
     },
+    "./table": {
+      "types": "./dist/table.d.ts",
+      "import": "./dist/table.js"
+    },
     "./tooltip": {
       "types": "./dist/tooltip.d.ts",
       "import": "./dist/tooltip.js"
+    },
+    "./scrollbar": {
+      "types": "./dist/scrollbar.d.ts",
+      "import": "./dist/scrollbar.js"
+    },
+    "./virtual-list": {
+      "types": "./dist/virtual-list.d.ts",
+      "import": "./dist/virtual-list.js"
     },
     "./styles": "./dist/index.css",
     "./dist/*": "./dist/*"

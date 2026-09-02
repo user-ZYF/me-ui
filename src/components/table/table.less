@@ -1,0 +1,341 @@
+@B: ~'@{namespace}-table';
+
+.@{B} {
+  position: relative;
+  width: 100%;
+  font-size: var(~'@{cv-font-size-base}');
+  color: var(~'@{cv-text-color-regular}');
+  background-color: @color-white;
+  border: 1px solid var(~'@{cv-border-color-lighter}');
+  border-radius: var(~'@{cv-border-radius-base}');
+  overflow: hidden;
+
+  &__inner-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  // ========== 表头 ==========
+  &__header-wrapper {
+    overflow: hidden;
+    border-bottom: 1px solid var(~'@{cv-border-color-lighter}');
+  }
+
+  &__header {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    th {
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: bold;
+      color: var(~'@{cv-text-color-secondary}');
+      background-color: var(~'@{cv-border-color-extra-light}');
+      border-bottom: 1px solid var(~'@{cv-border-color-lighter}');
+      user-select: none;
+
+      &.is-center {
+        text-align: center;
+      }
+
+      &.is-right {
+        text-align: right;
+      }
+
+      .@{B}__cell {
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+
+  // ========== 表体 ==========
+  &__body-wrapper {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  &__body {
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(~'@{cv-border-color-lighter}');
+      box-sizing: border-box;
+      transition: background-color 0.25s ease;
+
+      &.is-center {
+        text-align: center;
+      }
+
+      &.is-right {
+        text-align: right;
+      }
+    }
+  }
+
+  // ========== 行 ==========
+  &__row {
+    &:hover > td {
+      background-color: var(~'@{cv-border-color-extra-light}');
+    }
+
+    &.is-striped > td {
+      background-color: var(~'@{cv-border-color-extra-light}');
+    }
+
+    &.is-current > td {
+      background-color: var(~'@{cv-color-primary}@{suffix-light-9}');
+    }
+  }
+
+  // ========== 单元格 ==========
+  &__cell {
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.5;
+  }
+
+  // ========== 排序图标 ==========
+  &__sort-caret {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    margin-left: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    width: 14px;
+    height: 14px;
+
+    i {
+      position: absolute;
+      left: 3px;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+
+      &.@{B}__sort-caret--ascending {
+        top: 0;
+        border-bottom: 5px solid var(~'@{cv-text-color-placeholder}');
+
+        &.is-active {
+          border-bottom-color: var(~'@{cv-color-primary}');
+        }
+      }
+
+      &.@{B}__sort-caret--descending {
+        bottom: 0;
+        border-top: 5px solid var(~'@{cv-text-color-placeholder}');
+
+        &.is-active {
+          border-top-color: var(~'@{cv-color-primary}');
+        }
+      }
+    }
+  }
+
+  // ========== 空数据 ==========
+  &__empty-block {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    width: 100%;
+    padding: 20px 0;
+  }
+
+  &__empty-text {
+    color: var(~'@{cv-text-color-secondary}');
+    font-size: var(~'@{cv-font-size-base}');
+  }
+
+  // ========== 尺寸 ==========
+  &--large {
+    font-size: var(~'@{cv-font-size-medium}');
+
+    .@{B}__header th {
+      padding: 12px 16px;
+    }
+
+    .@{B}__body td {
+      padding: 12px 16px;
+    }
+  }
+
+  &--small {
+    font-size: var(~'@{cv-font-size-small}');
+
+    .@{B}__header th {
+      padding: 4px 8px;
+    }
+
+    .@{B}__body td {
+      padding: 4px 8px;
+    }
+  }
+
+  // ========== 边框 ==========
+  &.is-border {
+    .@{B}__body td,
+    .@{B}__header th {
+      border-right: 1px solid var(~'@{cv-border-color-lighter}');
+    }
+
+    .@{B}__body td:last-child,
+    .@{B}__header th:last-child {
+      border-right: none;
+    }
+  }
+
+  // ========== 固定列 ==========
+  &__header th {
+    &.is-fixed-left,
+    &.is-fixed-right {
+      position: sticky;
+      background-color: var(~'@{cv-border-color-extra-light}');
+
+      &.is-fixed-left-last,
+      &.is-fixed-right-first {
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 10px;
+          overflow: hidden;
+          pointer-events: none;
+          box-shadow: none;
+          touch-action: none;
+        }
+      }
+
+      &.is-fixed-left-last {
+        &::before {
+          right: -10px;
+        }
+      }
+
+      &.is-fixed-right-first {
+        &::before {
+          left: -10px;
+        }
+      }
+    }
+  }
+
+  &__body td {
+    &.is-fixed-left,
+    &.is-fixed-right {
+      position: sticky;
+      background-color: @color-white;
+
+      &.is-fixed-left-last,
+      &.is-fixed-right-first {
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 10px;
+          overflow: hidden;
+          pointer-events: none;
+          box-shadow: none;
+          touch-action: none;
+        }
+      }
+
+      &.is-fixed-left-last {
+        &::before {
+          right: -10px;
+        }
+      }
+
+      &.is-fixed-right-first {
+        &::before {
+          left: -10px;
+        }
+      }
+    }
+  }
+
+  // 固定列在行状态下的背景色覆盖
+  &__row {
+    &:hover > td.is-fixed-left,
+    &:hover > td.is-fixed-right {
+      background-color: var(~'@{cv-border-color-extra-light}');
+    }
+
+    &.is-striped > td.is-fixed-left,
+    &.is-striped > td.is-fixed-right {
+      background-color: var(~'@{cv-border-color-extra-light}');
+    }
+
+    &.is-current > td.is-fixed-left,
+    &.is-current > td.is-fixed-right {
+      background-color: var(~'@{cv-color-primary}@{suffix-light-9}');
+    }
+  }
+
+  // 固定列阴影（基于滚动状态，使用伪元素）
+  &__inner-wrapper {
+    // 滚动到左侧：右固定列左侧显示阴影，左固定列无阴影
+    &.is-scrolling-left {
+      .@{B}__header th.is-fixed-right-first,
+      .@{B}__body td.is-fixed-right-first {
+        &::before {
+          box-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.15);
+        }
+      }
+
+      .@{B}__header th.is-fixed-left-last,
+      .@{B}__body td.is-fixed-left-last {
+        &::before {
+          box-shadow: none;
+        }
+      }
+    }
+
+    // 滚动到右侧：左固定列右侧显示阴影，右固定列无阴影
+    &.is-scrolling-right {
+      .@{B}__header th.is-fixed-left-last,
+      .@{B}__body td.is-fixed-left-last {
+        &::before {
+          box-shadow: inset 10px 0 10px -10px rgba(0,0,0,0.15);
+        }
+      }
+
+      .@{B}__header th.is-fixed-right-first,
+      .@{B}__body td.is-fixed-right-first {
+        &::before {
+          box-shadow: none;
+        }
+      }
+    }
+
+    // 滚动到中间：左右固定列都显示阴影
+    &.is-scrolling-middle {
+      .@{B}__header th.is-fixed-left-last,
+      .@{B}__body td.is-fixed-left-last {
+        &::before {
+          box-shadow: inset 10px 0 10px -10px rgba(0,0,0,0.15);
+        }
+      }
+
+      .@{B}__header th.is-fixed-right-first,
+      .@{B}__body td.is-fixed-right-first {
+        &::before {
+          box-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.15);
+        }
+      }
+    }
+  }
+}

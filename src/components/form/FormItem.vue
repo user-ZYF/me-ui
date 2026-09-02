@@ -36,7 +36,8 @@ import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { formContextKey, formItemContextKey } from './constants';
 import { formItemProps } from './form-item';
-import { cloneDeep, ensureArray, getProp, isArray, isFunction } from './utils';
+import { isFunction } from '@me-ui/utils/types';
+import { cloneDeep, ensureArray, getProp, isArray } from './utils';
 import { useFormSize } from './hooks';
 
 import type { RuleItem } from 'async-validator';

@@ -15,11 +15,6 @@ export function isArray(value: unknown): value is any[] {
   return Array.isArray(value);
 }
 
-/** 判断是否为函数 */
-export function isFunction(value: unknown): value is Function {
-  return typeof value === 'function';
-}
-
 /** 深拷贝 */
 export function cloneDeep<T>(value: T): T {
   if (value === null || value === undefined) return value;

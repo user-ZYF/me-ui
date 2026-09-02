@@ -10,13 +10,14 @@ import { MePagination } from './components/pagination';
 import { MeRadio, MeRadioButton, MeRadioGroup } from './components/radio';
 import { MeSelect } from './components/select';
 import { MeScrollbar } from './components/scrollbar';
+import { MeTable, MeTableColumn } from './components/table';
 import { MeTag } from './components/tag';
 import { MeTooltip } from './components/tooltip';
 import { MeVirtualList } from './components/virtual-list';
 
 import './setup';
 
-const components = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTag, MeTooltip, MeVirtualList];
+const components = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTable, MeTableColumn, MeTag, MeTooltip, MeVirtualList];
 
 /**
  * Vue 插件安装入口
@@ -28,6 +29,6 @@ function install(app: App) {
   });
 }
 
-export { MeButton, MeCheckbox, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTag, MeTooltip, MeVirtualList };
+export { MeButton, MeCheckbox, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTable, MeTableColumn, MeTag, MeTooltip, MeVirtualList };
 
 export default { install };

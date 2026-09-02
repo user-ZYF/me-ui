@@ -3,6 +3,8 @@ import { useEventListener } from '@vueuse/core';
 
 import type { MaybeRef, Ref } from 'vue';
 
+import { isFunction } from '@me-ui/utils/types';
+
 /** useFocusController 配置项 */
 interface UseFocusControllerOptions {
   /** 是否禁用 */
@@ -39,7 +41,7 @@ export function useFocusController<T extends { focus: () => void }>(
 
   /** 处理聚焦 */
   function handleFocus(event: FocusEvent) {
-    const cancelFocus = typeof beforeFocus === 'function' ? beforeFocus(event) : false;
+    const cancelFocus = isFunction(beforeFocus) ? beforeFocus(event) : false;
     if (unref(disabled) || isFocused.value || cancelFocus) return;
 
     isFocused.value = true;
@@ -49,7 +51,7 @@ export function useFocusController<T extends { focus: () => void }>(
 
   /** 处理失焦 */
   function handleBlur(event: FocusEvent) {
-    const cancelBlur = typeof beforeBlur === 'function' ? beforeBlur(event) : false;
+    const cancelBlur = isFunction(beforeBlur) ? beforeBlur(event) : false;
     if (
       unref(disabled) ||
       (event.relatedTarget &&
