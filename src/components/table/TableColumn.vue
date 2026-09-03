@@ -1,10 +1,10 @@
-<!-- ? TableColumn 表格列组件（不渲染 DOM） -->
+<!-- ? TableColumn 表格列组件（不渲染可见 DOM，仅提供列配置和嵌套列渲染） -->
 <template>
-  <!---->
+  <slot></slot>
 </template>
 
 <script lang="ts" setup>
-import { h, inject, onBeforeMount, onBeforeUnmount, ref } from 'vue';
+import { h, inject, onBeforeMount, onBeforeUnmount, onMounted, provide, ref } from 'vue';
 
 import { get } from 'lodash';
 
@@ -15,7 +15,7 @@ import MeCheckbox from '@me-ui/components/checkbox';
 import { tableColumnProps } from './table-column';
 import type { TableColumnSlots } from './table-column';
 import type { DefaultRow, TableCellData, TableCellRenderData, TableColumnCtx, TableHeaderData } from './types';
-import { TABLE_INJECTION_KEY, createColumnId } from './constants';
+import { TABLE_COLUMN_INJECTION_KEY, TABLE_INJECTION_KEY, createColumnId } from './constants';
 import type { TableStore } from './store';
 
 defineOptions({ name: 'MeTableColumn' });
@@ -33,8 +33,14 @@ if (!parent) {
 
 const { store, tableId, emit } = parent;
 
+/** 注入父列上下文 */
+const parentColumn = inject(TABLE_COLUMN_INJECTION_KEY, undefined);
+
 /** 列配置 */
 const columnConfig = ref<TableColumnCtx<DefaultRow>>({} as TableColumnCtx<DefaultRow>);
+
+/** 提供列上下文给子列 */
+provide(TABLE_COLUMN_INJECTION_KEY, columnConfig);
 
 /** 渲染单元格值 */
 function renderCellValue(data: TableCellData): string | VNode | VNode[] {
@@ -99,7 +105,7 @@ onBeforeMount(() => {
     label: props.label,
     name: props.name,
     align: props.align,
-    headerAlign: props.headerAlign || props.align,
+    headerAlign: props.headerAlign ?? props.align,
     sort: isSelection ? false : props.sort,
     order: null,
     formatter: props.formatter,
@@ -114,13 +120,23 @@ onBeforeMount(() => {
     renderCell: isSelection
       ? (data) => selectionRenderCell(data)
       : (data) => defaultRenderCell(data),
+    isSubColumn: !!parentColumn,
+    // 以下均为临时设置的初始值
+    children: [],
+    level: 1,
+    colSpan: 1,
+    rowSpan: 1,
+    isColumnGroup: false,
   };
 
   columnConfig.value = column;
-  store.insertColumn(column);
+});
+
+onMounted(() => {
+  store.insertColumn(columnConfig.value, parentColumn?.value);
 });
 
 onBeforeUnmount(() => {
-  store.removeColumn(columnConfig.value);
+  store.removeColumn(columnConfig.value, parentColumn?.value);
 });
 </script>

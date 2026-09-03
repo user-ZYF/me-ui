@@ -120,14 +120,103 @@
       </me-table-column>
     </me-table>
 
-    <!-- 合并单元格 -->
-    <h2 class="play-table-title">合并单元格</h2>
-    <me-table :data="spanData" :span-method="spanMethod">
+    <!-- 多级表头 -->
+    <h2 class="play-table-title">多级表头</h2>
+    <me-table :data="fixedColumnData">
       <me-table-column name="name" label="姓名" :width="120" />
-      <me-table-column name="category" label="分类" :width="100" />
-      <me-table-column name="age" label="年龄" :width="100" />
-      <me-table-column name="address" label="地址" />
-      <me-table-column name="remark" label="备注" :width="150" />
+      <me-table-column label="基本信息">
+        <me-table-column name="age" label="年龄" :width="100" sort />
+        <me-table-column name="gender" label="性别" :width="80" />
+      </me-table-column>
+      <me-table-column label="联系方式">
+        <me-table-column name="phone" label="手机号" :width="150" />
+        <me-table-column name="email" label="邮箱" :width="200" />
+      </me-table-column>
+      <me-table-column name="address" label="地址" :min-width="250" />
+    </me-table>
+
+    <!-- 对齐方式 -->
+    <h2 class="play-table-title">对齐方式（align + header-align）</h2>
+    <p class="play-table-tip">align 控制表体对齐，header-align 控制表头对齐；header-align 未设置时跟随 align</p>
+    <me-table :data="basicData">
+      <me-table-column name="name" label="姓名（left/left）" :width="160" align="left" header-align="left" />
+      <me-table-column name="age" label="年龄（center/center）" :width="160" align="center" header-align="center" />
+      <me-table-column name="address" label="地址（left/right）" :min-width="200" align="left" header-align="right" />
+      <me-table-column name="status" label="状态（right/left）" :width="160" align="right" header-align="left" :formatter="statusFormatter" />
+    </me-table>
+
+    <!-- 对齐方式 + 多级表头 -->
+    <h2 class="play-table-title">对齐方式 + 多级表头</h2>
+    <p class="play-table-tip">分组列设置 header-align，子列各自设置 align 和 header-align</p>
+    <me-table :data="fixedColumnData">
+      <me-table-column name="name" label="姓名" :width="120" align="center" header-align="center" />
+      <me-table-column label="基本信息" header-align="center">
+        <me-table-column name="age" label="年龄" :width="100" align="right" header-align="right" sort />
+        <me-table-column name="gender" label="性别" :width="80" align="center" header-align="left" />
+      </me-table-column>
+      <me-table-column label="联系方式" header-align="right">
+        <me-table-column name="phone" label="手机号" :width="150" align="left" header-align="center" />
+        <me-table-column name="email" label="邮箱" :min-width="200" align="right" header-align="right" />
+      </me-table-column>
+    </me-table>
+
+    <!-- 三级表头 -->
+    <h2 class="play-table-title">三级表头</h2>
+    <me-table :data="fixedColumnData">
+      <me-table-column name="name" label="姓名" :width="120" />
+      <me-table-column label="个人信息">
+        <me-table-column label="基本">
+          <me-table-column name="age" label="年龄" :width="100" />
+          <me-table-column name="gender" label="性别" :width="80" />
+        </me-table-column>
+        <me-table-column label="联系">
+          <me-table-column name="phone" label="手机号" :width="150" />
+          <me-table-column name="email" label="邮箱" :width="200" />
+        </me-table-column>
+      </me-table-column>
+      <me-table-column label="工作信息">
+        <me-table-column name="company" label="公司" :width="180" />
+        <me-table-column name="position" label="职位" :min-width="150" />
+        <me-table-column name="salary" label="薪资" :width="120" />
+      </me-table-column>
+    </me-table>
+
+    <!-- 多级表头 + 固定列 -->
+    <h2 class="play-table-title">多级表头 + 固定列</h2>
+    <me-table :data="fixedColumnData" :height="300">
+      <me-table-column name="name" label="姓名" :width="120" fixed="left" />
+      <me-table-column label="个人信息" fixed="left">
+        <me-table-column name="age" label="年龄" :width="100" sort />
+        <me-table-column name="gender" label="性别" :width="80" />
+      </me-table-column>
+      <me-table-column label="联系方式">
+        <me-table-column name="phone" label="手机号" :width="150" />
+        <me-table-column name="email" label="邮箱" :width="200" />
+      </me-table-column>
+      <me-table-column label="工作信息">
+        <me-table-column name="company" label="公司" :width="180" />
+        <me-table-column name="position" label="职位" :min-width="150" />
+      </me-table-column>
+      <me-table-column name="salary" label="薪资" :width="120" fixed="right" />
+    </me-table>
+
+    <!-- 合并单元格 -->
+    <h2 class="play-table-title">合并单元格（多种合并形式）</h2>
+    <p class="play-table-tip">
+      1. 大区列：按字段值合并行（rowspan）<br>
+      2. 省份列：按字段值合并行（rowspan），含小计/汇总行<br>
+      3. 小计行：省份~合计 5 列合并为单个单元格（colspan）<br>
+      4. 汇总行：城市~合计 4 列合并为单个单元格（colspan）<br>
+      5. 备注列：按相邻相同值合并行（rowspan）
+    </p>
+    <me-table :data="spanData" :span-method="spanMethod">
+      <me-table-column name="region" label="大区" :width="100" />
+      <me-table-column name="province" label="省份" :width="100" />
+      <me-table-column name="city" label="城市" :width="100" />
+      <me-table-column name="q1" label="Q1销售额" :width="120" />
+      <me-table-column name="q2" label="Q2销售额" :width="120" />
+      <me-table-column name="total" label="上半年合计" :width="120" />
+      <me-table-column name="remark" label="备注" :min-width="120" />
     </me-table>
 
     <!-- 空数据 -->
@@ -217,23 +306,39 @@ const fixedColumnData = ref<FixedColumnRow[]>([
 const emptyData = ref<TableRow[]>([]);
 
 /** 合并单元格数据 */
-interface SpanRow extends TableRow {
-  /** 分类 */
-  category: string;
+interface SpanRow {
+  /** ID */
+  id: number;
+  /** 大区 */
+  region: string;
+  /** 省份 */
+  province: string;
+  /** 城市 */
+  city: string;
+  /** Q1 销售额 */
+  q1: number;
+  /** Q2 销售额 */
+  q2: number;
+  /** 上半年合计 */
+  total: number;
   /** 备注 */
   remark: string;
 }
 
 const spanData = ref<SpanRow[]>([
-  { id: 1, name: '张三', age: 25, address: '北京市朝阳区', status: 1, category: 'A 组', remark: '正常' },
-  { id: 2, name: '张三', age: 30, address: '上海市浦东新区', status: 0, category: 'A 组', remark: '正常' },
-  { id: 3, name: '王五', age: 28, address: '广州市天河区', status: 1, category: 'B 组', remark: '正常' },
-  { id: 4, name: '赵六', age: 35, address: '深圳市南山区', status: 0, category: 'B 组', remark: '正常' },
-  { id: 5, name: '赵六', age: 22, address: '杭州市西湖区', status: 1, category: 'B 组', remark: '正常' },
-  { id: 6, name: '孙七', age: 26, address: '成都市武侯区', status: 1, category: 'C 组', remark: '最后一行合并备注' },
+  { id: 1, region: '华东', province: '江苏', city: '南京', q1: 100, q2: 120, total: 220, remark: '达标' },
+  { id: 2, region: '华东', province: '江苏', city: '苏州', q1: 80, q2: 90, total: 170, remark: '达标' },
+  { id: 3, region: '华东', province: '浙江', city: '杭州', q1: 150, q2: 130, total: 280, remark: '优秀' },
+  { id: 4, region: '华东', province: '浙江', city: '宁波', q1: 70, q2: 85, total: 155, remark: '待提升' },
+  { id: 5, region: '华东', province: '华东小计', city: '—', q1: 400, q2: 425, total: 825, remark: '—' },
+  { id: 6, region: '华南', province: '广东', city: '广州', q1: 200, q2: 180, total: 380, remark: '优秀' },
+  { id: 7, region: '华南', province: '广东', city: '深圳', q1: 190, q2: 210, total: 400, remark: '优秀' },
+  { id: 8, region: '华南', province: '福建', city: '福州', q1: 60, q2: 70, total: 130, remark: '待提升' },
+  { id: 9, region: '华南', province: '福建', city: '厦门', q1: 55, q2: 65, total: 120, remark: '待提升' },
+  { id: 10, region: '华南', province: '汇总', city: '华南汇总', q1: 505, q2: 525, total: 1030, remark: '—' },
 ]);
 
-/** 计算指定列按字段值合并的跨度 */
+/** 计算指定列按字段值合并的行跨度（相邻相同值合并） */
 function getRowspanByField(rowIndex: number, field: keyof SpanRow): number {
   const current = spanData.value[rowIndex];
   const prev = spanData.value[rowIndex - 1];
@@ -251,28 +356,47 @@ function getRowspanByField(rowIndex: number, field: keyof SpanRow): number {
   return rowspan;
 }
 
-/** 合并单元格：姓名列按 name 合并，分类列按 category 合并，最后一行合并年龄和地址 */
+/** 小计行索引 */
+const SUMMARY_ROW_INDEX = 4;
+
+/** 汇总行索引 */
+const TOTAL_ROW_INDEX = 9;
+
+/** 合并单元格方法：多种合并形式 */
 function spanMethod({ rowIndex, columnIndex }: { row: DefaultRow; rowIndex: number; columnIndex: number }): SpanInfo {
-  const lastIndex = spanData.value.length - 1;
-
-  // 最后一行：年龄 + 地址 + 备注合并为一个单元格
-  if (rowIndex === lastIndex && columnIndex === 2) {
-    return { rowspan: 1, colspan: 3 };
+  // 小计行：省份 + 城市 + Q1 + Q2 + 合计 = colspan 5
+  if (rowIndex === SUMMARY_ROW_INDEX) {
+    if (columnIndex === 1) {
+      return { rowspan: 1, colspan: 5 };
+    }
+    if (columnIndex >= 2 && columnIndex <= 5) {
+      return { rowspan: 0, colspan: 0 };
+    }
   }
-  if (rowIndex === lastIndex && (columnIndex === 3 || columnIndex === 4)) {
-    return { rowspan: 0, colspan: 0 };
+
+  // 汇总行：城市 + Q1 + Q2 + 合计 = colspan 4
+  if (rowIndex === TOTAL_ROW_INDEX) {
+    if (columnIndex === 2) {
+      return { rowspan: 1, colspan: 4 };
+    }
+    if (columnIndex >= 3 && columnIndex <= 5) {
+      return { rowspan: 0, colspan: 0 };
+    }
   }
 
-  // 姓名列：按 name 合并
+  // 大区列：按 region 字段值合并行
   if (columnIndex === 0) {
-    const rowspan = getRowspanByField(rowIndex, 'name');
-    return { rowspan, colspan: 1 };
+    return { rowspan: getRowspanByField(rowIndex, 'region'), colspan: 1 };
   }
 
-  // 分类列：按 category 合并
+  // 省份列：按 province 字段值合并行
   if (columnIndex === 1) {
-    const rowspan = getRowspanByField(rowIndex, 'category');
-    return { rowspan, colspan: 1 };
+    return { rowspan: getRowspanByField(rowIndex, 'province'), colspan: 1 };
+  }
+
+  // 备注列：按 remark 字段值合并相邻行
+  if (columnIndex === 6) {
+    return { rowspan: getRowspanByField(rowIndex, 'remark'), colspan: 1 };
   }
 
   return { rowspan: 1, colspan: 1 };

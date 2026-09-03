@@ -1,5 +1,6 @@
 ---
 description: me-ui 组件库开发规范，新增/修改组件时必须遵循
+auto_execution_mode: 3
 ---
 
 # me-ui 组件库开发规范
@@ -54,11 +55,12 @@ export { /* ... */, MeNewComponent };
 'new-component': resolve(__dirname, 'src/components/new-component/index.ts'),
 ```
 
-## 2. 参考 Element Plus 实现
+## 2. 参考 Element Plus 源码实现
 
-- 新增组件时，参考 [Element Plus](https://github.com/element-plus/element-plus) 官方对应组件的实现方式
+- 新增组件和迭代更新补充功能时，都必须**参考 Element Plus**进行实现
+- Element Plus 源码位于项目根目录的 `element-plus/` 目录下
 - 初始实现**只包含核心功能**，不需要一次性对齐所有特性
-- 后续按需迭代补充高级功能
+- 后续迭代补充高级功能时，也必须按照 Element Plus 的实现方式进行
 
 ## 3. 组件目录结构
 
@@ -225,7 +227,12 @@ function fetchUserData() {
 }
 ```
 
-## 9. 命名规范
+## 9. 禁止自行运行项目
+
+- **禁止**自行执行启动、构建、预览等命令（如 `pnpm dev`、`pnpm build`、`pnpm play` 等）
+- 如需验证，请告知用户由用户自行运行
+
+## 10. 命名规范
 
 - **组件名称**：`Me` 前缀 + `PascalCase`，如 `MeButton`、`MeSelect`
 - **组件文件**：`PascalCase`，如 `Button.vue`、`Select.vue`
@@ -234,3 +241,15 @@ function fetchUserData() {
 - **常量文件**：固定命名为 `constants.ts`
 - **类型文件**：固定命名为 `types.ts`
 - **hooks 文件**：`kebab-case`，如 `kebab-case.ts`
+
+## 11. Slot 插槽规范
+
+- **禁止**使用自闭合形式书写 `<slot>` 标签，必须显式书写闭合标签
+
+```vue
+<!-- ✅ 正确 -->
+<slot></slot>
+
+<!-- ❌ 错误 -->
+<slot />
+```

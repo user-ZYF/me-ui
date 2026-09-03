@@ -38,16 +38,30 @@
 
       &.is-center {
         text-align: center;
+
+        .@{B}__cell {
+          justify-content: center;
+        }
       }
 
       &.is-right {
         text-align: right;
+
+        .@{B}__cell {
+          justify-content: flex-end;
+        }
       }
 
       .@{B}__cell {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
       }
+    }
+
+    // 多级表头模式下，分组列表头（is-group）需要底部边框以分隔子级表头
+    thead.is-group tr:not(:last-child) th.is-group {
+      border-bottom: 1px solid var(~'@{cv-border-color-lighter}');
     }
   }
 
@@ -95,9 +109,7 @@
   // ========== 单元格 ==========
   &__cell {
     box-sizing: border-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    word-break: break-word;
     line-height: 1.5;
   }
 
@@ -190,8 +202,8 @@
       border-right: 1px solid var(~'@{cv-border-color-lighter}');
     }
 
-    .@{B}__body td:last-child,
-    .@{B}__header th:last-child {
+    .@{B}__body td.is-last,
+    .@{B}__header th.is-last {
       border-right: none;
     }
   }

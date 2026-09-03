@@ -89,4 +89,16 @@ export interface TableColumnCtx<T extends DefaultRow = DefaultRow> {
   renderCell: (data: TableCellRenderData<T> & { cellIndex: number }) => string | VNode | VNode[];
   /** 固定列方向 */
   fixed?: TableColumnFixed;
+  /** 子列（用于多级表头） */
+  children?: TableColumnCtx<T>[];
+  /** 层级 */
+  level: number;
+  /** 列跨度 */
+  colSpan: number;
+  /** 行跨度 */
+  rowSpan: number;
+  /** 是否为分组列 */
+  isColumnGroup: boolean;
+  /** 是否为子列 */
+  isSubColumn: boolean;
 }

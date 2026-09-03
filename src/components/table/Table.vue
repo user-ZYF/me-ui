@@ -23,27 +23,44 @@
       <!-- 表头 -->
       <div ref="headerWrapperRef" :class="ns.e('header-wrapper')">
         <table :class="ns.e('header')" :style="{ width: bodyWidth }">
-          <thead>
-            <tr>
+          <!-- 控制列宽 -->
+          <colgroup>
+            <col
+              v-for="column in leafColumns"
+              :key="column.id"
+              :style="{ width: `${getColumnRealWidth(column)}px` }"
+            />
+          </colgroup>
+          <thead :class="ns.is('group', isGroup)">
+            <tr
+              v-for="(subColumns, rowIndex) in columnRows"
+              :key="rowIndex"
+            >
               <th
-                v-for="(column, columnIndex) in tableColumns"
+                v-for="(column, cellIndex) in subColumns"
                 :key="column.id"
+                :colspan="column.colSpan"
+                :rowspan="column.rowSpan"
                 :class="[
-                  ns.is(column.align, !!column.align),
+                  ns.is(column.headerAlign, !!column.headerAlign),
                   ns.is('fixed-left', column.fixed === 'left'),
                   ns.is('fixed-right', column.fixed === 'right'),
-                  ns.is('fixed-left-last', column.id === lastLeftFixedColumnId),
-                  ns.is(
-                    'fixed-right-first',
-                    column.id === firstRightFixedColumnId,
-                  ),
+                  ns.is('fixed-left-last', isLastLeftFixed(column)),
+                  ns.is('fixed-right-first', isFirstRightFixed(column)),
+                  ns.is('group', column.isColumnGroup),
+                  ns.is('last', isLastColumn(column)),
                 ]"
                 :style="getColumnStyle(column)"
                 @click="(event) => onHeaderCellClick(event, column)"
               >
                 <div :class="ns.e('cell')">
-                  <VNodeRenderer :content="renderHeader(column, columnIndex)" />
-                  <span v-if="column.sort" :class="ns.e('sort-caret')">
+                  <VNodeRenderer
+                    :content="renderHeader(column, cellIndex)"
+                  />
+                  <span
+                    v-if="column.sort && (!column.children || column.children.length === 0)"
+                    :class="ns.e('sort-caret')"
+                  >
                     <i
                       :class="[
                         ns.em('sort-caret', 'ascending'),
@@ -75,13 +92,20 @@
           @scroll="onBodyScroll"
         >
           <table :class="ns.e('body')" :style="{ width: bodyWidth }">
+            <colgroup>
+              <col
+                v-for="column in leafColumns"
+                :key="column.id"
+                :style="{ width: `${getColumnRealWidth(column)}px` }"
+              />
+            </colgroup>
             <tbody>
               <tr
                 v-for="(row, rowIndex) in tableData"
                 :key="rowIndex"
                 :class="[
                   ns.e('row'),
-                  ns.is('striped', rowIndex % 2 === 1),
+                  ns.is('striped', isOdd(rowIndex)),
                   ns.is('current', store.states.currentRow.value === row),
                 ]"
               >
@@ -103,6 +127,7 @@
                         'fixed-right-first',
                         cell.column.id === firstRightFixedColumnId,
                       ),
+                      ns.is('last', cell.column.id === lastLeafColumnId),
                     ]"
                     :style="getColumnStyle(cell.column)"
                     :rowspan="cell.span.rowspan"
@@ -146,6 +171,8 @@ import type { CSSProperties, FunctionalComponent, VNode } from "vue";
 import { useFormSize } from "@me-ui/components/form/hooks";
 import { useNamespace } from "@me-ui/hooks/use-namespace";
 import { useResizeObserver } from "@vueuse/core";
+
+import { isOdd } from "@me-ui/utils";
 
 import MeScrollbar from "@me-ui/components/scrollbar";
 import type MeScrollbarType from "@me-ui/components/scrollbar";
@@ -194,11 +221,68 @@ const scrollLeft = ref(0);
 /** 最大水平滚动距离 */
 const maxScrollLeft = ref(0);
 
-/** 渲染 VNode 的辅助组件 */
+/** 渲染 VNode 的函数式组件 */
 const VNodeRenderer: FunctionalComponent<{ content: VNode | VNode[] | null }> = ({ content }) => content;
 
-/** 列数据（计算属性确保模板响应性） */
-const tableColumns = computed(() => store.states.columns.value);
+/** 叶子列数据 */
+const leafColumns = computed(() => store.states.leafColumns.value);
+
+/** 将列树转换为表头行数组（计算每列的 level/colSpan/rowSpan） */
+function convertToRows(originCols: TableColumnCtx<DefaultRow>[]): TableColumnCtx<DefaultRow>[][] {
+  let maxLevel = 1;
+
+  /** 计算 level 和 colSpan */
+  function dfs(column: TableColumnCtx<DefaultRow>, parent?: TableColumnCtx<DefaultRow>) {
+    if (parent) {
+      column.level = parent.level + 1;
+      if (maxLevel < column.level) {
+        maxLevel = column.level;
+      }
+    }
+    if (column.children && column.children.length > 0) {
+      let colSpan = 0;
+      column.children.forEach((subColumn) => {
+        dfs(subColumn, column);
+        colSpan += subColumn.colSpan;
+      });
+      column.colSpan = colSpan;
+      column.isColumnGroup = true;
+    } else {
+      column.colSpan = 1;
+      column.isColumnGroup = false;
+    }
+  }
+
+  originCols.forEach((column) => {
+    column.level = 1;
+    dfs(column, undefined);
+  });
+
+  const rows: TableColumnCtx<DefaultRow>[][] = [];
+  for (let i = 0; i < maxLevel; i++) {
+    rows.push([]);
+  }
+
+  const allColumns = store.getAllColumns(originCols);
+  allColumns.forEach((column) => {
+    if (!column.isColumnGroup) {
+      column.rowSpan = maxLevel - column.level + 1;
+    } else {
+      column.rowSpan = 1;
+    }
+    rows[column.level - 1].push(column);
+  });
+
+  return rows;
+}
+
+/** 表头行数据（二维数组，每行对应一级表头） */
+const columnRows = computed(() =>
+  convertToRows(store.states.columns.value),
+);
+
+/** 是否为多级表头 */
+const isGroup = computed(() => columnRows.value.length > 1);
 
 /** 表格数据（计算属性确保模板响应性） */
 const tableData = computed(() => store.states.data.value);
@@ -208,7 +292,7 @@ const isEmpty = computed(() => tableData.value.length === 0);
 
 /** 是否有固定列 */
 const hasFixedColumns = computed(() =>
-  tableColumns.value.some((col) => col.fixed),
+  leafColumns.value.some((col) => col.fixed),
 );
 
 /** 获取列实际渲染宽度 */
@@ -223,7 +307,7 @@ function getColumnRealWidth(column: TableColumnCtx<DefaultRow>): number {
 
 /** 固定列偏移量映射 */
 const fixedColumnOffsets = computed(() => {
-  const cols = tableColumns.value;
+  const cols = leafColumns.value;
   const offsets: Record<string, number> = {};
   let leftOffset = 0;
   let rightOffset = 0;
@@ -244,12 +328,40 @@ const fixedColumnOffsets = computed(() => {
     }
   }
 
+  // 分组列的偏移量取其第一个/最后一个叶子列的偏移量
+  const allColumns = store.getAllColumns(store.states.columns.value);
+  allColumns.forEach((column) => {
+    if (column.fixed && column.children && column.children.length > 0) {
+      const leaves = store.getLeafColumns(column);
+      if (leaves.length > 0) {
+        const targetLeaf = column.fixed === 'left' ? leaves[0] : leaves[leaves.length - 1];
+        offsets[column.id] = offsets[targetLeaf.id] ?? 0;
+      }
+    }
+  });
+
   return offsets;
 });
 
+/** 最后一个叶子列 ID */
+const lastLeafColumnId = computed(() => {
+  const cols = leafColumns.value;
+  return cols.length > 0 ? cols[cols.length - 1].id : null;
+});
+
+/** 判断列是否为最后一列（支持分组列） */
+function isLastColumn(column: TableColumnCtx<DefaultRow>): boolean {
+  if (!column.children || column.children.length === 0) {
+    return column.id === lastLeafColumnId.value;
+  }
+  const leaves = store.getLeafColumns(column);
+  const lastLeaf = leaves[leaves.length - 1];
+  return !!lastLeaf && lastLeaf.id === lastLeafColumnId.value;
+}
+
 /** 最后一个左固定列 ID */
 const lastLeftFixedColumnId = computed(() => {
-  const cols = tableColumns.value;
+  const cols = leafColumns.value;
   for (let i = cols.length - 1; i >= 0; i--) {
     if (cols[i].fixed === "left") {
       return cols[i].id;
@@ -260,7 +372,7 @@ const lastLeftFixedColumnId = computed(() => {
 
 /** 第一个右固定列 ID */
 const firstRightFixedColumnId = computed(() => {
-  const cols = tableColumns.value;
+  const cols = leafColumns.value;
   for (let i = 0; i < cols.length; i++) {
     const col = cols[i];
     if (col.fixed === "right") {
@@ -269,6 +381,28 @@ const firstRightFixedColumnId = computed(() => {
   }
   return null;
 });
+
+/** 判断列是否为最后一个左固定列（支持分组列） */
+function isLastLeftFixed(column: TableColumnCtx<DefaultRow>): boolean {
+  if (column.fixed !== "left") return false;
+  if (!column.children || column.children.length === 0) {
+    return column.id === lastLeftFixedColumnId.value;
+  }
+  const leaves = store.getLeafColumns(column);
+  const lastLeaf = leaves[leaves.length - 1];
+  return !!lastLeaf && lastLeaf.id === lastLeftFixedColumnId.value;
+}
+
+/** 判断列是否为第一个右固定列（支持分组列） */
+function isFirstRightFixed(column: TableColumnCtx<DefaultRow>): boolean {
+  if (column.fixed !== "right") return false;
+  if (!column.children || column.children.length === 0) {
+    return column.id === firstRightFixedColumnId.value;
+  }
+  const leaves = store.getLeafColumns(column);
+  const firstLeaf = leaves[0];
+  return !!firstLeaf && firstLeaf.id === firstRightFixedColumnId.value;
+}
 
 /** 是否有横向滚动 */
 const hasScrollX = computed(() => store.states.scrollX.value);
@@ -302,19 +436,12 @@ const bodyWidth = computed(() => {
   return w ? `${w}px` : "100%";
 });
 
-/** 获取列样式（宽度 + 固定列偏移量） */
+/** 获取列样式（固定列偏移量，支持分组列） */
 function getColumnStyle(column: TableColumnCtx<DefaultRow>): CSSProperties {
   const style: CSSProperties = {};
 
-  const width = column.realWidth ?? column.width;
-  if (width !== undefined && width !== null) {
-    style.width = `${width}px`;
-  } else if (column.minWidth) {
-    style.minWidth = `${column.minWidth}px`;
-  }
-
   if (column.fixed) {
-    const offset = fixedColumnOffsets.value[column.id] || 0;
+    const offset = fixedColumnOffsets.value[column.id] ?? 0;
     if (column.fixed === "left") {
       style.left = `${offset}px`;
     } else {
@@ -385,7 +512,7 @@ function renderCell(
 
 /** 获取行单元格列表（含合并跨度信息） */
 function getRowCells(row: DefaultRow, rowIndex: number) {
-  return tableColumns.value.map((column, cellIndex) => ({
+  return leafColumns.value.map((column, cellIndex) => ({
     column,
     cellIndex,
     span: getSpan(row, column, rowIndex, cellIndex),
@@ -469,7 +596,7 @@ function onBodyCellClick(
 
 /** 监听 selection 变化，向外 emit 事件 */
 watch(
-  () => store.states.selection.value,
+  store.states.selection,
   (newSelection) => {
     emit("selection-change", newSelection);
   },
@@ -486,7 +613,7 @@ watch(
 
 /** 监听列变化，重新计算列宽 */
 watch(
-  () => store.states.columns.value,
+  store.states.leafColumns,
   doLayout,
   { flush: "post" },
 );

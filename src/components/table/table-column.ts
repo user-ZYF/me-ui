@@ -41,7 +41,7 @@ export const tableColumnProps = {
   /** 表头对齐方式 */
   headerAlign: {
     type: String as PropType<TableColumnAlign>,
-    default: '',
+    default: undefined,
   },
   /** 排序配置（true 开启默认排序，传入函数则使用自定义排序） */
   sort: {
@@ -70,6 +70,8 @@ export type TableColumnProps = ExtractPropTypes<typeof tableColumnProps>;
 
 /** TableColumn Slots 类型 */
 export interface TableColumnSlots {
+  /** 默认插槽（用于嵌套子列，实现多级表头） */
+  default(): VNode[];
   /** 表体插槽 */
   body(props: { row: DefaultRow; column: TableColumnCtx<DefaultRow>; $index: number }): VNode[];
   /** 表头插槽 */

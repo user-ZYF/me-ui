@@ -10,10 +10,12 @@ import { isFunction } from '@me-ui/utils/types';
 /** 表格 Store 状态管理 */
 export function useTableStore<T extends DefaultRow = DefaultRow>() {
 
-  /** 原始列定义 */
+  /** 原始列定义（树形结构） */
   const _columns: Ref<TableColumnCtx<T>[]> = ref([]);
-  /** 展平后的列 */
+  /** 按固定状态排序的列（树形结构，用于表头渲染） */
   const columns: Ref<TableColumnCtx<T>[]> = ref([]);
+  /** 展平后的叶子列（用于表体渲染） */
+  const leafColumns: Ref<TableColumnCtx<T>[]> = ref([]);
   /** 原始数据 */
   const _data: Ref<T[]> = ref([]);
   /** 当前展示数据（经过排序） */
@@ -37,8 +39,34 @@ export function useTableStore<T extends DefaultRow = DefaultRow>() {
   /** 是否有横向滚动 */
   const scrollX: Ref<boolean> = ref(false);
 
-  /** 更新列（按固定状态排序：左固定 → 非固定 → 右固定） */
+  /** 校验单个列配置，返回 false 表示不允许插入 */
+  function validateColumn(column: TableColumnCtx<T>, parent?: TableColumnCtx<T>): boolean {
+    if (parent && column.fixed) {
+      console.warn('[MeTable] fixed 只能在第一层列上设置，子列的 fixed 会被父列覆盖');
+    }
+    if (column.type === 'selection' && leafColumns.value.some((col) => col.type === 'selection')) {
+      console.warn('[MeTable] 只允许存在一个 type="selection" 的列');
+      return false;
+    }
+    if (column.children && column.children.length > 0) {
+      if (column.type === 'selection') {
+        console.warn('[MeTable] type="selection" 的列不能包含子列，请将其设置为叶子列');
+        return false;
+      }
+      if (column.sort) {
+        console.warn('[MeTable] 分组列不应设置 sort，sort 仅对叶子列有效');
+      }
+    }
+    return true;
+  }
+
+  /** 更新列（按固定状态排序：左固定 → 非固定 → 右固定，保留树形结构） */
   function updateColumns() {
+    // 只有最外层table-column设置的fixed才有效
+    _columns.value.forEach((column) => {
+      updateChildFixed(column);
+    });
+
     const leftFixed: TableColumnCtx<T>[] = [];
     const nonFixed: TableColumnCtx<T>[] = [];
     const rightFixed: TableColumnCtx<T>[] = [];
@@ -54,11 +82,12 @@ export function useTableStore<T extends DefaultRow = DefaultRow>() {
     });
 
     columns.value = [...leftFixed, ...nonFixed, ...rightFixed];
+    leafColumns.value = doFlattenColumns(columns.value);
   }
 
   /** 计算列宽度 */
   function updateColumnsWidth(containerWidth: number) {
-    const cols = columns.value;
+    const cols = leafColumns.value;
     if (cols.length === 0) return;
 
     /** 没有 width 的弹性列 */
@@ -117,12 +146,20 @@ export function useTableStore<T extends DefaultRow = DefaultRow>() {
   }
 
   /** 插入列 */
-  function insertColumn(column: TableColumnCtx<T>) {
-    if (column.type === 'selection' && _columns.value.some((col) => col.type === 'selection')) {
-      console.warn('[MeTable] 只允许存在一个 type="selection" 的列');
-      return;
+  function insertColumn(column: TableColumnCtx<T>, parent?: TableColumnCtx<T>) {
+    validateColumn(column, parent);
+
+    if (!parent) {
+      _columns.value.push(column);
+    } else {
+      if (!parent.children) {
+        parent.children = [];
+      }
+      parent.children.push(column);
+      // 列表&子列表全部整体替换，方便外部触发浅层响应式
+      _columns.value = replaceColumn(_columns.value, parent);
     }
-    _columns.value.push(column);
+
     if (column.type === 'selection' && column.selectable) {
       selectable.value = column.selectable;
     }
@@ -130,15 +167,33 @@ export function useTableStore<T extends DefaultRow = DefaultRow>() {
   }
 
   /** 移除列 */
-  function removeColumn(column: TableColumnCtx<T>) {
-    const index = _columns.value.indexOf(column);
-    if (index > -1) {
-      _columns.value.splice(index, 1);
-      if (column.type === 'selection') {
-        selectable.value = null;
+  function removeColumn(column: TableColumnCtx<T>, parent?: TableColumnCtx<T>) {
+    let removed = false;
+
+    if (parent) {
+      if (parent.children) {
+        const childIndex = parent.children.findIndex((item) => item.id === column.id);
+        if (childIndex > -1) {
+          parent.children.splice(childIndex, 1);
+          removed = true;
+        }
+        if (parent.children.length === 0) {
+          delete parent.children;
+        }
       }
-      updateColumns();
+      _columns.value = replaceColumn(_columns.value, parent);
+    } else {
+      const index = _columns.value.indexOf(column);
+      if (index > -1) {
+        _columns.value.splice(index, 1);
+        removed = true;
+      }
     }
+
+    if (removed && column.type === 'selection') {
+      selectable.value = null;
+    }
+    updateColumns();
   }
 
   /** 设置数据 */
@@ -291,10 +346,65 @@ export function useTableStore<T extends DefaultRow = DefaultRow>() {
     });
   }
 
+  /** 递归展平列树，只保留叶子列（用于表体渲染） */
+  function doFlattenColumns(columns: TableColumnCtx<T>[]): TableColumnCtx<T>[] {
+    const result: TableColumnCtx<T>[] = [];
+    columns.forEach((column) => {
+      if (column.children && column.children.length > 0) {
+        result.push(...doFlattenColumns(column.children));
+      } else {
+        result.push(column);
+      }
+    });
+    return result;
+  }
+
+  /** 递归获取单个列子树中的所有叶子列 */
+  function getLeafColumns(column: TableColumnCtx<T>): TableColumnCtx<T>[] {
+    if (!column.children || column.children.length === 0) {
+      return [column];
+    }
+    return column.children.flatMap((child) => getLeafColumns(child));
+  }
+
+  /** 收集所有列（包括子列） */
+  function getAllColumns(cols: TableColumnCtx<T>[]): TableColumnCtx<T>[] {
+    const result: TableColumnCtx<T>[] = [];
+    cols.forEach((column) => {
+      result.push(column);
+      if (column.children) {
+        result.push(...getAllColumns(column.children));
+      }
+    });
+    return result;
+  }
+
+  /** 在列树中替换指定列（用于更新父列的 children） */
+  function replaceColumn(columns: TableColumnCtx<T>[], column: TableColumnCtx<T>): TableColumnCtx<T>[] {
+    return columns.map((item) => {
+      if (item.id === column.id) {
+        return column;
+      }
+      if (item.children?.length) {
+        item.children = replaceColumn(item.children, column);
+      }
+      return item;
+    });
+  }
+
+  /** 递归将父列的 fixed 属性传递给子列 */
+  function updateChildFixed(column: TableColumnCtx<T>) {
+    column.children?.forEach((childColumn) => {
+      childColumn.fixed = column.fixed;
+      updateChildFixed(childColumn);
+    });
+  }
+
   return {
     states: {
       _columns,
       columns,
+      leafColumns,
       _data,
       data,
       isAllSelected,
@@ -323,6 +433,8 @@ export function useTableStore<T extends DefaultRow = DefaultRow>() {
     updateSort,
     execSort,
     clearSort,
+    getLeafColumns,
+    getAllColumns,
   };
 }
 

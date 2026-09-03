@@ -1,6 +1,6 @@
-import type { InjectionKey } from 'vue';
+import type { InjectionKey, Ref } from 'vue';
 
-import type { TableSortOrder } from './types';
+import type { DefaultRow, TableSortOrder, TableColumnCtx } from './types';
 import type { TableContext } from './table';
 
 /** Table 命名空间 */
@@ -8,6 +8,9 @@ export const TABLE_NAMESPACE = 'table';
 
 /** Table 注入 key */
 export const TABLE_INJECTION_KEY: InjectionKey<TableContext> = Symbol('MeTable');
+
+/** TableColumn 注入 key（用于多级表头父子关系） */
+export const TABLE_COLUMN_INJECTION_KEY: InjectionKey<Ref<TableColumnCtx<DefaultRow> | undefined>> = Symbol('MeTableColumn');
 
 /** 列默认最小宽度 */
 export const DEFAULT_MIN_COLUMN_WIDTH = 80;
