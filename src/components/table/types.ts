@@ -24,7 +24,7 @@ export interface TableCellData<T extends DefaultRow = DefaultRow> {
   /** 列配置 */
   column: TableColumnCtx<T>;
   /** 行索引 */
-  $index: number;
+  rowIndex: number;
 }
 
 /** 表头渲染数据 */
@@ -32,7 +32,7 @@ export interface TableHeaderData<T extends DefaultRow = DefaultRow> {
   /** 列配置 */
   column: TableColumnCtx<T>;
   /** 列索引 */
-  $index: number;
+  columnIndex: number;
 }
 
 /** 单元格渲染数据 */
@@ -80,13 +80,13 @@ export interface TableColumnCtx<T extends DefaultRow = DefaultRow> {
   /** 排序顺序 */
   order: TableSortOrder | null;
   /** 格式化函数 */
-  formatter?: (row: T, column: TableColumnCtx<T>, cellValue: any, index: number) => string | VNode | VNode[];
+  formatter?: (row: T, column: TableColumnCtx<T>, cellValue: any, rowIndex: number) => string | VNode | VNode[];
   /** 是否可选（仅 type=selection） */
-  selectable?: (row: T, index: number) => boolean;
+  selectable?: (row: T, rowIndex: number) => boolean;
   /** 渲染表头 */
   renderHeader: (data: TableHeaderRenderData<T>) => string | VNode | VNode[];
   /** 渲染单元格 */
-  renderCell: (data: TableCellRenderData<T> & { cellIndex: number }) => string | VNode | VNode[];
+  renderCell: (data: TableCellRenderData<T>) => string | VNode | VNode[];
   /** 固定列方向 */
   fixed?: TableColumnFixed;
   /** 子列（用于多级表头） */

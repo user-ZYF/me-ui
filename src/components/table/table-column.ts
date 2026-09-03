@@ -73,9 +73,9 @@ export interface TableColumnSlots {
   /** 默认插槽（用于嵌套子列，实现多级表头） */
   default(): VNode[];
   /** 表体插槽 */
-  body(props: { row: DefaultRow; column: TableColumnCtx<DefaultRow>; $index: number }): VNode[];
+  body(props: { row: DefaultRow; column: TableColumnCtx<DefaultRow>; rowIndex: number }): VNode[];
   /** 表头插槽 */
-  header(props: { column: TableColumnCtx<DefaultRow>; $index: number }): VNode[];
+  header(props: { column: TableColumnCtx<DefaultRow>; columnIndex: number }): VNode[];
 }
 
 /** TableColumn Emits 定义 */

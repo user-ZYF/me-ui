@@ -37,7 +37,7 @@
               :key="rowIndex"
             >
               <th
-                v-for="(column, cellIndex) in subColumns"
+                v-for="(column, index) in subColumns"
                 :key="column.id"
                 :colspan="column.colSpan"
                 :rowspan="column.rowSpan"
@@ -55,7 +55,7 @@
               >
                 <div :class="ns.e('cell')">
                   <VNodeRenderer
-                    :content="renderHeader(column, cellIndex)"
+                    :content="renderHeader(column, index)"
                   />
                   <span
                     v-if="column.sort && (!column.children || column.children.length === 0)"
@@ -136,7 +136,7 @@
                   >
                     <div :class="ns.e('cell')">
                       <VNodeRenderer
-                        :content="renderCell(row, cell.column, rowIndex, cell.cellIndex)"
+                        :content="renderCell(row, cell.column, rowIndex)"
                       />
                     </div>
                   </td>
@@ -481,7 +481,7 @@ useResizeObserver(tableWrapperRef, doLayout);
 function renderHeader(column: TableColumnCtx<DefaultRow>, columnIndex: number) {
   const result = column.renderHeader({
     column,
-    $index: columnIndex,
+    columnIndex,
     store,
   });
   if (typeof result === "string") {
@@ -495,13 +495,11 @@ function renderCell(
   row: DefaultRow,
   column: TableColumnCtx<DefaultRow>,
   rowIndex: number,
-  cellIndex: number,
 ) {
   const result = column.renderCell({
     row,
     column,
-    $index: rowIndex,
-    cellIndex,
+    rowIndex,
     store,
   });
   if (typeof result === "string") {
@@ -512,10 +510,9 @@ function renderCell(
 
 /** 获取行单元格列表（含合并跨度信息） */
 function getRowCells(row: DefaultRow, rowIndex: number) {
-  return leafColumns.value.map((column, cellIndex) => ({
+  return leafColumns.value.map((column, columnIndex) => ({
     column,
-    cellIndex,
-    span: getSpan(row, column, rowIndex, cellIndex),
+    span: getSpan(row, column, rowIndex, columnIndex),
   }));
 }
 
@@ -524,7 +521,7 @@ function getSpan(
   row: DefaultRow,
   column: TableColumnCtx<DefaultRow>,
   rowIndex: number,
-  cellIndex: number,
+  columnIndex: number,
 ): SpanInfo {
   let rowspan = 1;
   let colspan = 1;
@@ -533,7 +530,7 @@ function getSpan(
       row,
       rowIndex,
       column,
-      columnIndex: cellIndex,
+      columnIndex,
     });
     rowspan = result.rowspan;
     colspan = result.colspan;

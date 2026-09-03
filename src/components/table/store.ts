@@ -33,7 +33,7 @@ export function useTableStore<T extends DefaultRow = DefaultRow>() {
   /** 排序方向 */
   const sortOrder: Ref<TableSortOrder | null> = ref(null);
   /** selectable 函数 */
-  const selectable: Ref<((row: T, index: number) => boolean) | null> = ref(null);
+  const selectable: Ref<TableColumnCtx<T>['selectable'] | null> = ref(null);
   /** 表体宽度（像素） */
   const bodyWidth: Ref<number> = ref(0);
   /** 是否有横向滚动 */

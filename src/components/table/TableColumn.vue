@@ -44,11 +44,11 @@ provide(TABLE_COLUMN_INJECTION_KEY, columnConfig);
 
 /** 渲染单元格值 */
 function renderCellValue(data: TableCellData): string | VNode | VNode[] {
-  const { row, column, $index } = data;
+  const { row, column, rowIndex } = data;
   const property = column.name;
   const value = property ? get(row, property) : undefined;
   if (column.formatter) {
-    return column.formatter(row, column, value, $index);
+    return column.formatter(row, column, value, rowIndex);
   }
   return value?.toString?.() || '';
 }
@@ -67,10 +67,10 @@ function selectionRenderHeader(store: TableStore<DefaultRow>): VNode {
 
 /** selection 列渲染单元格 */
 function selectionRenderCell(data: TableCellRenderData): string | VNode | VNode[] {
-  const { row, column, $index, store } = data;
+  const { row, column, rowIndex, store } = data;
   return h(MeCheckbox, {
     modelValue: store.isSelected(row),
-    disabled: column.selectable ? !column.selectable(row, $index) : false,
+    disabled: column.selectable ? !column.selectable(row, rowIndex) : false,
     onChange: () => {
       store.toggleRowSelection(row);
       emit('select', store.getSelectionRows(), row);
