@@ -253,3 +253,48 @@ function fetchUserData() {
 <!-- ❌ 错误 -->
 <slot />
 ```
+
+## 12. 图标使用规范
+
+- 所有图标**必须**使用 `@element-plus/icons-vue` 提供的图标组件
+- **禁止**自行生成或使用 SVG 图标
+- 图标组件按需导入，直接在模板中使用
+
+```vue
+<template>
+  <me-icon>
+    <Close />
+  </me-icon>
+</template>
+
+<script lang="ts" setup>
+import { Close } from '@element-plus/icons-vue';
+</script>
+```
+
+## 13. CSS 类名命名空间规范
+
+- **所有 class 必须使用命名空间或以命名空间作为前缀**
+- 在 Less 样式文件中，所有类名必须通过 `@{B}` 或 `@{namespace}` 变量生成，禁止硬编码不带命名空间前缀的类名
+- `@keyframes` 名称因 Less 语法限制无法使用变量插值，允许硬编码，但必须以命名空间前缀开头（如 `me-modal-fade-in`）
+
+## 14. 无障碍相关豁免
+
+- 实现组件时，**无需考虑无障碍（Accessibility / a11y）相关内容**
+- 不需要添加 `role`、`aria-*` 等属性
+
+## 15. Vue 内置组件使用规范
+
+- Vue 内置组件（如 `transition`、`teleport`、`keep-alive`、`suspense`、`component` 等）在使用时**首字母小写**
+
+```vue
+<!-- ✅ 正确 -->
+<transition name="fade">
+<teleport to="body">
+<component :is="comp">
+
+<!-- ❌ 错误 -->
+<Transition name="fade">
+<Teleport to="body">
+<Component :is="comp">
+```

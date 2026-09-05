@@ -4,6 +4,7 @@ import type { MeConfigProvider } from './components/config-provider';
 import type { MeForm, MeFormItem } from './components/form';
 import type { MeIcon } from './components/icon';
 import type { MeInput } from './components/input';
+import type { MeModal } from './components/modal';
 import type { MePagination } from './components/pagination';
 import type { MeRadio, MeRadioButton, MeRadioGroup } from './components/radio';
 import type { MeSelect } from './components/select';
@@ -23,6 +24,7 @@ declare module 'vue' {
     MeFormItem: typeof MeFormItem;
     MeIcon: typeof MeIcon;
     MeInput: typeof MeInput;
+    MeModal: typeof MeModal;
     MePagination: typeof MePagination;
     MeRadio: typeof MeRadio;
     MeRadioButton: typeof MeRadioButton;

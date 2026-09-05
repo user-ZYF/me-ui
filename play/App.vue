@@ -1,7 +1,7 @@
 <template>
-  <Table />
+  <Modal />
 </template>
 
 <script setup lang="ts">
-import Table from './Table.vue';
+import Modal from './Modal.vue';
 </script>

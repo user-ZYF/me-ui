@@ -28,6 +28,7 @@ export default defineConfig(({ command }) => ({
         'form': resolve(__dirname, 'src/components/form/index.ts'),
         'icon': resolve(__dirname, 'src/components/icon/index.ts'),
         'input': resolve(__dirname, 'src/components/input/index.ts'),
+        'modal': resolve(__dirname, 'src/components/modal/index.ts'),
         'pagination': resolve(__dirname, 'src/components/pagination/index.ts'),
         'radio': resolve(__dirname, 'src/components/radio/index.ts'),
         'select': resolve(__dirname, 'src/components/select/index.ts'),

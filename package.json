@@ -44,6 +44,10 @@
       "types": "./dist/input.d.ts",
       "import": "./dist/input.js"
     },
+    "./modal": {
+      "types": "./dist/modal.d.ts",
+      "import": "./dist/modal.js"
+    },
     "./pagination": {
       "types": "./dist/pagination.d.ts",
       "import": "./dist/pagination.js"
