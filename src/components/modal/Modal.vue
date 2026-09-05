@@ -54,7 +54,7 @@
                   :type="confirmType"
                   :disabled="confirmButtonDisabled"
                   :loading="confirmLoading"
-                  @click="onOkClick"
+                  @click="onConfirmClick"
                 >
                   {{ confirmText }}
                 </me-button>
@@ -131,7 +131,7 @@ function onCloseClick() {
 }
 
 /** 确认按钮点击 */
-function onOkClick() {
+function onConfirmClick() {
   emit('confirm');
 }
 

@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, render } from 'vue';
+import { defineComponent, h, markRaw, ref, render } from 'vue';
 import type { Component } from 'vue';
 
 import { CircleCheckFilled, CircleCloseFilled, InfoFilled, WarningFilled } from '@element-plus/icons-vue';
@@ -45,6 +45,7 @@ function useFunctionalModal(type: ModalType, userOptions: ModalOptions): ModalFu
   const mergedOptions: ModalOptions = {
     ...defaultOptionsMap[type],
     ...userOptions,
+    ...(userOptions.icon ? { icon: markRaw(userOptions.icon) } : {}),
   };
 
   /** 是否可见 */
@@ -109,7 +110,11 @@ function useFunctionalModal(type: ModalType, userOptions: ModalOptions): ModalFu
    * 更新配置
    */
   function update(newOptions: Partial<ModalOptions>) {
-    currentOptions.value = { ...currentOptions.value, ...newOptions };
+    currentOptions.value = {
+      ...currentOptions.value,
+      ...newOptions,
+      ...(newOptions.icon ? { icon: markRaw(newOptions.icon) } : {}),
+    };
   }
 
   /** 容器 DOM */
