@@ -44,7 +44,7 @@ export type CheckboxProps = ExtractPropTypes<typeof checkboxProps>;
 /** Checkbox Emits 定义 */
 export const checkboxEmits = {
   /** 值变化事件 */
-  change: (value: boolean) => value,
+  change: (_value: boolean) => true,
 } as const;
 
 /** Checkbox Emits 类型 */
