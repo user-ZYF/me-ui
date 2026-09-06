@@ -55,7 +55,7 @@ export interface HeightCollection<T> {
 export function useItemHeights<T>(
   data: ComputedRef<any[]>,
   getItemKey: ItemKey<T>,
-  itemHeight: number,
+  itemHeight: ComputedRef<number>,
   onResize: (changes: HeightChange[]) => void,
 ): HeightCollection<T> {
   /** DOM 实例缓存 */
@@ -105,13 +105,10 @@ export function useItemHeights<T>(
   );
 
   /** itemHeight 变化时，未缓存项的回退高度改变，前缀和需重建 */
-  watch(
-    () => itemHeight,
-    () => {
-      prefixSumsDirty = true;
-      heightUpdateMark.value = Symbol('height-update');
-    },
-  );
+  watch(itemHeight, () => {
+    prefixSumsDirty = true;
+    heightUpdateMark.value = Symbol('height-update');
+  });
 
   /** 重建前缀和数组 O(n) */
   function rebuildPrefixSums() {
@@ -143,8 +140,6 @@ export function useItemHeights<T>(
   function doCollectHeight() {
     // 批量收集高度变化，避免逐项回调导致 O(n²)
     const changes: HeightChange[] = [];
-    /** 待应用的高度更新 */
-    const updates: Array<{ key: any; height: number }> = [];
     itemRefs.forEach((el, key) => {
       // offsetParent 为 null 表示元素未挂载或 display:none，此时 offsetHeight 无意义，跳过测量
       if (el && el.offsetParent) {
@@ -152,7 +147,7 @@ export function useItemHeights<T>(
         const prevHeight = heights.get(key);
         if (prevHeight !== offsetHeight) {
           // 首次测量且实际高度等于预估高度时，静默更新缓存，不触发前缀和重建
-          if (prevHeight === undefined && offsetHeight === itemHeight) {
+          if (prevHeight === undefined && offsetHeight === itemHeight.value) {
             heights.set(key, offsetHeight);
             return;
           }
@@ -161,27 +156,24 @@ export function useItemHeights<T>(
             changes.push({
               index,
               key,
-              oldHeight: prevHeight ?? itemHeight,
+              oldHeight: prevHeight ?? itemHeight.value,
               newHeight: offsetHeight,
               prevItemTop: 0,
             });
           }
-          updates.push({ key, height: offsetHeight });
         }
       }
     });
     if (changes.length > 0) {
       // 先确保前缀和反映变更前的高度状态
       ensurePrefixSums();
-      // 使用前缀和 O(1) 获取变更项的顶部位置，传给 onResize
+      // 使用前缀和 O(1) 获取变更项的顶部位置，同时应用高度更新到缓存
       for (const change of changes) {
         change.prevItemTop = getItemTop(change.index);
+        // 设置高度不会触发前缀和重计算，因此后续元素的preItemTop都还是基于原有的
+        heights.set(change.key, change.newHeight);
       }
       onResize(changes);
-      // 再应用高度更新到缓存
-      for (const { key, height } of updates) {
-        heights.set(key, height);
-      }
       heightUpdateMark.value = Symbol('height-update');
       prefixSumsDirty = true;
     }
@@ -223,7 +215,7 @@ export function useItemHeights<T>(
 
   /** 获取项高度，未缓存时回退到 itemHeight */
   function getItemHeight(key: any): number {
-    return heights.get(key) ?? itemHeight;
+    return heights.get(key) ?? itemHeight.value;
   }
 
   /** 判断项高度是否已缓存 */

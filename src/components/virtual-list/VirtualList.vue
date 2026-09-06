@@ -127,7 +127,12 @@ const {
   getItemBottom,
   findIndexAtOffset,
   getTotalHeight,
-} = useItemHeights(items, getItemKey, props.itemHeight ?? 0, onResize);
+} = useItemHeights(
+  items,
+  getItemKey,
+  computed(() => props.itemHeight ?? 0),
+  onResize,
+);
 
 /** 可见区间计算结果 */
 const visibleRange = reactive<VisibleRange>({
