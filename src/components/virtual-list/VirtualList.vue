@@ -71,7 +71,7 @@ const items = computed(() => props.data);
 
 /** itemKey 解析函数 */
 const resolveKey = shallowRef<ItemKey>(
-  (_item: Record<string, any>) => undefined as any,
+  (_item) => undefined,
 );
 
 watch(

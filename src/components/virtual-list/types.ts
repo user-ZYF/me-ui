@@ -1,5 +1,5 @@
 /** 列表项 key 获取函数 */
-export type ItemKey<T = Record<string, any>> = (item: T) => any;
+export type ItemKey<T = any> = (item: T) => any;
 
 /**
  * 可见区间计算结果
