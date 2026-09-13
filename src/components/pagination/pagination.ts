@@ -1,5 +1,7 @@
 import type { ExtractPropTypes, PropType } from 'vue';
 
+import { isNumber } from '@me-ui/utils/types';
+
 /** Pagination 布局元素类型 */
 export type PaginationLayoutKey = 'sizes' | 'prev' | 'pager' | 'next' | 'jumper' | '->' | 'total';
 
@@ -67,13 +69,13 @@ export type PaginationProps = ExtractPropTypes<typeof paginationProps>;
 /** Pagination Emits 定义 */
 export const paginationEmits = {
   /** 当前页变化 */
-  'current-change': (val: number) => typeof val === 'number',
+  'current-change': (val: number) => isNumber(val),
   /** 每页条数变化 */
-  'size-change': (val: number) => typeof val === 'number',
+  'size-change': (val: number) => isNumber(val),
   /** 上一页点击 */
-  'prev-click': (val: number) => typeof val === 'number',
+  'prev-click': (val: number) => isNumber(val),
   /** 下一页点击 */
-  'next-click': (val: number) => typeof val === 'number',
+  'next-click': (val: number) => isNumber(val),
 } as const;
 
 /** Pagination Emits 类型 */

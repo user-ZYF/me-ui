@@ -1,4 +1,4 @@
-<!-- ? MeSelect 选择器组件使用示例 -->
+<!-- MeSelect 选择器组件使用示例 -->
 <template>
   <div class="play-root">
     <h1>MeSelect 选择器组件示例</h1>

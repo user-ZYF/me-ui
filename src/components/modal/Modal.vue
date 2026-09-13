@@ -1,4 +1,4 @@
-<!-- ? Modal 对话框 -->
+<!-- Modal 对话框 -->
 <template>
   <teleport to="body">
     <transition :name="`${ns.namespace}-modal-fade`" appear @after-leave="onAfterLeave">
@@ -7,9 +7,11 @@
         :class="[ns.e('wrapper'), ns.is('transparent', !mask)]"
         :style="wrapperStyle"
         @click="onWrapperClick"
+        @mousedown.self="onWrapperMousedown"
+        @mouseup.self="onWrapperMouseup"
       >
         <div
-          :class="[ns.b.value, wrapClassName]"
+          :class="[ns.b.value, modalClassName]"
           :style="modalStyle"
           @click.stop
         >
@@ -118,9 +120,29 @@ const modalStyle = computed(() => ({
   width: typeof props.width === 'number' ? `${props.width}px` : props.width,
 }));
 
+/** 记录 mousedown / mouseup 是否发生在遮罩本身，规避跨元素拖动误触发遮罩点击 */
+let mouseDownOnWrapper = false;
+let mouseUpOnWrapper = false;
+
+/** wrapper mousedown（仅当 target 为 wrapper 本身时触发） */
+function onWrapperMousedown() {
+  mouseDownOnWrapper = true;
+}
+
+/** wrapper mouseup（仅当 target 为 wrapper 本身时触发） */
+function onWrapperMouseup() {
+  mouseUpOnWrapper = true;
+}
+
 /** wrapper 点击（遮罩点击） */
 function onWrapperClick() {
-  if (props.maskClosable) {
+  // 只有 mousedown 和 mouseup 都落在遮罩本身，才视为一次遮罩点击
+  // 跨元素拖动（如 content down + wrapper up，或 wrapper down + content up）
+  // 会导致 click 派发在共同祖先 wrapper 上，此时不应关闭
+  const shouldClose = mouseDownOnWrapper && mouseUpOnWrapper;
+  mouseDownOnWrapper = false;
+  mouseUpOnWrapper = false;
+  if (shouldClose && props.maskClosable) {
     handleClose();
   }
 }

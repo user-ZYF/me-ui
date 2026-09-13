@@ -1,9 +1,11 @@
 import type { Arrayable, TooltipTriggerType } from '../tooltip';
 import type { Ref } from 'vue';
 
+import { isArray } from '@me-ui/utils/types';
+
 /** 判断触发方式是否包含指定类型 */
 export function isTriggerType(trigger: Arrayable<TooltipTriggerType>, type: TooltipTriggerType): boolean {
-  if (Array.isArray(trigger)) {
+  if (isArray(trigger)) {
     return trigger.includes(type);
   }
   return trigger === type;

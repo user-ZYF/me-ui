@@ -1,7 +1,11 @@
 <template>
-  <Modal />
+  <!-- <TreeScrollTo /> -->
+  <Tree />
+  <!-- <Tooltip /> -->
 </template>
 
-<script setup lang="ts">
-import Modal from './Modal.vue';
+<script lang="ts" setup>
+// import TreeScrollTo from "./TreeScrollTo.vue";
+import Tree from "./Tree.vue";
+// import Tooltip from "./Tooltip.vue";
 </script>

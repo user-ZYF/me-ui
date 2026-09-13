@@ -1,4 +1,4 @@
-<!-- ? Pagination Next 下一页 -->
+<!-- Pagination Next 下一页 -->
 <template>
   <button
     type="button"

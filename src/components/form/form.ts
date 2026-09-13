@@ -4,6 +4,7 @@ import type { ExtractPropTypes, PropType } from 'vue';
 import type { ComponentSize } from '@me-ui/types/config';
 import type { FormItemName } from './form-item.ts';
 import type { FormRules } from './types';
+import { isArray, isBoolean, isString } from '@me-ui/utils/types';
 
 /** Form Props 定义 */
 export const formProps = {
@@ -65,7 +66,7 @@ export const formEmits = {
     name: FormItemName,
     isValid: boolean,
     message: string,
-  ) => (typeof name === 'string' || Array.isArray(name)) && typeof isValid === 'boolean' && typeof message === 'string',
+  ) => (isString(name) || isArray(name)) && isBoolean(isValid) && isString(message),
 } as const;
 
 /** Form Emits 类型 */

@@ -1,4 +1,4 @@
-<!-- ? Checkbox 多选框组件示例 -->
+<!-- Checkbox 多选框组件示例 -->
 <template>
   <div class="play-checkbox">
     <h1>MeCheckbox 多选框</h1>

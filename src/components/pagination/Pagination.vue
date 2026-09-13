@@ -1,4 +1,4 @@
-<!-- ? Pagination 分页 -->
+<!-- Pagination 分页 -->
 <template>
   <div v-if="showPagination" :class="[ns.b.value, ns.is('background', props.background)]">
     <component

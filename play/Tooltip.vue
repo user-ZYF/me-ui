@@ -1,4 +1,4 @@
-<!-- ? MeTooltip 文字提示组件使用示例 -->
+<!-- MeTooltip 文字提示组件使用示例 -->
 <template>
   <div class="play-root">
     <h1>MeTooltip 文字提示组件示例</h1>

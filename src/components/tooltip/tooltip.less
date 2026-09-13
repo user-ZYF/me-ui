@@ -87,12 +87,12 @@
   // ========== 深色主题 ==========
   &--dark {
     color: @color-white;
-    background-color: #303133;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background-color: var(~'@{cv-text-color-primary}');
+    box-shadow: 0 2px 8px rgba(@color-black, 0.15);
 
     .@{B}__arrow::before {
-      background: #303133;
-      border: 1px solid #303133;
+      background: var(~'@{cv-text-color-primary}');
+      border: 1px solid var(~'@{cv-text-color-primary}');
     }
   }
 
@@ -100,7 +100,7 @@
   &--light {
     color: var(~'@{cv-text-color-primary}');
     background-color: @color-white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 8px rgba(@color-black, 0.12);
     border: 1px solid var(~'@{cv-border-color-light}');
 
     .@{B}__arrow::before {

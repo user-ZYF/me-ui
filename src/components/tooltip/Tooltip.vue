@@ -25,6 +25,7 @@ import {
 
 import { useResizeObserver } from "@vueuse/core";
 
+import { isBoolean } from "@me-ui/utils/types";
 import { TOOLTIP_INJECTION_KEY } from "./constants";
 import { addScrollSubscriber, removeScrollSubscriber } from "./scroll-subscriber";
 import { tooltipEmits, tooltipProps } from "./tooltip";
@@ -187,7 +188,7 @@ watch(
 watch(
   visibleModel,
   (val) => {
-    if (typeof val === "boolean") {
+    if (isBoolean(val)) {
       open.value = val;
     }
   },

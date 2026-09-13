@@ -1,4 +1,4 @@
-<!-- ? RadioGroup 单选框组 -->
+<!-- RadioGroup 单选框组 -->
 <template>
   <div :class="ns.b.value">
     <slot></slot>

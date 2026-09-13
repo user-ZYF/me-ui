@@ -61,6 +61,7 @@ import { computed, inject } from 'vue';
 import MeScrollbar from '@me-ui/components/scrollbar';
 import MeVirtualList from '@me-ui/components/virtual-list';
 import { useNamespace } from '@me-ui/hooks/use-namespace';
+import { isArray } from '@me-ui/utils/types';
 
 import { SELECT_DROPDOWN_NAMESPACE, selectKey } from './constants';
 import { selectDropdownEmits, selectDropdownProps } from './select';
@@ -86,7 +87,7 @@ const virtualListHeight = computed(() => {
 function isOptionSelected(option: SelectOption): boolean {
   const val = modelValue.value;
   if (props.multiple) {
-    return Array.isArray(val) && val.includes(option.value);
+    return isArray(val) && val.includes(option.value);
   }
   return val === option.value;
 }

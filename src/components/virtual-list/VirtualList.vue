@@ -25,6 +25,7 @@ import type { CSSProperties } from "vue";
 
 import MeScrollbar from "@me-ui/components/scrollbar";
 import { useNamespace } from "@me-ui/hooks/use-namespace";
+import { isFunction } from "@me-ui/utils/types";
 
 import { virtualListEmits, virtualListProps } from "./virtual-list";
 import { useItemHeights } from "./hooks/use-item-height";
@@ -77,7 +78,7 @@ const resolveKey = shallowRef<ItemKey>(
 watch(
   () => props.itemKey,
   (val) => {
-    if (typeof val === "function") {
+    if (isFunction(val)) {
       resolveKey.value = val;
     } else {
       resolveKey.value = (item: Record<string, any>) => item?.[val];

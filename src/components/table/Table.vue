@@ -1,4 +1,4 @@
-<!-- ? Table 表格组件 -->
+<!-- Table 表格组件 -->
 <template>
   <div
     ref="tableWrapperRef"
@@ -173,6 +173,7 @@ import { useNamespace } from "@me-ui/hooks/use-namespace";
 import { useResizeObserver } from "@vueuse/core";
 
 import { isOdd } from "@me-ui/utils";
+import { isString } from "@me-ui/utils/types";
 
 import MeScrollbar from "@me-ui/components/scrollbar";
 import type MeScrollbarType from "@me-ui/components/scrollbar";
@@ -484,7 +485,7 @@ function renderHeader(column: TableColumnCtx<DefaultRow>, columnIndex: number) {
     columnIndex,
     store,
   });
-  if (typeof result === "string") {
+  if (isString(result)) {
     return h("span", null, result);
   }
   return result;
@@ -502,7 +503,7 @@ function renderCell(
     rowIndex,
     store,
   });
-  if (typeof result === "string") {
+  if (isString(result)) {
     return h("span", null, result);
   }
   return result;

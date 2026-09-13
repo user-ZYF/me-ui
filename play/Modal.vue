@@ -1,4 +1,4 @@
-<!-- ? Modal 对话框组件示例 -->
+<!-- Modal 对话框组件示例 -->
 <template>
   <div class="play-modal">
     <h1>MeModal 对话框</h1>

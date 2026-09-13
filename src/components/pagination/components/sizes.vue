@@ -15,6 +15,7 @@ import { computed, inject, ref, watch } from 'vue';
 
 import MeSelect from '@me-ui/components/select';
 import { useNamespace } from '@me-ui/hooks/use-namespace';
+import { isNumber } from '@me-ui/utils/types';
 
 import { mePaginationKey } from '../constants';
 import { paginationSizesProps } from './sizes';
@@ -48,7 +49,7 @@ const sizeOptions = computed<SelectOption[]>(() =>
 
 /** 值变化时同步通知父组件 */
 function onChange(val: OptionValue | OptionValue[] | undefined) {
-  if (typeof val === 'number') {
+  if (isNumber(val)) {
     pagination.handleSizeChange(val);
   }
 }

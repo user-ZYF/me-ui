@@ -1,4 +1,4 @@
-<!-- ? Tooltip 内容组件，负责弹出层的渲染和过渡动画 -->
+<!-- Tooltip 内容组件，负责弹出层的渲染和过渡动画 -->
 <template>
   <teleport to="body">
     <transition :name="transitionName" @after-leave="onAfterLeave" @before-enter="onBeforeEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave">

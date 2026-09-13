@@ -1,4 +1,4 @@
-<!-- ? Scrollbar 滚动条组件 -->
+<!-- Scrollbar 滚动条组件 -->
 <template>
   <div :class="ns.b.value">
     <div
@@ -15,6 +15,7 @@
       </div>
     </div>
 
+      <!-- 纵向滚动条 -->
       <Bar
         v-if="sizeHeight"
         :vertical="true"
@@ -22,6 +23,7 @@
         :move="moveY"
         @scroll="onVerticalScroll"
       />
+      <!-- 横向滚动条 -->
       <Bar
         v-if="sizeWidth"
         :vertical="false"

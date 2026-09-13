@@ -92,7 +92,7 @@ export const modalProps = {
     default: 1000,
   },
   /** 自定义类名 */
-  wrapClassName: {
+  modalClassName: {
     type: String,
     default: '',
   },

@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'vue';
 
+import { isNumber } from '@me-ui/utils/types';
+
 /** 隐藏 textarea 样式 */
 const HIDDEN_STYLE: Record<string, string> = {
   height: '0',
@@ -128,7 +130,7 @@ export function calcTextareaHeight(
     const singleRowHeight = hiddenTextarea.scrollHeight - paddingSize;
 
     // 根据 minRows 计算最小高度约束
-    if (typeof minRows === 'number') {
+    if (isNumber(minRows)) {
       let minHeight = singleRowHeight * minRows;
       // border-box 下 height 属性包含 padding 和 border，需补上
       if (boxSizing === 'border-box') {
@@ -139,7 +141,7 @@ export function calcTextareaHeight(
       result.minHeight = `${minHeight}px`;
     }
     // 根据 maxRows 计算最大高度约束
-    if (typeof maxRows === 'number') {
+    if (isNumber(maxRows)) {
       let maxHeight = singleRowHeight * maxRows;
       // border-box 下 height 属性包含 padding 和 border，需补上
       if (boxSizing === 'border-box') {

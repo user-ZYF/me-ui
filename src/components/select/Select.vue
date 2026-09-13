@@ -1,4 +1,4 @@
-<!-- ? Select 选择器 -->
+<!-- Select 选择器 -->
 <template>
   <div
     ref="selectRef"
@@ -185,6 +185,7 @@ import {
 } from "@me-ui/components/form/hooks";
 import { useNamespace } from "@me-ui/hooks/use-namespace";
 import { useFocusController } from "@me-ui/hooks/use-focus-controller";
+import { isArray } from "@me-ui/utils/types";
 
 import { selectEmits, selectProps } from "./select";
 import { DEFAULT_LIST_HEIGHT, selectKey } from "./constants";
@@ -277,7 +278,7 @@ const dropdownMaxHeight = computed(() => {
 const hasValue = computed(() => {
   const val = modelValue.value;
   if (props.multiple) {
-    return Array.isArray(val) && val.length > 0;
+    return isArray(val) && val.length > 0;
   }
   return val !== undefined && val !== null && val !== "";
 });
@@ -286,7 +287,7 @@ const hasValue = computed(() => {
 const selectedItems = computed<OptionItem[]>(() => {
   if (!props.multiple) return [];
   const val = modelValue.value;
-  if (!Array.isArray(val)) return [];
+  if (!isArray(val)) return [];
   const valSet = new Set(val);
   return props.options.filter((o) => valSet.has(o.value));
 });
@@ -358,7 +359,7 @@ const filteredOptionsCount = computed(() => filteredOptions.value.length);
 function selectPropOption(option: SelectOption) {
   if (option.disabled) return;
   if (props.multiple) {
-    const val = Array.isArray(modelValue.value) ? [...modelValue.value] : [];
+    const val = isArray(modelValue.value) ? [...modelValue.value] : [];
     const index = val.indexOf(option.value);
     if (index > -1) {
       val.splice(index, 1);
@@ -414,7 +415,7 @@ function handleClear() {
 /** 删除标签 */
 function deleteTag(option: OptionItem) {
   if (actualDisabled.value) return;
-  const val = Array.isArray(modelValue.value) ? [...modelValue.value] : [];
+  const val = isArray(modelValue.value) ? [...modelValue.value] : [];
   const index = val.indexOf(option.value);
   if (index > -1) {
     val.splice(index, 1);
@@ -430,7 +431,7 @@ function handleKeydown(evt: KeyboardEvent) {
   if (actualDisabled.value) return;
 
   if (evt.key === "Backspace" && props.multiple && !filterQuery.value) {
-    const val = Array.isArray(modelValue.value) ? [...modelValue.value] : [];
+    const val = isArray(modelValue.value) ? [...modelValue.value] : [];
     if (val.length > 0) {
       val.pop();
       modelValue.value = val;

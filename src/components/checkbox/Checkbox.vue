@@ -1,4 +1,4 @@
-<!-- ? Checkbox 多选框 -->
+<!-- Checkbox 多选框 -->
 <template>
   <label
     :class="[
@@ -75,7 +75,7 @@ const isChecked = computed(() => {
   if (isInGroup.value) {
     return checkboxGroup!.modelValue.value.includes(props.value as string | number | boolean);
   }
-  return model.value === true;
+  return model.value;
 });
 
 /** 切换选中状态 */

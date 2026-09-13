@@ -5,7 +5,7 @@ import type { DefaultRow, TableColumnCtx, TableSortOrder } from './types';
 
 import { get } from 'lodash';
 
-import { isFunction } from '@me-ui/utils/types';
+import { isFunction, isObject } from '@me-ui/utils/types';
 
 /** 表格 Store 状态管理 */
 export function useTableStore<T extends DefaultRow = DefaultRow>() {
@@ -327,7 +327,7 @@ export function useTableStore<T extends DefaultRow = DefaultRow>() {
     const getKey = sortMethod
       ? null
       : function (value: T) {
-          if (sortKey && typeof value === 'object') {
+          if (sortKey && isObject(value)) {
             return get(value, sortKey);
           }
           return value;

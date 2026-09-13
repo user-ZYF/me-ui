@@ -1,4 +1,4 @@
-<!-- ? CheckboxGroup 多选框组 -->
+<!-- CheckboxGroup 多选框组 -->
 <template>
   <div :class="ns.b.value">
     <slot></slot>

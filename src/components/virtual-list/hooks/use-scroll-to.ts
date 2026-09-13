@@ -3,6 +3,7 @@ import { onBeforeUnmount } from 'vue';
 import { easeOutQuint } from 'js-easing-functions';
 
 import type { MeScrollbar } from '@me-ui/components/scrollbar';
+import { isNumber, isObject } from '@me-ui/utils/types';
 import { isScrollToIndex, isScrollToKey } from '../types';
 import type { ItemKey, ScrollAlign, ScrollConfig, ScrollTo } from '../types';
 
@@ -215,12 +216,12 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
 
     const items = data.value;
 
-    if (typeof arg === 'number') {
+    if (isNumber(arg)) {
       setScrollTop(arg);
       return;
     }
 
-    if (arg && typeof arg === 'object') {
+    if (arg && isObject(arg)) {
       if (items.length === 0) return;
 
       /** itemHeight 为 0 时（非虚拟模式），高度全部依赖缓存，需同步收集 */

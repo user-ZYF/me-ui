@@ -1,4 +1,4 @@
-<!-- ? 虚拟列表组件示例 -->
+<!-- 虚拟列表组件示例 -->
 <template>
   <div class="play-virtual-list">
     <h1>MeVirtualList 虚拟列表</h1>

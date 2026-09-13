@@ -149,6 +149,7 @@ import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { inputEmits, inputProps } from './input';
 import { calcTextareaHeight } from './utils';
+import { isObject, isUndefined } from '@me-ui/utils/types';
 
 defineOptions({ name: 'MeInput', inheritAttrs: false });
 
@@ -235,12 +236,12 @@ watch(
 function resizeTextarea() {
   const target = textareaRef.value;
   // SSR 环境或非 textarea 模式或元素未挂载时跳过
-  if (typeof window === 'undefined' || !isTextarea.value || !target) return;
+  if (isUndefined(window) || !isTextarea.value || !target) return;
 
   if (props.autosize) {
     // autosize 为对象时提取 minRows/maxRows，为 boolean 时传 undefined
-    const minRows = typeof props.autosize === 'object' ? props.autosize.minRows : undefined;
-    const maxRows = typeof props.autosize === 'object' ? props.autosize.maxRows : undefined;
+    const minRows = isObject(props.autosize) ? props.autosize.minRows : undefined;
+    const maxRows = isObject(props.autosize) ? props.autosize.maxRows : undefined;
     const textareaStyle = calcTextareaHeight(target, minRows, maxRows);
 
     // 先隐藏滚动条，避免计算高度时滚动条闪烁

@@ -1,4 +1,4 @@
-<!-- ? Input 输入框组件示例 -->
+<!-- Input 输入框组件示例 -->
 <template>
   <div class="play-input">
     <h1>MeInput 输入框</h1>

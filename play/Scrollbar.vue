@@ -1,4 +1,4 @@
-<!-- ? Scrollbar 滚动条组件示例 -->
+<!-- Scrollbar 滚动条组件示例 -->
 <template>
   <div class="play-scrollbar">
     <h1>MeScrollbar 滚动条</h1>

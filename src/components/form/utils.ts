@@ -1,6 +1,10 @@
 import type { FormItemContext } from './types';
 import type { FormItemName } from './form-item.ts';
 
+import { isArray } from '@me-ui/utils/types';
+
+export { isArray };
+
 /** 可被数组或单值包装的类型 */
 export type Arrayable<T> = T | T[];
 
@@ -8,11 +12,6 @@ export type Arrayable<T> = T | T[];
 export function ensureArray<T>(value: Arrayable<T> | undefined): T[] {
   if (value === undefined || value === null) return [];
   return Array.isArray(value) ? value : [value];
-}
-
-/** 判断是否为数组 */
-export function isArray(value: unknown): value is any[] {
-  return Array.isArray(value);
 }
 
 /** 深拷贝 */

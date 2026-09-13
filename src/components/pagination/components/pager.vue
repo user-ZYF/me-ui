@@ -1,4 +1,4 @@
-<!-- ? Pagination Pager 页码按钮 -->
+<!-- Pagination Pager 页码按钮 -->
 <template>
   <ul :class="nsPager.b.value">
     <!-- 首页 -->

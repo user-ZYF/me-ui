@@ -1,4 +1,4 @@
-<!-- ? Bar 滚动条组件 -->
+<!-- Bar 滚动条组件 -->
 <template>
   <div
     ref="trackRef"

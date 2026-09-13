@@ -1,4 +1,4 @@
-<!-- ? TableColumn 表格列组件（不渲染可见 DOM，仅提供列配置和嵌套列渲染） -->
+<!-- TableColumn 表格列组件（不渲染可见 DOM，仅提供列配置和嵌套列渲染） -->
 <template>
   <slot></slot>
 </template>

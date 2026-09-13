@@ -1,4 +1,4 @@
-<!-- ? Pagination Jumper 跳页 -->
+<!-- Pagination Jumper 跳页 -->
 <template>
   <span :class="ns.e('jump')">
     <span :class="ns.e('goto')">前往</span>

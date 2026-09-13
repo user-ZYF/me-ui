@@ -1,4 +1,4 @@
-<!-- ? event.target 与 event.relatedTarget 对比示例 -->
+<!-- event.target 与 event.relatedTarget 对比示例 -->
 <template>
   <div class="play-root">
     <h1>event.target 与 event.relatedTarget 对比示例</h1>

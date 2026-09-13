@@ -1,4 +1,4 @@
-<!-- ? Tooltip 触发器组件，包裹默认插槽并绑定触发事件 -->
+<!-- Tooltip 触发器组件，包裹默认插槽并绑定触发事件 -->
 <template>
   <span ref="triggerRef" :class="ns.e('trigger')" @blur="onBlur" @click="onClick" @contextmenu="onContextMenu" @focus="onFocus" @mouseenter="onMouseenter" @mouseleave="onMouseleave">
     <slot></slot>

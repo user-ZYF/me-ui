@@ -1,4 +1,4 @@
-<!-- ? Form 表单组件 -->
+<!-- Form 表单组件 -->
 <template>
   <form ref="formRef" :class="formClasses" @submit.prevent @reset.prevent>
     <slot></slot>

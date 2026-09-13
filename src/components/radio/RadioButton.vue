@@ -1,4 +1,4 @@
-<!-- ? RadioButton 按钮样式的单选框 -->
+<!-- RadioButton 按钮样式的单选框 -->
 <template>
   <label
     :class="[

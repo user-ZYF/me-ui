@@ -166,7 +166,7 @@ function useFunctionalModal(type: ModalType, userOptions: ModalOptions): ModalFu
           confirmButtonDisabled: opts.confirmButtonProps?.disabled || opts.confirmButtonDisabled || false,
           cancelButtonDisabled: opts.cancelButtonProps?.disabled || opts.cancelButtonDisabled || false,
           zIndex: opts.zIndex,
-          wrapClassName: opts.wrapClassName,
+          modalClassName: opts.modalClassName,
           footer: opts.footer,
         }, {
           default: () => opts.content,

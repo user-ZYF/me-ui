@@ -1,4 +1,4 @@
-<!-- ? Pagination Total 总条目数 -->
+<!-- Pagination Total 总条目数 -->
 <template>
   <span :class="ns.e('total')">
     共 {{ total }} 条

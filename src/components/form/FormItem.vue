@@ -1,4 +1,4 @@
-<!-- ? FormItem 表单项组件 -->
+<!-- FormItem 表单项组件 -->
 <template>
   <div
     ref="formItemRef"

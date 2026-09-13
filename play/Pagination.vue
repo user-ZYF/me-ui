@@ -1,4 +1,4 @@
-<!-- ? Pagination 分页组件示例 -->
+<!-- Pagination 分页组件示例 -->
 <template>
   <div class="play-pagination">
     <h1>MePagination 分页</h1>
