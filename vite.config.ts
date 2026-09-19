@@ -2,12 +2,14 @@ import { resolve } from 'node:path';
 import { defineConfig, type UserConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import dts from 'vite-plugin-dts';
+import { libInjectCss } from 'vite-plugin-lib-inject-css';
 
 export default defineConfig(({ command }): UserConfig => ({
   plugins: [
     vue(),
     ...(command === 'build'
       ? [
+          libInjectCss(),
           dts({
             entryRoot: 'src',
             include: ['src/**/*.ts', 'src/**/*.vue'],

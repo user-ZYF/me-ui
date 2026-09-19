@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A Vue 3 UI component library",
   "license": "MIT",
-  "author": "ZYF",
+  "author": "ZYF <3252667584@qq.com>",
   "publishConfig": {
     "access": "public"
   },
@@ -18,6 +18,14 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/user-ZYF/me-ui.git"
+  },
+  "bugs": {
+    "url": "https://github.com/user-ZYF/me-ui/issues"
+  },
+  "homepage": "https://github.com/user-ZYF/me-ui#readme",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -87,7 +95,7 @@
       "types": "./dist/components/virtual-list/index.d.ts",
       "import": "./dist/virtual-list.js"
     },
-    "./styles": "./dist/index.css",
+    "./styles/*": "./dist/*.css",
     "./dist/*": "./dist/*",
     "./package.json": "./package.json"
   },
@@ -95,9 +103,9 @@
     "dist"
   ],
   "sideEffects": [
-    "*.css",
-    "*.less",
-    "*.vue"
+    "**/*.css",
+    "**/*.less",
+    "**/*.vue"
   ],
   "scripts": {
     "dev": "vite",
@@ -137,6 +145,7 @@
     "uuid": "^14.0.1",
     "vite": "^5.4.0",
     "vite-plugin-dts": "^5.1.0",
+    "vite-plugin-lib-inject-css": "^2.2.2",
     "vitest": "^2.0.0",
     "vue": "^3.4.0",
     "vue-tsc": "^2.0.0"

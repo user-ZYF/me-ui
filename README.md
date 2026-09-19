@@ -1,6 +1,6 @@
 # Me UI
 
-A Vue 3 UI component library.
+A Vue 3 UI component library built with TypeScript.
 
 ## Tech Stack
 
@@ -9,7 +9,58 @@ A Vue 3 UI component library.
 - Vite
 - Less
 
-## Getting Started
+## Install
+
+```bash
+npm install @zyf_dsb/me-ui
+# or
+pnpm add @zyf_dsb/me-ui
+```
+
+Requires Vue `^3.3.0`. Peer dependencies (`lodash`, `async-validator`, `uuid`, `@vueuse/core`, `@element-plus/icons-vue`, `js-easing-functions`) are auto-installed by npm 7+ / pnpm.
+
+## Usage
+
+Styles are automatically injected — no manual CSS import needed.
+
+Full import:
+
+```ts
+import { createApp } from 'vue';
+import MeUI from '@zyf_dsb/me-ui';
+
+const app = createApp(App);
+app.use(MeUI);
+```
+
+On-demand import:
+
+```ts
+import { MeButton } from '@zyf_dsb/me-ui/button';
+
+app.use(MeButton);
+```
+
+## Components
+
+- Button
+- Checkbox / CheckboxGroup
+- ConfigProvider
+- Form / FormItem
+- Icon
+- Input
+- Modal
+- Pagination
+- Radio / RadioButton / RadioGroup
+- Select
+- Scrollbar
+- Table / TableColumn
+- Tag
+- Tooltip
+- Tree
+- VirtualList
+
+## Development
 
 ```bash
 # Install dependencies
@@ -24,21 +75,6 @@ pnpm build
 # Run tests
 pnpm test:run
 ```
-
-## Usage
-
-```ts
-import { createApp } from 'vue';
-import MeUI from 'me-ui';
-import 'me-ui/styles';
-
-const app = createApp(App);
-app.use(MeUI);
-```
-
-## Components
-
-- [x] Button
 
 ## License
 

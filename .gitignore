@@ -6,3 +6,14 @@ dist
 coverage
 
 *.tsbuildinfo
+
+# Editors
+.windsurf
+.cursor
+.vscode
+
+# AI tools
+.claude
+.codex
+CLAUDE.md
+AGENTS.md
