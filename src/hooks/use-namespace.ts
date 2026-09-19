@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useConfigProvider } from '@me-ui/components/config-provider/hooks/use-config-provider';
 import { defaultNamespace } from '@me-ui/constants/config';
 
-/** BEM 命名空间 hook，参考 Element Plus 的 useNamespace */
+/** BEM 命名空间 hook */
 export function useNamespace(block: string, namespaceOverride?: string) {
   /** 从 ConfigProvider 上下文获取命名空间 */
   const configContext = useConfigProvider();

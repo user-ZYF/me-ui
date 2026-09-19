@@ -1,9 +1,21 @@
 import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import dts from 'vite-plugin-dts';
 
-export default defineConfig(({ command }) => ({
-  plugins: [vue()],
+export default defineConfig(({ command }): UserConfig => ({
+  plugins: [
+    vue(),
+    ...(command === 'build'
+      ? [
+          dts({
+            entryRoot: 'src',
+            include: ['src/**/*.ts', 'src/**/*.vue'],
+            exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
+          }),
+        ]
+      : []),
+  ],
   resolve: {
     alias: {
       '@me-ui': resolve(__dirname, 'src'),
@@ -36,12 +48,23 @@ export default defineConfig(({ command }) => ({
         'tag': resolve(__dirname, 'src/components/tag/index.ts'),
         'scrollbar': resolve(__dirname, 'src/components/scrollbar/index.ts'),
         'tooltip': resolve(__dirname, 'src/components/tooltip/index.ts'),
+        'tree': resolve(__dirname, 'src/components/tree/index.ts'),
         'virtual-list': resolve(__dirname, 'src/components/virtual-list/index.ts'),
       },
       name: 'MeUI',
+      formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue', '@element-plus/icons-vue', '@vueuse/core', 'lodash'],
+      external: [
+        'vue',
+        /^vue\//,
+        /^@element-plus\/icons-vue/,
+        /^@vueuse\//,
+        /^lodash/,
+        /^async-validator/,
+        /^uuid/,
+        /^js-easing-functions/,
+      ],
       output: {
         globals: {
           vue: 'Vue',

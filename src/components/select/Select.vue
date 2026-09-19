@@ -237,7 +237,7 @@ const wrapperRef = ref<HTMLElement>();
 const { isFocused } = useFocusController(inputRef, wrapperRef, {
   disabled: actualDisabled,
   beforeBlur(event) {
-    // 焦点移动到弹出层内的可聚焦元素时，不改变触发器中input的isFocused的真状态（和Element Plus保持一致）
+    // 焦点移动到弹出层内的可聚焦元素时，不改变触发器中input的isFocused的真状态
     return tooltipRef.value?.isFocusInsideContent(event);
   },
   afterBlur() {
