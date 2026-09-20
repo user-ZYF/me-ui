@@ -19,7 +19,7 @@ import { MeVirtualList } from './components/virtual-list';
 
 import './setup';
 
-const components = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeModal, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTable, MeTableColumn, MeTag, MeTooltip, MeTree, MeVirtualList];
+const components: Plugin[] = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeModal, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTable, MeTableColumn, MeTag, MeTooltip, MeTree, MeVirtualList];
 
 /**
  * Vue 插件安装入口
@@ -27,7 +27,7 @@ const components = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeF
  */
 function install(app: App) {
   components.forEach((component) => {
-    app.use(component as unknown as { install: (app: App) => void });
+    app.use(component);
   });
 }
 
