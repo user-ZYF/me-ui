@@ -188,9 +188,12 @@ export function useDragNodeHandler({
 
     let indicatorTop = -9999;
     const distance = event.clientY - targetPosition.top;
-    if (distance < targetPosition.height * beforePercent) {
+    if (dropBefore && distance < targetPosition.height * beforePercent) {
       dropType = "before";
-    } else if (distance > targetPosition.height * (1 - afterPercent)) {
+    } else if (
+      dropAfter &&
+      distance > targetPosition.height * (1 - afterPercent)
+    ) {
       dropType = "after";
     } else if (dropInner) {
       dropType = "inner";
