@@ -253,27 +253,33 @@ export function useDragNodeHandler({
       const draggingNodeData = draggingNode!.node.data;
       // 内联判断以收窄 dropType 类型为 Exclude<NodeDropType, 'none'>
       if (dropType && dropType !== "none") {
-        draggingNode!.node.remove();
-        if (dropType === "before") {
-          dropNode.node.parent?.insertBefore(draggingNodeData, dropNode.node);
-        } else if (dropType === "after") {
-          dropNode.node.parent?.insertAfter(draggingNodeData, dropNode.node);
-        } else if (dropType === "inner") {
-          dropNode.node.insertChild(draggingNodeData);
-        }
+        /** 落库前按最终 dropType 再校验一次 allowDrop：dragover 阶段判定的是 before/inner/after 的并集，与最终落点类型可能不一致，且不允许时应避免内部模型被改动后与外部数据分叉 */
+        const dropAllowed = isFunction(props.allowDrop)
+          ? props.allowDrop(draggingNode!.node, dropNode.node, dropType)
+          : true;
+        if (dropAllowed) {
+          draggingNode!.node.remove();
+            if (dropType === "before") {
+            dropNode.node.parent?.insertBefore(draggingNodeData, dropNode.node);
+          } else if (dropType === "after") {
+            dropNode.node.parent?.insertAfter(draggingNodeData, dropNode.node);
+          } else if (dropType === "inner") {
+            dropNode.node.insertChild(draggingNodeData);
+          }
 
-        const keyName = store.value.keyName;
-        // 新节点已通过 insertChild -> initialize -> registerNode 注册，此处仅需同步选中状态
-        if (keyName) {
-          draggingNode!.node.eachNode((node) => {
-            store.value.nodesMap[node.data[keyName]]?.setChecked(
-              node.checkedState,
-              !store.value.checkStrictly,
-            );
-          });
-        }
+          const keyName = store.value.keyName;
+          // 新节点已通过 insertChild -> initialize -> registerNode 注册，此处仅需同步选中状态
+          if (keyName) {
+            draggingNode!.node.eachNode((node) => {
+              store.value.nodesMap[node.data[keyName]]?.setChecked(
+                node.checkedState,
+                !store.value.checkStrictly,
+              );
+            });
+          }
 
-        ctx.emit("node-drop", draggingNode!.node, dropNode.node, dropType, event);
+          ctx.emit("node-drop", draggingNode!.node, dropNode.node, dropType, event);
+        }
       }
 
       dropNode.node.isDropInner = false;
