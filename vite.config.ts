@@ -52,6 +52,7 @@ export default defineConfig(({ command }): UserConfig => ({
         'tooltip': resolve(__dirname, 'src/components/tooltip/index.ts'),
         'tree': resolve(__dirname, 'src/components/tree/index.ts'),
         'virtual-list': resolve(__dirname, 'src/components/virtual-list/index.ts'),
+        'setup': resolve(__dirname, 'src/setup.ts'),
       },
       name: 'MeUI',
       formats: ['es'],

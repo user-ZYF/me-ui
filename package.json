@@ -105,7 +105,9 @@
   "sideEffects": [
     "**/*.css",
     "**/*.less",
-    "**/*.vue"
+    "**/*.vue",
+    "src/setup.ts",
+    "dist/setup*.js"
   ],
   "scripts": {
     "dev": "vite",
