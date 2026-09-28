@@ -15,11 +15,12 @@ import { MeTable, MeTableColumn } from './components/table';
 import { MeTag } from './components/tag';
 import { MeTooltip } from './components/tooltip';
 import { MeTree } from './components/tree';
+import { MeTypewriter } from './components/typewriter';
 import { MeVirtualList } from './components/virtual-list';
 
 import './setup';
 
-const components: Plugin[] = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeModal, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTable, MeTableColumn, MeTag, MeTooltip, MeTree, MeVirtualList];
+const components: Plugin[] = [MeButton, MeCheckbox, MeCheckboxGroup, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeModal, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTable, MeTableColumn, MeTag, MeTooltip, MeTree, MeTypewriter, MeVirtualList];
 
 /**
  * Vue 插件安装入口
@@ -31,7 +32,7 @@ function install(app: App) {
   });
 }
 
-export { MeButton, MeCheckbox, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeModal, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTable, MeTableColumn, MeTag, MeTooltip, MeTree, MeVirtualList };
+export { MeButton, MeCheckbox, MeConfigProvider, MeForm, MeFormItem, MeIcon, MeInput, MeModal, MePagination, MeRadio, MeRadioButton, MeRadioGroup, MeSelect, MeScrollbar, MeTable, MeTableColumn, MeTag, MeTooltip, MeTree, MeTypewriter, MeVirtualList };
 
 const MeUI: Plugin = { install };
 

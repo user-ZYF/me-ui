@@ -87,6 +87,10 @@
       "types": "./dist/components/tree/index.d.ts",
       "import": "./dist/tree.js"
     },
+    "./typewriter": {
+      "types": "./dist/components/typewriter/index.d.ts",
+      "import": "./dist/typewriter.js"
+    },
     "./scrollbar": {
       "types": "./dist/components/scrollbar/index.d.ts",
       "import": "./dist/scrollbar.js"

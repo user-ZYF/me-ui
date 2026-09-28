@@ -51,6 +51,7 @@ export default defineConfig(({ command }): UserConfig => ({
         'scrollbar': resolve(__dirname, 'src/components/scrollbar/index.ts'),
         'tooltip': resolve(__dirname, 'src/components/tooltip/index.ts'),
         'tree': resolve(__dirname, 'src/components/tree/index.ts'),
+        'typewriter': resolve(__dirname, 'src/components/typewriter/index.ts'),
         'virtual-list': resolve(__dirname, 'src/components/virtual-list/index.ts'),
         'setup': resolve(__dirname, 'src/setup.ts'),
       },

@@ -67,12 +67,12 @@
       <h2>圆形按钮</h2>
       <p class="play-desc">设置 circle 显示为圆形按钮，通常配合图标使用</p>
       <div class="play-row">
-        <me-button circle><Search /></me-button>
-        <me-button type="primary" circle><Edit /></me-button>
-        <me-button type="success" circle><Check /></me-button>
-        <me-button type="warning" circle><Star /></me-button>
-        <me-button type="danger" circle><Delete /></me-button>
-        <me-button type="info" circle><Share /></me-button>
+        <me-button circle><me-icon><Search /></me-icon></me-button>
+        <me-button type="primary" circle><me-icon><Edit /></me-icon></me-button>
+        <me-button type="success" circle><me-icon><Check /></me-icon></me-button>
+        <me-button type="warning" circle><me-icon><Star /></me-icon></me-button>
+        <me-button type="danger" circle><me-icon><Delete /></me-icon></me-button>
+        <me-button type="info" circle><me-icon><Share /></me-icon></me-button>
       </div>
     </section>
 

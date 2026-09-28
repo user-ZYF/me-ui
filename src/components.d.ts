@@ -13,6 +13,7 @@ import type { MeTable, MeTableColumn } from './components/table';
 import type { MeTag } from './components/tag';
 import type { MeTooltip } from './components/tooltip';
 import type { MeTree } from './components/tree';
+import type { MeTypewriter } from './components/typewriter';
 import type { MeVirtualList } from './components/virtual-list';
 
 declare module 'vue' {
@@ -37,6 +38,7 @@ declare module 'vue' {
     MeTag: typeof MeTag;
     MeTooltip: typeof MeTooltip;
     MeTree: typeof MeTree;
+    MeTypewriter: typeof MeTypewriter;
     MeVirtualList: typeof MeVirtualList;
   }
 }

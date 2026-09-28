@@ -1,0 +1,27 @@
+@B: ~'@{namespace}-typewriter';
+
+.@{B} {
+  display: inline;
+
+  &.is-block {
+    display: block;
+    width: 100%;
+  }
+
+  &__cursor {
+    display: inline-block;
+    animation: me-typewriter-blink 1s step-end infinite;
+  }
+}
+
+// keyframes 名称为全局命名，固定使用默认命名空间
+@keyframes me-typewriter-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
