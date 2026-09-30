@@ -43,10 +43,10 @@ const ns = useNamespace("virtual-list");
 /** MeScrollbar 引用 */
 const scrollbarRef = ref<InstanceType<typeof MeScrollbar>>();
 
-/** 是否启用虚拟滚动 */
+/** 是否启用虚拟滚动（需要容器高度和预估项高度） */
 const isVirtual = computed(() => {
-  const { height, itemHeight, virtual } = props;
-  return !!(virtual && height && itemHeight);
+  const { height, itemHeight } = props;
+  return !!(height && itemHeight);
 });
 
 /** 是否真正进入虚拟模式（数据量超过容器高度） */
@@ -131,7 +131,7 @@ const {
 } = useItemHeights(
   items,
   getItemKey,
-  computed(() => props.itemHeight ?? 0),
+  computed(() => props.itemHeight),
   onResize,
 );
 

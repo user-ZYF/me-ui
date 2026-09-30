@@ -126,26 +126,6 @@
       <p class="play-label">当前数据量：{{ dynamicData.length }} 条</p>
     </section>
 
-    <!-- 非虚拟模式 -->
-    <section class="play-section">
-      <h2>非虚拟模式</h2>
-      <p class="play-desc">不传 virtual / itemHeight 时，退化为普通滚动列表</p>
-      <div class="play-border">
-        <me-virtual-list
-          :data="basicData.slice(0, 20)"
-          :height="300"
-          item-key="id"
-        >
-          <template #default="{ item, index }">
-            <div class="play-item" :class="{ 'is-odd': index % 2 === 0 }">
-              <span class="play-item-index">#{{ item.id }}</span>
-              <span class="play-item-label">{{ item.label }}</span>
-            </div>
-          </template>
-        </me-virtual-list>
-      </div>
-    </section>
-
     <!-- 自定义渲染 -->
     <section class="play-section">
       <h2>自定义渲染</h2>
@@ -634,6 +614,7 @@ function scrollVariableToKey(key: number, align: ScrollAlign = 'top', behavior: 
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 </style>

@@ -19,7 +19,6 @@
         :item-height="itemHeight"
         :item-key="virtualItemKey"
         :overscan="overscan"
-        :virtual="true"
       >
         <template #default="{ item }">
           <virtual-tree-node

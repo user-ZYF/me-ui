@@ -17,12 +17,7 @@ export const virtualListProps = {
   /** 每项预估高度，用于初始渲染前计算可见区间，实际高度由 DOM 测量后动态修正 */
   itemHeight: {
     type: Number,
-    default: undefined,
-  },
-  /** 是否启用虚拟滚动，默认开启 */
-  virtual: {
-    type: Boolean,
-    default: true,
+    required: true as const,
   },
   /** 获取项 key 的字段名或函数，用于高度缓存和列表项复用 */
   itemKey: {
