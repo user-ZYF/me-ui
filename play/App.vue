@@ -3,7 +3,8 @@
   <!-- <Tree /> -->
   <!-- <Button /> -->
   <!-- <Tooltip /> -->
-  <Typewriter />
+  <!-- <Typewriter /> -->
+  <VirtualList />
 </template>
 
 <script lang="ts" setup>
@@ -11,5 +12,6 @@
 // import Tree from "./Tree.vue";
 // import Button from "./Button.vue";
 // import Tooltip from "./Tooltip.vue";
-import Typewriter from "./Typewriter.vue";
+// import Typewriter from "./Typewriter.vue";
+import VirtualList from "./VirtualList.vue";
 </script>

@@ -204,6 +204,39 @@
       </div>
       <p class="play-label">当前 scrollTop：{{ variableScrollTop }}px</p>
     </section>
+
+    <!-- 异步内容加载 -->
+    <section class="play-section">
+      <h2>异步内容加载</h2>
+      <p class="play-desc">
+        模拟图片等异步内容：列表项初始只有一行文本（约 40px），渲染后随机延迟 300~1500ms 加载出额外内容块（80px），
+        由 ResizeObserver 感知高度变化并触发二次收集，滚动条和可见区间自动修正
+      </p>
+      <div class="play-controls">
+        <me-button size="small" @click="reloadAsyncData">重新加载数据</me-button>
+      </div>
+      <div class="play-border">
+        <me-virtual-list
+          :data="asyncData"
+          :height="300"
+          :item-height="40"
+          item-key="id"
+        >
+          <template #default="{ item, index }">
+            <div class="play-async-item" :class="{ 'is-odd': index % 2 === 0 }">
+              <div class="play-async-header">
+                <span class="play-item-index">#{{ item.id }}</span>
+                <span class="play-item-label">{{ item.label }}</span>
+                <span class="play-item-tag">{{ item.loaded ? '已加载' : '加载中…' }}</span>
+              </div>
+              <div v-if="item.loaded" class="play-async-image">
+                模拟异步内容（图片）已加载 · 80px
+              </div>
+            </div>
+          </template>
+        </me-virtual-list>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -407,6 +440,46 @@ function scrollVariableTo(index: number, align: ScrollAlign = 'top', behavior: '
 function scrollVariableToKey(key: number, align: ScrollAlign = 'top', behavior: 'auto' | 'smooth' = 'auto') {
   variableListRef.value?.scrollTo({ key, align, behavior });
 }
+
+/** 异步内容项类型 */
+interface AsyncItem {
+  id: number;
+  label: string;
+  loaded: boolean;
+}
+
+/** 异步内容数据 */
+const asyncData = ref<AsyncItem[]>([]);
+
+/** 异步定时器，重新加载时统一清理 */
+let asyncTimers: ReturnType<typeof setTimeout>[] = [];
+
+/**
+ * 生成异步内容数据：每项初始 unloaded，随机延迟后置为 loaded，
+ * 触发项内内容块渲染 → 高度变化 → ResizeObserver 二次收集
+ */
+function generateAsyncData(count: number) {
+  asyncTimers.forEach(clearTimeout);
+  asyncTimers = [];
+  asyncData.value = Array.from({ length: count }, (_, i) => ({
+    id: i,
+    label: `异步项 ${String(i + 1).padStart(3, '0')}`,
+    loaded: false,
+  }));
+  asyncData.value.forEach((item) => {
+    const timer = setTimeout(() => {
+      item.loaded = true;
+    }, Math.random() * 1200 + 300);
+    asyncTimers.push(timer);
+  });
+}
+
+/** 重新加载异步数据 */
+function reloadAsyncData() {
+  generateAsyncData(200);
+}
+
+generateAsyncData(200);
 </script>
 
 <style lang="less" scoped>
@@ -616,5 +689,32 @@ function scrollVariableToKey(key: number, align: ScrollAlign = 'top', behavior: 
   -webkit-line-clamp: 3;
   line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+.play-async-item {
+  padding: 8px 16px;
+  border-bottom: 1px solid #f2f3f5;
+
+  &.is-odd {
+    background-color: #fafbfc;
+  }
+}
+
+.play-async-header {
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
+.play-async-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  margin-top: 8px;
+  border-radius: 4px;
+  background-color: #e8f3ff;
+  color: #165dff;
+  font-size: 12px;
 }
 </style>

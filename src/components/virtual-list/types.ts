@@ -68,11 +68,11 @@ export function isScrollToIndex(arg: ScrollConfig): arg is ScrollToIndex {
 
 /** 类型守卫：是否为按 key 滚动 */
 export function isScrollToKey(arg: ScrollConfig): arg is ScrollToKey {
-  return 'key' in arg;
+  return 'key' in arg && arg.key !== undefined;
 }
 
 /**
  * 滚动到指定位置
- * @param arg 传数字则直接滚动到该 scrollTop 值；传 ScrollConfig 则滚动到指定索引或 key；传 undefined 不滚动
+ * @param arg 传数字则直接滚动到该 scrollTop 值；传 ScrollConfig 则滚动到指定索引或 key
  */
-export type ScrollTo = (arg: number | ScrollConfig | undefined) => void;
+export type ScrollTo = (arg: number | ScrollConfig) => void;

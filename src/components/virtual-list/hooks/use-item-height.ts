@@ -1,8 +1,10 @@
-import { ref, watch } from 'vue';
+import { computed, ref, shallowReactive, watch } from 'vue';
 import type { ComputedRef, Ref } from 'vue';
 
+import { useResizeObserver } from '@vueuse/core';
 import { useRafThrottle } from '@me-ui/hooks/use-raf-throttle';
 import type { ItemKey } from '../types';
+import { isNil } from '@me-ui/utils/types';
 
 /** 高度缓存 */
 export type HeightCache = Map<any, number>;
@@ -42,7 +44,7 @@ export interface HeightCollection<T> {
   /** 获取指定索引项的底部偏移量 O(1) */
   getItemBottom: (index: number) => number;
   /** 二分查找：给定垂直偏移量，返回该偏移量所在项的索引 O(log n) */
-  findIndexAtOffset: (offset: number) => number;
+  findIndexByOffset: (offset: number) => number;
   /** 列表总高度 O(1) */
   getTotalHeight: () => number;
 }
@@ -58,20 +60,26 @@ export function useItemHeights<T>(
   itemHeight: ComputedRef<number>,
   onResize: (changes: HeightChange[]) => void,
 ): HeightCollection<T> {
-  /** DOM 实例缓存 */
-  const itemRefs = new Map<any, HTMLElement>();
-  /** 高度缓存 */
+  /** key → DOM 实例（shallowReactive：追踪增删但不代理 DOM 元素） */
+  const itemRefs = shallowReactive(new Map<any, HTMLElement>());
+  /** key → 实际高度（仅包含已渲染元素） */
   const heights = new Map<any, number>();
-  /** key → index 映射 */
+  /** key → index */
   const keyToIndex = new Map<any, number>();
   /** 更新标记 */
   const heightUpdateMark = ref(Symbol('height-update'));
-  /** index → key 数组，用于前缀和重建时避免函数调用 */
+  /** index → key */
   let keysArray: any[] = [];
   /** 前缀和数组：prefixSums[i] = 项 0..i 的高度总和，prefixSums[n-1] = 总高度 */
   let prefixSums: number[] = [];
   /** 前缀和是否脏（需要重建） */
   let prefixSumsDirty = true;
+
+  /** 渲染中的项元素列表（供 ResizeObserver 监听） */
+  const observedEls = computed(() => [...itemRefs.values()]);
+
+  /** 监听渲染中项的尺寸变化 */
+  useResizeObserver(observedEls, () => collectHeight());
 
   watch(
     data,
@@ -144,33 +152,29 @@ export function useItemHeights<T>(
       // offsetParent 为 null 表示元素未挂载或 display:none，此时 offsetHeight 无意义，跳过测量
       if (el && el.offsetParent) {
         const { offsetHeight } = el;
-        const prevHeight = heights.get(key);
-        if (prevHeight !== offsetHeight) {
-          // 首次测量且实际高度等于预估高度时，静默更新缓存，不触发前缀和重建
-          if (prevHeight === undefined && offsetHeight === itemHeight.value) {
-            heights.set(key, offsetHeight);
-            return;
-          }
-          const index = keyToIndex.get(key);
-          if (index !== undefined) {
-            changes.push({
-              index,
-              key,
-              oldHeight: prevHeight ?? itemHeight.value,
-              newHeight: offsetHeight,
-              prevItemTop: 0,
-            });
-          }
+        // 参与计算的旧高度：已缓存取缓存值，未缓存回退到预估值
+        const prevHeight = getItemHeight(key);
+        // 实测高度与参与计算的高度一致时，静默写入缓存，不触发前缀和重建
+        if (prevHeight === offsetHeight) {
+          heights.set(key, offsetHeight);
+          return;
         }
+        changes.push({
+          index: keyToIndex.get(key)!,
+          key,
+          oldHeight: prevHeight,
+          newHeight: offsetHeight,
+          prevItemTop: 0,
+        });
       }
     });
     if (changes.length > 0) {
       // 先确保前缀和反映变更前的高度状态
       ensurePrefixSums();
-      // 使用前缀和 O(1) 获取变更项的顶部位置，同时应用高度更新到缓存
+      // 获取变更项的顶部位置，同时应用高度更新到缓存
       for (const change of changes) {
         change.prevItemTop = getItemTop(change.index);
-        // 设置高度不会触发前缀和重计算，因此后续元素的preItemTop都还是基于原有的
+        // 这里仅设置高度，不让前缀和重计算，因为后续元素的preItemTop还要基于原有的
         heights.set(change.key, change.newHeight);
       }
       onResize(changes);
@@ -198,7 +202,7 @@ export function useItemHeights<T>(
   /** 设置/移除项 DOM 实例 */
   function setItemRef(item: T, el: HTMLElement | null) {
     const key = getItemKey(item);
-    if (key === undefined || key === null) {
+    if (isNil(key)) {
       console.warn(
         '[MeVirtualList] itemKey 解析结果为空，请检查 itemKey 配置是否正确',
         item,
@@ -223,7 +227,7 @@ export function useItemHeights<T>(
     return heights.has(key);
   }
 
-  /** 获取指定索引项的顶部偏移量 O(1) */
+  /** 获取指定索引项的顶部偏移量 */
   function getItemTop(index: number): number {
     ensurePrefixSums();
     const n = data.value.length;
@@ -232,7 +236,7 @@ export function useItemHeights<T>(
     return prefixSums[index - 1];
   }
 
-  /** 获取指定索引项的底部偏移量 O(1) */
+  /** 获取指定索引项的底部偏移量 */
   function getItemBottom(index: number): number {
     ensurePrefixSums();
     const n = data.value.length;
@@ -241,8 +245,8 @@ export function useItemHeights<T>(
     return prefixSums[index];
   }
 
-  /** 二分查找：返回包含指定偏移量的项的索引 O(log n) */
-  function findIndexAtOffset(offset: number): number {
+  /** 返回offset所在列表项的下标 */
+  function findIndexByOffset(offset: number): number {
     ensurePrefixSums();
     const n = data.value.length;
     if (n === 0) return 0;
@@ -263,7 +267,7 @@ export function useItemHeights<T>(
     return Math.min(left, n - 1);
   }
 
-  /** 列表总高度 O(1) */
+  /** 列表总高度 */
   function getTotalHeight(): number {
     ensurePrefixSums();
     const n = data.value.length;
@@ -280,7 +284,7 @@ export function useItemHeights<T>(
     ensurePrefixSums,
     getItemTop,
     getItemBottom,
-    findIndexAtOffset,
+    findIndexByOffset,
     getTotalHeight,
   };
 }

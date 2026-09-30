@@ -10,7 +10,7 @@
             :key="getItemKey(item)"
           >
             <div :ref="(el) => setItemRef(item, el as HTMLElement | null)">
-              <slot :item="item" :index="startIndex + index"></slot>
+              <slot :item="item" :index="visibleRange.startIndex + index"></slot>
             </div>
           </template>
         </div>
@@ -25,7 +25,7 @@ import type { CSSProperties } from "vue";
 
 import MeScrollbar from "@me-ui/components/scrollbar";
 import { useNamespace } from "@me-ui/hooks/use-namespace";
-import { isFunction } from "@me-ui/utils/types";
+import { isFunction, isNil, isNumber } from "@me-ui/utils/types";
 
 import { virtualListEmits, virtualListProps } from "./virtual-list";
 import { useItemHeights } from "./hooks/use-item-height";
@@ -55,7 +55,6 @@ const isVirtualActive = computed(() => {
   return (
     isVirtual.value &&
     data &&
-    itemHeight &&
     data.length > 0 &&
     itemHeight * data.length > (height || 0)
   );
@@ -90,11 +89,7 @@ watch(
 /** 获取列表项 key */
 function getItemKey(item: Record<string, any>) {
   const key = resolveKey.value(item);
-  if (
-    key === undefined ||
-    key === null ||
-    (typeof key === "number" && Number.isNaN(key))
-  ) {
+  if (isNil(key) || (isNumber(key) && Number.isNaN(key))) {
     throw new Error(
       "[me-virtual-list] getItemKey 返回了无效值（undefined / null / NaN），请检查 itemKey 配置是否正确",
     );
@@ -126,7 +121,7 @@ const {
   heightUpdateMark,
   getItemTop,
   getItemBottom,
-  findIndexAtOffset,
+  findIndexByOffset,
   getTotalHeight,
 } = useItemHeights(
   items,
@@ -143,43 +138,11 @@ const visibleRange = reactive<VisibleRange>({
   offset: undefined,
 });
 
-/** 非虚拟模式：渲染全部 */
-watch(
-  [isVirtual, items],
-  () => {
-    if (!isVirtual.value) {
-      Object.assign(visibleRange, {
-        totalHeight: undefined,
-        startIndex: 0,
-        endIndex: items.value.length - 1,
-        offset: undefined,
-      });
-    }
-  },
-  { immediate: true },
-);
-
-/** 虚拟模式但数据量不够：渲染全部 */
-watch(
-  [isVirtual, items, isVirtualActive],
-  () => {
-    if (isVirtual.value && !isVirtualActive.value) {
-      Object.assign(visibleRange, {
-        totalHeight: undefined,
-        startIndex: 0,
-        endIndex: items.value.length - 1,
-        offset: undefined,
-      });
-    }
-  },
-  { immediate: true },
-);
-
-/** 虚拟模式核心计算：根据 scrollTop 计算可见区间 */
+/** 可见区间计算：非虚拟或数据量不足时渲染全部，否则按 scrollTop 二分查找可见区间 */
 watch(
   [
-    isVirtualActive,
     isVirtual,
+    isVirtualActive,
     scrollTop,
     items,
     heightUpdateMark,
@@ -187,7 +150,18 @@ watch(
     () => props.overscan,
   ],
   () => {
-    if (!isVirtual.value || !isVirtualActive.value) return;
+    // 非虚拟模式或数据量不足以启用虚拟滚动：渲染全部
+    if (!isVirtual.value || !isVirtualActive.value) {
+      // 非虚拟模式下不消费 pendingJump，避免残留值在切换为虚拟模式后被误用
+      pendingJump = 0;
+      Object.assign(visibleRange, {
+        totalHeight: undefined,
+        startIndex: 0,
+        endIndex: items.value.length - 1,
+        offset: undefined,
+      });
+      return;
+    }
 
     /** 数据总量 */
     const itemCount = items.value.length;
@@ -198,16 +172,16 @@ watch(
     /** 可见区域底部（scrollTop + 容器高度） */
     const visibleBottom = visibleTop + height!;
 
-    // O(log n) 二分查找可见区间
-    const rawStartIndex = findIndexAtOffset(visibleTop);
-    const rawEndIndex = findIndexAtOffset(visibleBottom);
+    // 二分查找可见区间
+    const rawStartIndex = findIndexByOffset(visibleTop);
+    const rawEndIndex = findIndexByOffset(visibleBottom);
 
     // 添加 overscan 缓冲区
     const startIndex = Math.max(0, rawStartIndex - overscan);
     const endIndex = Math.min(itemCount - 1, rawEndIndex + overscan);
-    /** 起始偏移量 O(1) */
+    /** 起始偏移量 */
     const startOffset = getItemTop(startIndex);
-    /** 列表总高度 O(1) */
+    /** 列表总高度 */
     const totalHeight = getTotalHeight();
 
     // 消费pendingJump，补偿scrollTop，避免跳变
@@ -253,7 +227,7 @@ watch(
     if (!wrap) return;
     const maxScrollTop = newTotal - wrap.clientHeight;
     if (maxScrollTop <= 0) return;
-    /** 差距超过 1px 才修正，避免亚像素级变化导致不必要的滚动和 watch 循环 */
+    // 差距超过 1px 才修正，避免亚像素级变化导致不必要的滚动和 watch 循环
     if (Math.abs(scrollTop.value - maxScrollTop) > 1) {
       isCompensating = true;
       setScrollTop(maxScrollTop);
@@ -286,9 +260,6 @@ const scrollTo: ScrollTo = useScrollTo({
   getItemTop,
   getItemBottom,
 });
-
-/** 起始索引 */
-const startIndex = computed(() => visibleRange.startIndex);
 
 /** 可见项 */
 const visibleItems = computed(() => {
