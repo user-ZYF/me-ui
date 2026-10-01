@@ -38,8 +38,8 @@ interface Props {
   };
   /** 上下文 */
   ctx: { emit: TreeEmitFn };
-  /** 根元素引用 */
-  el$: Ref<HTMLElement | null>;
+  /** 容器元素引用 */
+  container$: Ref<HTMLElement | null>;
   /** 放置指示器引用 */
   dropIndicator$: Ref<HTMLElement | null>;
   /** 树存储 */
@@ -75,7 +75,7 @@ export const dragEventsKey = Symbol("dragEvents") as InjectionKey<DragEvents>;
 export function useDragNodeHandler({
   props,
   ctx,
-  el$,
+  container$,
   dropIndicator$,
   store,
 }: Props) {
@@ -178,8 +178,8 @@ export function useDragNodeHandler({
     const targetPosition = dropEl
       .querySelector(`.${ns.e("content")}`)!
       .getBoundingClientRect();
-    const treePosition = el$.value!.getBoundingClientRect();
-    const treeScrollTop = el$.value!.scrollTop;
+    const treePosition = container$.value!.getBoundingClientRect();
+    const treeScrollTop = container$.value!.scrollTop;
     let dropType: NodeDropType;
     // 显示before指示器的区间百分比
     const beforePercent = dropBefore ? (dropInner ? 0.25 : dropAfter ? 0.5 : 1) : 0;

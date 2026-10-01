@@ -1,17 +1,17 @@
 <template>
   <!-- <TreeScrollTo /> -->
-  <!-- <Tree /> -->
+  <Tree />
   <!-- <Button /> -->
   <!-- <Tooltip /> -->
   <!-- <Typewriter /> -->
-  <VirtualList />
+  <!-- <VirtualList /> -->
 </template>
 
 <script lang="ts" setup>
 // import TreeScrollTo from "./TreeScrollTo.vue";
-// import Tree from "./Tree.vue";
+import Tree from "./Tree.vue";
 // import Button from "./Button.vue";
 // import Tooltip from "./Tooltip.vue";
 // import Typewriter from "./Typewriter.vue";
-import VirtualList from "./VirtualList.vue";
+// import VirtualList from "./VirtualList.vue";
 </script>

@@ -1,7 +1,7 @@
 <!-- ? 树组件 -->
 <template>
   <div
-    ref="el$"
+    ref="container$"
     :class="[
       ns.b.value,
       ns.m('highlight-current'),
@@ -141,8 +141,8 @@ const ns = useNamespace("tree");
 const instance = getCurrentInstance()!;
 const slots = useSlots();
 
-/** 根元素引用 */
-const el$ = ref<HTMLElement | null>(null);
+/** 容器元素引用 */
+const container$ = ref<HTMLElement | null>(null);
 /** 放置指示器引用 */
 const dropIndicator$ = ref<HTMLElement | null>(null);
 /** 虚拟列表引用 */
@@ -196,7 +196,7 @@ const isLoading = computed(
 const { dragState } = useDragNodeHandler({
   props,
   ctx: { emit },
-  el$,
+  container$,
   dropIndicator$,
   store,
 });
