@@ -68,8 +68,6 @@ export function useItemHeights<T>(
   const keyToIndex = new Map<any, number>();
   /** 更新标记 */
   const heightUpdateMark = ref(Symbol('height-update'));
-  /** index → key */
-  let keysArray: any[] = [];
   /** 前缀和数组：prefixSums[i] = 项 0..i 的高度总和，prefixSums[n-1] = 总高度 */
   let prefixSums: number[] = [];
   /** 前缀和是否脏（需要重建） */
@@ -87,10 +85,8 @@ export function useItemHeights<T>(
       // 清理不再存在的高度缓存和 DOM 引用，避免 key 复用时使用过期缓存
       const currentKeys = new Set<any>();
       keyToIndex.clear();
-      keysArray = new Array(data.value.length);
       for (let i = 0; i < data.value.length; i++) {
         const key = getItemKey(data.value[i]);
-        keysArray[i] = key;
         currentKeys.add(key);
         keyToIndex.set(key, i);
       }
@@ -131,7 +127,7 @@ export function useItemHeights<T>(
     }
     let sum = 0;
     for (let i = 0; i < n; i++) {
-      sum += getItemHeight(keysArray[i]);
+      sum += getItemHeight(getItemKey(data.value[i]));
       prefixSums[i] = sum;
     }
     prefixSumsDirty = false;

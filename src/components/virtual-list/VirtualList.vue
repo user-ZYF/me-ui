@@ -107,7 +107,8 @@ let pendingJump = 0;
 function onResize(changes: HeightChange[]) {
   for (const change of changes) {
     if (change.prevItemTop < scrollTop.value) {
-      pendingJump += change.newHeight - change.oldHeight;
+        const diff = change.newHeight - change.oldHeight;
+        pendingJump += diff;
     }
   }
 }
@@ -219,20 +220,21 @@ function onScroll(top: number) {
 
 /** 底部修正：高度收集导致 totalHeight 变化时，若用户在底部则同步修正 scrollTop */
 watch(
-  () => visibleRange.totalHeight,
-  (newTotal) => {
-    if (!isVirtualActive.value || !isAtBottom.value || newTotal === undefined)
+  [() => visibleRange.totalHeight, isAtBottom],
+  ([newTotal]) => {
+    if (!isVirtualActive.value || !isAtBottom.value || newTotal === undefined){
       return;
+    }
     const wrap = scrollbarRef.value?.wrapRef;
     if (!wrap) return;
-    const maxScrollTop = newTotal - wrap.clientHeight;
-    if (maxScrollTop <= 0) return;
-    // 差距超过 1px 才修正，避免亚像素级变化导致不必要的滚动和 watch 循环
-    if (Math.abs(scrollTop.value - maxScrollTop) > 1) {
-      isCompensating = true;
-      setScrollTop(maxScrollTop);
-    }
-  },
+      const maxScrollTop = newTotal - wrap.clientHeight;
+      if (maxScrollTop <= 0) return;
+      // 差距超过 1px 才修正，避免亚像素级变化导致不必要的滚动和 watch 循环
+      if (Math.abs(scrollTop.value - maxScrollTop) > 1) {
+        isCompensating = true;
+        setScrollTop(maxScrollTop);
+      }
+    },
 );
 
 /** 设置滚动位置（同步更新 DOM 和组件状态） */

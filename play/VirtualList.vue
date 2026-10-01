@@ -214,9 +214,12 @@
       </p>
       <div class="play-controls">
         <me-button size="small" @click="reloadAsyncData">重新加载数据</me-button>
+        <me-button size="small" @click="scrollAsyncToBottom('auto')">滚动到底部 · auto</me-button>
+        <me-button size="small" @click="scrollAsyncToBottom('smooth')">滚动到底部 · smooth</me-button>
       </div>
       <div class="play-border">
         <me-virtual-list
+          ref="asyncListRef"
           :data="asyncData"
           :height="300"
           :item-height="40"
@@ -477,6 +480,21 @@ function generateAsyncData(count: number) {
 /** 重新加载异步数据 */
 function reloadAsyncData() {
   generateAsyncData(200);
+}
+
+/** 异步列表引用 */
+const asyncListRef = ref<InstanceType<typeof MeVirtualList>>();
+
+/**
+ * 滚动到异步列表底部
+ * 滚动过程中异步内容仍在加载撑高，可观察到底部修正逻辑（isAtBottom 时跟随 totalHeight 变化）
+ */
+function scrollAsyncToBottom(behavior: 'auto' | 'smooth' = 'auto') {
+  asyncListRef.value?.scrollTo({
+    index: asyncData.value.length - 1,
+    align: 'bottom',
+    behavior,
+  });
 }
 
 generateAsyncData(200);
