@@ -1,6 +1,5 @@
-import type { ComponentInternalInstance, InjectionKey, PropType } from "vue";
+import type { InjectionKey, PropType } from "vue";
 
-import type Node from "./model/node";
 import type {
   AllowDragFunction,
   AllowDropFunction,
@@ -8,9 +7,19 @@ import type {
   NodeDropType,
   RootTreeType,
   TreeComponentProps,
+  TreeOptionProps,
   TreeData,
+  TreeEventNode,
   TreeNodeData,
 } from "./types";
+
+/** fieldMap 默认字段映射（未传入字段时使用） */
+export const DEFAULT_FIELD_MAP: TreeOptionProps = {
+  children: "children",
+  label: "label",
+  disabled: "disabled",
+  isLeaf: "isLeaf",
+};
 
 /** Tree Props 定义 */
 export const treeProps = {
@@ -55,14 +64,9 @@ export const treeProps = {
     default: undefined,
   },
   /** 属性映射 */
-  props: {
-    type: Object as PropType<TreeComponentProps["props"]>,
-    default: () => ({
-      children: "children",
-      label: "label",
-      disabled: "disabled",
-      isLeaf: "isLeaf",
-    }),
+  fieldMap: {
+    type: Object as PropType<TreeComponentProps["fieldMap"]>,
+    default: () => ({ ...DEFAULT_FIELD_MAP }),
   },
   /** 懒加载 */
   lazy: {
@@ -120,62 +124,46 @@ export const treeEmits = {
     _indeterminate: boolean,
   ) => true,
   /** 当前选中节点变化 */
-  "current-change": (_data: TreeNodeData | null, _node: Node | null) => true,
+  "current-change": (_data: TreeNodeData | null, _node: TreeEventNode | null) => true,
   /** 节点被点击 */
-  "node-click": (
-    _data: TreeNodeData,
-    _node: Node,
-    _nodeInstance: ComponentInternalInstance | null,
-    _evt: MouseEvent,
-  ) => true,
+  "node-click": (_data: TreeNodeData, _node: TreeEventNode, _evt: MouseEvent) =>
+    true,
   /** 节点被右键点击 */
-  "node-contextmenu": (
-    _evt: Event,
-    _data: TreeNodeData,
-    _node: Node,
-    _nodeInstance: ComponentInternalInstance | null,
-  ) => true,
+  "node-contextmenu": (_evt: Event, _data: TreeNodeData, _node: TreeEventNode) =>
+    true,
   /** 节点折叠 */
-  "node-collapse": (
-    _data: TreeNodeData,
-    _node: Node,
-    _nodeInstance: ComponentInternalInstance | null,
-  ) => true,
+  "node-collapse": (_data: TreeNodeData, _node: TreeEventNode) => true,
   /** 节点展开 */
-  "node-expand": (
-    _data: TreeNodeData,
-    _node: Node,
-    _nodeInstance: ComponentInternalInstance | null,
-  ) => true,
+  "node-expand": (_data: TreeNodeData, _node: TreeEventNode) => true,
   /** 节点复选框被点击（返回选中信息） */
   check: (_data: TreeNodeData, _checkedInfo: CheckedInfo) => true,
   /** 节点拖拽开始 */
-  "node-drag-start": (_node: Node, _evt: DragEvent) => true,
+  "node-drag-start": (_node: TreeEventNode, _evt: DragEvent) => true,
   /** 节点拖拽结束（无论是否成功放置） */
   "node-drag-end": (
-    _draggingNode: Node | null,
-    _dropNode: Node | null,
+    _draggingNode: TreeEventNode | null,
+    _dropNode: TreeEventNode | null,
     _dropType: NodeDropType,
     _evt: DragEvent,
   ) => true,
-  /** 节点拖拽放置成功 */
+  /** 节点拖拽放置成功（组件不修改 data，需外部根据参数自行更新数据） */
   "node-drop": (
-    _draggingNode: Node,
-    _dropNode: Node,
+    _draggingNode: TreeEventNode,
+    _dropNode: TreeEventNode,
     _dropType: Exclude<NodeDropType, "none">,
     _evt: DragEvent,
   ) => true,
   /** 拖拽节点离开某可放置节点 */
   "node-drag-leave": (
-    _draggingNode: Node,
-    _oldDropNode: Node,
+    _draggingNode: TreeEventNode,
+    _oldDropNode: TreeEventNode,
     _evt: DragEvent,
   ) => true,
   /** 拖拽节点进入某可放置节点 */
-  "node-drag-enter": (_draggingNode: Node, _dropNode: Node, _evt: DragEvent) =>
+  "node-drag-enter": (_draggingNode: TreeEventNode, _dropNode: TreeEventNode, _evt: DragEvent) =>
     true,
   /** 拖拽节点经过某可放置节点 */
-  "node-drag-over": (_draggingNode: Node, _dropNode: Node, _evt: DragEvent) =>
+  "node-drag-over": (_draggingNode: TreeEventNode, _dropNode: TreeEventNode, _evt: DragEvent) =>
     true,
 } as const;
 
@@ -185,5 +173,3 @@ export type TreeEmits = typeof treeEmits;
 /** 注入 key */
 export const ROOT_TREE_INJECTION_KEY: InjectionKey<RootTreeType> =
   Symbol("RootTree");
-export const NODE_INSTANCE_INJECTION_KEY: InjectionKey<ComponentInternalInstance> =
-  Symbol("NodeInstance");

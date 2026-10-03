@@ -69,6 +69,8 @@
     right: 0;
     height: 1px;
     background-color: var(~'@{cv-color-primary}');
+    // 纯展示层：不接收指针/拖拽事件，避免悬停指示器时打断放置状态造成闪烁
+    pointer-events: none;
   }
 }
 
@@ -118,10 +120,6 @@
       cursor: default;
       visibility: hidden;
     }
-
-    &.is-hidden {
-      visibility: hidden;
-    }
   }
 
   &__loading-icon {
@@ -137,15 +135,6 @@
     align-items: center;
     align-self: stretch;
     padding-right: 8px;
-  }
-
-  &__children {
-    overflow: hidden;
-    background-color: transparent;
-  }
-
-  &.is-expanded > .@{B-node}__children {
-    display: block;
   }
 }
 

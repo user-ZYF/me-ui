@@ -55,7 +55,7 @@
     <!-- 显示复选框 -->
     <section class="play-section">
       <h2>显示复选框</h2>
-      <p class="play-desc">设置 show-checkbox 显示复选框，父子节点联动选中</p>
+      <p class="play-desc">设置 checkable 显示复选框，父子节点联动选中</p>
       <div class="play-border">
         <me-tree :data="baseData" node-key="id" checkable />
       </div>
@@ -150,13 +150,13 @@
 
     <!-- 自定义 props 映射 -->
     <section class="play-section">
-      <h2>自定义 props 映射</h2>
-      <p class="play-desc">通过 props 自定义字段名，此处使用 name 作为 label、subList 作为 children</p>
+      <h2>自定义字段映射</h2>
+      <p class="play-desc">通过 fieldMap 自定义字段名，此处使用 name 作为 label、subList 作为 children</p>
       <div class="play-border">
         <me-tree
           :data="customPropsData"
           node-key="id"
-          :props="customProps"
+          :field-map="customProps"
         />
       </div>
     </section>
@@ -188,7 +188,12 @@
       <h2>拖拽排序</h2>
       <p class="play-desc">设置 draggable 开启节点拖拽排序</p>
       <div class="play-border">
-        <me-tree :data="dragData" node-key="id" draggable @node-drop="onNodeDrop" />
+        <me-tree
+          :data="dragData"
+          node-key="id"
+          draggable
+          @node-drop="(n: any, d: any, t: any) => onNodeDrop(dragData, n, d, t)"
+        />
       </div>
     </section>
 
@@ -197,7 +202,13 @@
       <h2>拖拽 + 复选框</h2>
       <p class="play-desc">拖拽与复选框组合使用</p>
       <div class="play-border">
-        <me-tree :data="dragData" node-key="id" draggable checkable />
+        <me-tree
+          :data="dragData"
+          node-key="id"
+          draggable
+          checkable
+          @node-drop="(n: any, d: any, t: any) => onNodeDrop(dragData, n, d, t)"
+        />
       </div>
     </section>
 
@@ -211,7 +222,7 @@
           node-key="id"
           draggable
           :allow-drag="checkDraggable"
-          @node-drop="onNodeDrop"
+          @node-drop="(n: any, d: any, t: any) => onNodeDrop(allowDragData, n, d, t)"
         >
           <template #default="{ data }">
             <span class="play-tree-drag-node">
@@ -232,14 +243,14 @@
     <!-- 拖拽 + allowDrop 控制放置位置 -->
     <section class="play-section">
       <h2>拖拽 + allowDrop 控制放置位置</h2>
-      <p class="play-desc">通过 allow-drop 控制节点可接受的放置类型：inner（放入内部）/ prev（前方）/ next（后方），由 allowInner/allowSibling 字段控制。未设置 allow-drag 时所有节点均可拖起</p>
+      <p class="play-desc">通过 allow-drop 控制节点可接受的放置类型：inner（放入内部）/ before（前方）/ after（后方），由 allowInner/allowSibling 字段控制。未设置 allow-drag 时所有节点均可拖起</p>
       <div class="play-border">
         <me-tree
           :data="allowDropData"
           node-key="id"
           draggable
           :allow-drop="checkDroppable"
-          @node-drop="onNodeDrop"
+          @node-drop="(n: any, d: any, t: any) => onNodeDrop(allowDropData, n, d, t)"
         >
           <template #default="{ data }">
             <span class="play-tree-drag-node">
@@ -267,7 +278,7 @@
           draggable
           :allow-drag="checkComprehensiveDrag"
           :allow-drop="checkComprehensiveDrop"
-          @node-drop="onNodeDrop"
+          @node-drop="(n: any, d: any, t: any) => onNodeDrop(comprehensiveDragData, n, d, t)"
         >
           <template #default="{ node, data }">
             <span class="play-tree-drag-node">
@@ -322,7 +333,15 @@
       <h2>虚拟滚动 + 拖拽</h2>
       <p class="play-desc">虚拟滚动与拖拽排序组合使用，适用于大数据量场景下的拖拽排序</p>
       <div class="play-border">
-        <me-tree :data="virtualDragData" node-key="id" virtual draggable :height="300" :item-height="26" @node-drop="onNodeDrop" />
+        <me-tree
+          :data="virtualDragData"
+          node-key="id"
+          virtual
+          draggable
+          :height="300"
+          :item-height="26"
+          @node-drop="(n: any, d: any, t: any) => onNodeDrop(virtualDragData, n, d, t)"
+        />
       </div>
     </section>
 
@@ -339,7 +358,7 @@
           checkable
           :height="300"
           :item-height="26"
-          @node-drop="onNodeDrop"
+          @node-drop="(n: any, d: any, t: any) => onNodeDrop(virtualDragCheckData, n, d, t)"
           @check="onVirtualDragCheck"
         />
       </div>
@@ -729,7 +748,7 @@ const lazyData = [
 ];
 
 /** 拖拽数据 */
-const dragData = [
+const dragData = ref([
   {
     id: 1,
     label: '可拖拽节点 1',
@@ -753,10 +772,10 @@ const dragData = [
       { id: 31, label: '子节点 3-1' },
     ],
   },
-];
+]);
 
 /** allowDrag 演示数据 - draggable 字段控制可拖拽 */
-const allowDragData = [
+const allowDragData = ref([
   {
     id: 1,
     label: '节点 1（可拖拽）',
@@ -778,10 +797,10 @@ const allowDragData = [
     id: 3,
     label: '节点 3（默认可拖拽）',
   },
-];
+]);
 
 /** allowDrop 演示数据 - allowInner/allowSibling 控制放置类型 */
-const allowDropData = [
+const allowDropData = ref([
   {
     id: 1,
     label: '容器节点 1（仅可放入内部）',
@@ -807,10 +826,10 @@ const allowDropData = [
     allowInner: false,
     allowSibling: true,
   },
-];
+]);
 
 /** 综合拖拽演示数据 - disabled / 容器 / 叶子 */
-const comprehensiveDragData = [
+const comprehensiveDragData = ref([
   {
     id: 1,
     label: '容器节点 1',
@@ -842,7 +861,7 @@ const comprehensiveDragData = [
       { id: 31, label: '叶子 3-1' },
     ],
   },
-];
+]);
 
 /** 方法演示数据 */
 const methodData = ref([
@@ -908,10 +927,10 @@ function generateVirtualData(count: number) {
 const virtualData = generateVirtualData(100);
 
 /** 虚拟滚动 + 拖拽数据（50 个根节点） */
-const virtualDragData = generateVirtualData(50);
+const virtualDragData = ref(generateVirtualData(50));
 
 /** 虚拟滚动 + 拖拽 + 复选框数据（50 个根节点） */
-const virtualDragCheckData = generateVirtualData(50);
+const virtualDragCheckData = ref(generateVirtualData(50));
 
 /** 虚拟滚动 + 拖拽 + 复选框 选中 keys */
 const virtualDragCheckedKeys = ref<any[]>([]);
@@ -931,7 +950,7 @@ const virtualLazyData = Array.from({ length: 50 }, (_, i) => ({
 // ==================== 懒加载 ====================
 
 /** 懒加载最大层级（根节点为 0，最多加载到第 3 层） */
-const LAZY_MAX_LEVEL = 3;
+const LAZY_MAX_LEVEL = 5;
 
 /** 懒加载函数 */
 function loadNode(node: any, resolve: (data: any[]) => void) {
@@ -954,8 +973,32 @@ function loadNode(node: any, resolve: (data: any[]) => void) {
 
 // ==================== 拖拽 ====================
 
-/** 拖拽放置回调 */
-function onNodeDrop(draggingNode: any, dropNode: any, dropType: string) {
+/**
+ * 拖拽放置回调
+ * @param treeData 该树的根数据数组
+ */
+function onNodeDrop(
+  treeData: any[],
+  draggingNode: any,
+  dropNode: any,
+  dropType: string,
+) {
+  const movedData = draggingNode.data;
+  // 源兄弟列表：非顶层取父节点 children 字段，顶层取根数据
+  const fromSiblings = draggingNode.parent?.data?.children ?? treeData;
+  const fromIndex = fromSiblings.indexOf(movedData);
+  if (fromIndex > -1) fromSiblings.splice(fromIndex, 1);
+  if (dropType === 'inner') {
+    (dropNode.data.children ??= []).push(movedData);
+  } else {
+    const toSiblings = dropNode.parent?.data?.children ?? treeData;
+    const toIndex = toSiblings.indexOf(dropNode.data);
+    toSiblings.splice(
+      dropType === 'before' ? toIndex : toIndex + 1,
+      0,
+      movedData,
+    );
+  }
   message.success(`${draggingNode.label} 移动到 ${dropNode.label} ${dropType}`);
 }
 

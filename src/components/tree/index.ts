@@ -12,4 +12,4 @@ export default MeTree;
 
 export * from './tree';
 export * from './types';
-export type { default as TreeNodeModel } from './model/node';
+export type { TreeEventNode as TreeNodeModel } from './types';
