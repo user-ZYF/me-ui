@@ -103,8 +103,8 @@ export function useDragNodeHandler({
     }
   }
 
-  /** 解析实体：实体图可能已重建，按 key 取当前实体，取不到视为已失效 */
-  function resolveEntity(entity: DataEntity): DataEntity | null {
+  /** 获取最新实体：实体图可能已重建，按 key 取当前实体，取不到视为已失效 */
+  function getCurrentEntity(entity: DataEntity): DataEntity | null {
     return keyEntities.value.get(entity.key) ?? null;
   }
 
@@ -118,7 +118,7 @@ export function useDragNodeHandler({
 
   /** 节点拖拽开始 */
   function treeNodeDragStart({ event, treeNode }: DragOptions) {
-    const entity = resolveEntity(treeNode.node);
+    const entity = getCurrentEntity(treeNode.node);
     if (!entity) {
       event.preventDefault();
       return false;
@@ -145,8 +145,8 @@ export function useDragNodeHandler({
     const draggingNode = dragState.value.draggingNode;
     if (!draggingNode || !dropNode) return;
     // 实体图可能已重建（拖拽中途自动展开触发懒加载），按 key 取当前实体
-    const draggingEntity = resolveEntity(draggingNode.node);
-    const dropEntity = resolveEntity(dropNode.node);
+    const draggingEntity = getCurrentEntity(draggingNode.node);
+    const dropEntity = getCurrentEntity(dropNode.node);
     if (!draggingEntity || !dropEntity) return;
 
     const draggingEventNode = createEventNode(draggingEntity);
@@ -187,7 +187,7 @@ export function useDragNodeHandler({
     const newDropNode = canDrop
       ? markRaw({ node: dropEntity, $el: treeNode.$el })
       : null;
-    const oldEntity = oldDropNode ? resolveEntity(oldDropNode.node) : null;
+    const oldEntity = oldDropNode ? getCurrentEntity(oldDropNode.node) : null;
 
     // 离开旧 dropNode（切换到不可放置或其他节点时）
     if (oldEntity && (!newDropNode || oldEntity.key !== dropEntity.key)) {
@@ -274,7 +274,7 @@ export function useDragNodeHandler({
       ) {
         autoExpandTimer = setTimeout(() => {
           // 展开函数内部已处理手风琴收拢与懒加载等待
-          const current = resolveEntity(dropEntity);
+          const current = getCurrentEntity(dropEntity);
           if (current) onNodeExpand(current);
           clearAutoExpandTimer();
         }, AUTO_EXPAND_DELAY);
@@ -299,8 +299,8 @@ export function useDragNodeHandler({
   function treeContainerDragOver(event: DragEvent) {
     const { draggingNode, dropNode } = dragState.value;
     if (!draggingNode || !dropNode) return;
-    const draggingEntity = resolveEntity(draggingNode.node);
-    const dropEntity = resolveEntity(dropNode.node);
+    const draggingEntity = getCurrentEntity(draggingNode.node);
+    const dropEntity = getCurrentEntity(dropNode.node);
     if (draggingEntity && dropEntity) {
       ctx.emit(
         "node-drag-leave",
@@ -326,9 +326,9 @@ export function useDragNodeHandler({
     clearAutoExpandTimer();
 
     const draggingEntity = draggingNode
-      ? resolveEntity(draggingNode.node)
+      ? getCurrentEntity(draggingNode.node)
       : null;
-    const dropEntity = dropNode ? resolveEntity(dropNode.node) : null;
+    const dropEntity = dropNode ? getCurrentEntity(dropNode.node) : null;
 
     const draggingEventNode = draggingEntity
       ? createEventNode(draggingEntity)
