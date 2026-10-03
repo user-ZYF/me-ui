@@ -46,8 +46,10 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
   /** 滚动循环的动画帧 ID */
   let rafId: number | undefined;
 
-  /** 修正帧数：普通滚动总帧数；平滑滚动为动画结束后的修正帧数 */
-  const CORRECTION_FRAMES = 5;
+  /** 修正帧数上限：目标位置连续稳定则提前退出，此值仅兜底防死循环 */
+  const MAX_CORRECTION_FRAMES = 10;
+  /** 判定收敛所需的连续稳定帧数 */
+  const STABLE_FRAMES = 2;
 
   onBeforeUnmount(() => {
     if (rafId) cancelAnimationFrame(rafId);
@@ -95,8 +97,8 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
 
   /**
    * 滚动循环：每帧收集高度、重新计算目标位置并设置 scrollTop
-   * - 普通模式（无 duration）：每帧直接跳到目标位置，共修正 CORRECTION_FRAMES 帧
-   * - 平滑模式（有 duration）：每帧按 easeOutQuint 缓动插值，动画结束后再修正 CORRECTION_FRAMES 帧
+   * - 普通模式（无 duration）：每帧直接跳到目标位置，收敛后提前退出，上限 MAX_CORRECTION_FRAMES 帧
+   * - 平滑模式（有 duration）：每帧按 easeOutQuint 缓动插值，动画结束后进入修正阶段（同上收敛退出）
    */
   function runScrollLoop(
     index: number,
@@ -112,8 +114,11 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
     const startTime = performance.now();
     // auto 模式下锁定的对齐方向（仅普通滚动），避免多帧修正时反复跳变
     let lockedAlign: ScrollAlign | undefined;
-    // 剩余帧数；平滑滚动在动画期间不限帧数，结束后切换为修正帧数
-    let remainingFrames = duration ? Number.POSITIVE_INFINITY : CORRECTION_FRAMES;
+    // 剩余修正帧数；平滑滚动在动画期间不限帧数，结束后切换为修正帧数
+    let remainingFrames = duration ? Number.POSITIVE_INFINITY : MAX_CORRECTION_FRAMES;
+    // 上一帧的目标位置与连续稳定帧数，用于收敛判断
+    let lastTargetTop = Number.NaN;
+    let stableFrames = 0;
 
     const step = (currentTime: number) => {
       const container = getContainer();
@@ -138,6 +143,19 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
         }
 
         const targetTop = calculateTargetTop(index, lockedAlign ?? align, offset);
+        // 修正阶段（普通滚动或平滑动画结束后）：目标位置连续稳定即收敛，提前退出
+        const isScrollEnd = !duration || elapsedTime >= duration;
+        if (isScrollEnd) {
+          if (targetTop === lastTargetTop) {
+            stableFrames++;
+            if (stableFrames >= STABLE_FRAMES) {
+              return;
+            }
+          } else {
+            stableFrames = 0;
+          }
+          lastTargetTop = targetTop;
+        }
         // 如果动画还未结束，则继续进行平滑滚动，否则直接滚动到目标（普通滚动直接滚动到目标）
         const top = duration && elapsedTime < duration
           ? easeOutQuint(elapsedTime, startTop, targetTop - startTop, duration)
@@ -148,8 +166,8 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
       }
 
       // 平滑滚动动画结束后进入修正阶段
-      if (duration && elapsedTime >= duration && remainingFrames > CORRECTION_FRAMES) {
-        remainingFrames = CORRECTION_FRAMES;
+      if (duration && elapsedTime >= duration && remainingFrames > MAX_CORRECTION_FRAMES) {
+        remainingFrames = MAX_CORRECTION_FRAMES;
       }
       remainingFrames--;
       if (remainingFrames >= 0) {
