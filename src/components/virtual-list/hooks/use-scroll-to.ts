@@ -121,6 +121,7 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
     // 锁定 auto 的实际对齐方向（top/bottom）：
     // 1. 目标项比容器高时，避免每帧在 top/bottom 间翻转导致滚动位置来回振荡
     // 2. 平滑滚动期间保证动画目标稳定，不会中途换方向
+    // 已知问题：平滑滚动期间，用户主动触发的滚动会被动画吞掉
     if (align === 'auto') {
       const { itemTop, itemBottom } = getItemPosition(index);
       if (itemTop < startTop) {
