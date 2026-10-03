@@ -69,7 +69,7 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
   }
 
   /** 计算目标滚动位置（基于当前高度缓存） */
-  function calculateTargetTop(index: number, align: ScrollAlign | undefined, offset: number): number {
+  function calculateTargetTop(index: number, align: ScrollAlign, offset: number): number {
     const container = getContainer();
     if (!container) return 0;
 
@@ -102,7 +102,7 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
    */
   function runScrollLoop(
     index: number,
-    align: ScrollAlign | undefined,
+    align: ScrollAlign = 'auto',
     offset: number,
     duration?: number,
   ) {
@@ -112,13 +112,23 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
     const startTop = container.scrollTop;
     // 动画起始时间戳，与 RAF 回调参数同一时钟源，用于计算每帧的已进行时长
     const startTime = performance.now();
-    // auto 模式下锁定的对齐方向（仅普通滚动），避免多帧修正时反复跳变
-    let lockedAlign: ScrollAlign | undefined;
     // 剩余修正帧数；平滑滚动在动画期间不限帧数，结束后切换为修正帧数
     let remainingFrames = duration ? Number.POSITIVE_INFINITY : MAX_CORRECTION_FRAMES;
     // 上一帧的目标位置与连续稳定帧数，用于收敛判断
-    let lastTargetTop = Number.NaN;
+    let lastTargetTop = -1;
     let stableFrames = 0;
+
+    // 锁定 auto 的实际对齐方向（top/bottom）：
+    // 1. 目标项比容器高时，避免每帧在 top/bottom 间翻转导致滚动位置来回振荡
+    // 2. 平滑滚动期间保证动画目标稳定，不会中途换方向
+    if (align === 'auto') {
+      const { itemTop, itemBottom } = getItemPosition(index);
+      if (itemTop < startTop) {
+        align = 'top';
+      } else if (itemBottom > startTop + container.clientHeight) {
+        align = 'bottom';
+      }
+    }
 
     const step = (currentTime: number) => {
       const container = getContainer();
@@ -126,26 +136,17 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
 
       // 已过的时间
       const elapsedTime = currentTime - startTime;
+      // 平滑滚动是否仍在动画期间
+      const isAnimating = !!duration && elapsedTime < duration;
 
       if (container.clientHeight) {
         // 每帧同步收集高度并重新计算目标位置
         collectHeight(true);
 
-        // 普通滚动的 auto 模式：目标项不在可视区域内时，根据位置锁定对齐方向
-        if (!duration && !align) {
-          const { itemTop, itemBottom } = getItemPosition(index);
-          const scrollTop = container.scrollTop;
-          if (itemTop < scrollTop) {
-            lockedAlign = 'top';
-          } else if (itemBottom > scrollTop + container.clientHeight) {
-            lockedAlign = 'bottom';
-          }
-        }
+        const targetTop = calculateTargetTop(index, align, offset);
 
-        const targetTop = calculateTargetTop(index, lockedAlign ?? align, offset);
-        // 修正阶段（普通滚动或平滑动画结束后）：目标位置连续稳定即收敛，提前退出
-        const isScrolling = duration !== undefined && elapsedTime < duration;
-        if (!isScrolling) {
+        // 修正阶段：目标位置连续稳定即收敛，提前退出
+        if (!isAnimating) {
           if (targetTop === lastTargetTop) {
             stableFrames++;
             if (stableFrames >= STABLE_FRAMES) {
@@ -156,8 +157,9 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
           }
           lastTargetTop = targetTop;
         }
+        
         // 如果动画还未结束，则继续进行平滑滚动，否则直接滚动到目标（普通滚动直接滚动到目标）
-        const top = isScrolling
+        const top = isAnimating
           ? easeOutQuint(elapsedTime, startTop, targetTop - startTop, duration)
           : targetTop;
         if (top !== container.scrollTop) {
@@ -165,8 +167,8 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
         }
       }
 
-      // 平滑滚动动画结束后进入修正阶段
-      if (duration && elapsedTime >= duration && remainingFrames > MAX_CORRECTION_FRAMES) {
+      // 平滑滚动动画结束后进入修正阶段（普通滚动 remainingFrames 初始即上限，不会命中）
+      if (!isAnimating && remainingFrames > MAX_CORRECTION_FRAMES) {
         remainingFrames = MAX_CORRECTION_FRAMES;
       }
       remainingFrames--;
