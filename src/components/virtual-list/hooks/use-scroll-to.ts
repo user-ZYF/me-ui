@@ -144,8 +144,8 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
 
         const targetTop = calculateTargetTop(index, lockedAlign ?? align, offset);
         // 修正阶段（普通滚动或平滑动画结束后）：目标位置连续稳定即收敛，提前退出
-        const isScrollEnd = !duration || elapsedTime >= duration;
-        if (isScrollEnd) {
+        const isScrolling = duration !== undefined && elapsedTime < duration;
+        if (!isScrolling) {
           if (targetTop === lastTargetTop) {
             stableFrames++;
             if (stableFrames >= STABLE_FRAMES) {
@@ -157,7 +157,7 @@ export function useScrollTo(options: ScrollToOptions): ScrollTo {
           lastTargetTop = targetTop;
         }
         // 如果动画还未结束，则继续进行平滑滚动，否则直接滚动到目标（普通滚动直接滚动到目标）
-        const top = duration && elapsedTime < duration
+        const top = isScrolling
           ? easeOutQuint(elapsedTime, startTop, targetTop - startTop, duration)
           : targetTop;
         if (top !== container.scrollTop) {
