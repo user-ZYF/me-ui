@@ -41,7 +41,7 @@
       @header-cell-click="onHeaderClick"
       @sort-change="onSortChange"
     >
-      <me-table-column type="selection" :width="50" :selectable="checkSelectable" />
+      <me-table-column type="selection" :width="50" :selectable-fn="checkSelectable" />
       <me-table-column name="name" label="姓名" :width="120" />
       <me-table-column name="age" label="年龄" :width="100" sort />
       <me-table-column name="address" label="地址" />
@@ -123,6 +123,22 @@
     <!-- 多级表头 -->
     <h2 class="play-table-title">多级表头</h2>
     <me-table :data="fixedColumnData">
+      <me-table-column name="name" label="姓名" :width="120" />
+      <me-table-column label="基本信息">
+        <me-table-column name="age" label="年龄" :width="100" sort />
+        <me-table-column name="gender" label="性别" :width="80" />
+      </me-table-column>
+      <me-table-column label="联系方式">
+        <me-table-column name="phone" label="手机号" :width="150" />
+        <me-table-column name="email" label="邮箱" :width="200" />
+      </me-table-column>
+      <me-table-column name="address" label="地址" :min-width="250" />
+    </me-table>
+
+    <!-- 多级表头 + selection -->
+    <h2 class="play-table-title">多级表头 + selection</h2>
+    <me-table :data="fixedColumnData" @selection-change="onSelectionChange">
+      <me-table-column type="selection" :width="50" />
       <me-table-column name="name" label="姓名" :width="120" />
       <me-table-column label="基本信息">
         <me-table-column name="age" label="年龄" :width="100" sort />
@@ -240,14 +256,6 @@
       </template>
     </me-table>
 
-    <!-- 事件日志 -->
-    <h2 class="play-table-title">事件日志</h2>
-    <div class="play-table-logs">
-      <div v-for="(log, index) in eventLogs" :key="index" class="play-table-logs-item">
-        {{ log }}
-      </div>
-      <div v-if="eventLogs.length === 0" class="play-table-logs-empty">暂无事件日志</div>
-    </div>
   </div>
 </template>
 
@@ -405,19 +413,12 @@ function spanMethod({ rowIndex, columnIndex }: { row: DefaultRow; rowIndex: numb
 /** 选中行 */
 const selectionRows = ref<DefaultRow[]>([]);
 
-/** 事件日志 */
-const eventLogs = ref<string[]>([]);
-
 /** 选择表格引用 */
 const selectionTableRef = ref();
 
 /** 添加日志 */
 function addLog(message: string) {
-  const time = new Date().toLocaleTimeString();
-  eventLogs.value.unshift(`[${time}] ${message}`);
-  if (eventLogs.value.length > 50) {
-    eventLogs.value.pop();
-  }
+  console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
 }
 
 /** 可选判断 */
@@ -492,8 +493,8 @@ function onHeaderClick(column: any) {
 }
 
 /** 排序变化事件 */
-function onSortChange(data: { column: any; name: string | null; order: string | null }) {
-  addLog(`sort-change: name=${data.name}, order=${data.order}`);
+function onSortChange(column: any) {
+  addLog(`sort-change: name=${column.name}, order=${column.order}`);
 }
 
 /** 编辑 */
@@ -554,27 +555,5 @@ function handleDelete(row: DefaultRow) {
 
 .play-table-custom-empty {
   padding: 16px 0;
-}
-
-.play-table-logs {
-  border: 1px solid #e5e6eb;
-  border-radius: 4px;
-  padding: 12px;
-  max-height: 200px;
-  overflow-y: auto;
-  font-size: 12px;
-  line-height: 1.8;
-  color: #4e5969;
-  background-color: #f7f8fa;
-}
-
-.play-table-logs-item {
-  font-family: monospace;
-}
-
-.play-table-logs-empty {
-  color: #c9cdd4;
-  text-align: center;
-  padding: 8px 0;
 }
 </style>

@@ -31,13 +31,13 @@
               :style="{ width: `${getColumnRealWidth(column)}px` }"
             />
           </colgroup>
-          <thead :class="ns.is('group', isGroup)">
+          <thead :class="ns.is('group', isGroupHeader)">
             <tr
               v-for="(subColumns, rowIndex) in columnRows"
               :key="rowIndex"
             >
               <th
-                v-for="(column, index) in subColumns"
+                v-for="(column, colIndex) in subColumns"
                 :key="column.id"
                 :colspan="column.colSpan"
                 :rowspan="column.rowSpan"
@@ -55,8 +55,9 @@
               >
                 <div :class="ns.e('cell')">
                   <VNodeRenderer
-                    :content="renderHeader(column, index)"
+                    :content="renderHeaderCell(column, colIndex)"
                   />
+                  <!-- 排序图标 -->
                   <span
                     v-if="column.sort && (!column.children || column.children.length === 0)"
                     :class="ns.e('sort-caret')"
@@ -92,6 +93,7 @@
           @scroll="onBodyScroll"
         >
           <table :class="ns.e('body')" :style="{ width: bodyWidth }">
+            <!-- 控制列宽 -->
             <colgroup>
               <col
                 v-for="column in leafColumns"
@@ -106,7 +108,7 @@
                 :class="[
                   ns.e('row'),
                   ns.is('striped', isOdd(rowIndex)),
-                  ns.is('current', store.states.currentRow.value === row),
+                  ns.is('current', curHighlightRow === row),
                 ]"
               >
                 <template
@@ -136,7 +138,7 @@
                   >
                     <div :class="ns.e('cell')">
                       <VNodeRenderer
-                        :content="renderCell(row, cell.column, rowIndex)"
+                        :content="renderBodyCell(row, cell.column, rowIndex)"
                       />
                     </div>
                   </td>
@@ -176,7 +178,6 @@ import { isOdd } from "@me-ui/utils";
 import { isString } from "@me-ui/utils/types";
 
 import MeScrollbar from "@me-ui/components/scrollbar";
-import type MeScrollbarType from "@me-ui/components/scrollbar";
 
 import { tableEmits, tableProps } from "./table";
 import type { DefaultRow, SpanInfo, TableColumnCtx, TableSortOrder } from "./types";
@@ -199,6 +200,26 @@ const tableId = createTableId(ns.namespace);
 /** Store */
 const store = useTableStore();
 
+const {
+  columns,
+  leafColumns,
+  data: tableData,
+  hasScrollX,
+  tableBodyWidth,
+  curHighlightRow,
+  selection,
+  getAllColumns,
+  getLeafColumns,
+  updateColumnsWidth,
+  setData,
+  setCurrentRow: storeSetCurrentRow,
+  updateSort,
+  clearSelection,
+  toggleAllSelection,
+  toggleRowSelection,
+  clearSort,
+} = store;
+
 /** 提供 Table 上下文 */
 provide(TABLE_INJECTION_KEY, {
   tableId,
@@ -214,7 +235,7 @@ const tableWrapperRef = ref<HTMLElement>();
 const headerWrapperRef = ref<HTMLElement>();
 
 /** 滚动条组件引用 */
-const scrollbarRef = ref<InstanceType<typeof MeScrollbarType>>();
+const scrollbarRef = ref<InstanceType<typeof MeScrollbar>>();
 
 /** 当前水平滚动位置 */
 const scrollLeft = ref(0);
@@ -224,9 +245,6 @@ const maxScrollLeft = ref(0);
 
 /** 渲染 VNode 的函数式组件 */
 const VNodeRenderer: FunctionalComponent<{ content: VNode | VNode[] | null }> = ({ content }) => content;
-
-/** 叶子列数据 */
-const leafColumns = computed(() => store.states.leafColumns.value);
 
 /** 将列树转换为表头行数组（计算每列的 level/colSpan/rowSpan） */
 function convertToRows(originCols: TableColumnCtx<DefaultRow>[]): TableColumnCtx<DefaultRow>[][] {
@@ -259,34 +277,37 @@ function convertToRows(originCols: TableColumnCtx<DefaultRow>[]): TableColumnCtx
     dfs(column, undefined);
   });
 
+  // 二维数组，每行对应一个层级的表头
   const rows: TableColumnCtx<DefaultRow>[][] = [];
   for (let i = 0; i < maxLevel; i++) {
     rows.push([]);
   }
 
-  const allColumns = store.getAllColumns(originCols);
+  const allColumns = getAllColumns(originCols);
+
+  // 计算 rowSpan
   allColumns.forEach((column) => {
     if (!column.isColumnGroup) {
+      // 非组表头根据表头自身级别计算
       column.rowSpan = maxLevel - column.level + 1;
     } else {
+      // 组表头始终只会占据一行
       column.rowSpan = 1;
     }
+    // 按级别将表头加入到 rows 的对应索引处
     rows[column.level - 1].push(column);
   });
 
   return rows;
 }
 
-/** 表头行数据（二维数组，每行对应一级表头） */
+/** 表头行数据 */
 const columnRows = computed(() =>
-  convertToRows(store.states.columns.value),
+  convertToRows(columns.value),
 );
 
 /** 是否为多级表头 */
-const isGroup = computed(() => columnRows.value.length > 1);
-
-/** 表格数据（计算属性确保模板响应性） */
-const tableData = computed(() => store.states.data.value);
+const isGroupHeader = computed(() => columnRows.value.length > 1);
 
 /** 是否为空 */
 const isEmpty = computed(() => tableData.value.length === 0);
@@ -301,8 +322,8 @@ function getColumnRealWidth(column: TableColumnCtx<DefaultRow>): number {
   if (column.realWidth !== null && !Number.isNaN(column.realWidth)) {
     return column.realWidth;
   }
+  // 在布局完成前，realWidth仍为null，此时使用width或minWidth兜底
   const width = Number(column.width);
-  // 布局前的兜底值使用 minWidth，布局完成后将使用列的真实宽度
   return Number.isNaN(width) ? column.minWidth : width;
 }
 
@@ -330,10 +351,10 @@ const fixedColumnOffsets = computed(() => {
   }
 
   // 分组列的偏移量取其第一个/最后一个叶子列的偏移量
-  const allColumns = store.getAllColumns(store.states.columns.value);
+  const allColumns = getAllColumns(columns.value);
   allColumns.forEach((column) => {
     if (column.fixed && column.children && column.children.length > 0) {
-      const leaves = store.getLeafColumns(column);
+      const leaves = getLeafColumns(column);
       if (leaves.length > 0) {
         const targetLeaf = column.fixed === 'left' ? leaves[0] : leaves[leaves.length - 1];
         offsets[column.id] = offsets[targetLeaf.id] ?? 0;
@@ -355,7 +376,7 @@ function isLastColumn(column: TableColumnCtx<DefaultRow>): boolean {
   if (!column.children || column.children.length === 0) {
     return column.id === lastLeafColumnId.value;
   }
-  const leaves = store.getLeafColumns(column);
+  const leaves = getLeafColumns(column);
   const lastLeaf = leaves[leaves.length - 1];
   return !!lastLeaf && lastLeaf.id === lastLeafColumnId.value;
 }
@@ -389,7 +410,7 @@ function isLastLeftFixed(column: TableColumnCtx<DefaultRow>): boolean {
   if (!column.children || column.children.length === 0) {
     return column.id === lastLeftFixedColumnId.value;
   }
-  const leaves = store.getLeafColumns(column);
+  const leaves = getLeafColumns(column);
   const lastLeaf = leaves[leaves.length - 1];
   return !!lastLeaf && lastLeaf.id === lastLeftFixedColumnId.value;
 }
@@ -400,20 +421,17 @@ function isFirstRightFixed(column: TableColumnCtx<DefaultRow>): boolean {
   if (!column.children || column.children.length === 0) {
     return column.id === firstRightFixedColumnId.value;
   }
-  const leaves = store.getLeafColumns(column);
+  const leaves = getLeafColumns(column);
   const firstLeaf = leaves[0];
   return !!firstLeaf && firstLeaf.id === firstRightFixedColumnId.value;
 }
 
-/** 是否有横向滚动 */
-const hasScrollX = computed(() => store.states.scrollX.value);
-
-/** 是否滚动到最左边 */
+/** 是否滚动到最左边（左侧阴影消除） */
 const isScrollingLeft = computed(
   () => hasFixedColumns.value && hasScrollX.value && scrollLeft.value === 0,
 );
 
-/** 是否滚动到最右边 */
+/** 是否滚动到最右边（右侧阴影消除） */
 const isScrollingRight = computed(
   () =>
     hasFixedColumns.value &&
@@ -431,10 +449,10 @@ const isScrollingMiddle = computed(
     !isScrollingRight.value,
 );
 
-/** 表体宽度（使用 store 计算的 bodyWidth） */
+/** 表体宽度 */
 const bodyWidth = computed(() => {
-  const w = store.states.bodyWidth.value;
-  return w ? `${w}px` : "100%";
+  const width = tableBodyWidth.value;
+  return width ? `${width}px` : "100%";
 });
 
 /** 获取列样式（固定列偏移量，支持分组列） */
@@ -467,7 +485,7 @@ function doLayout() {
   const el = tableWrapperRef.value;
   if (!el) return;
   const containerWidth = el.clientWidth;
-  store.updateColumnsWidth(containerWidth);
+  updateColumnsWidth(containerWidth);
   // 更新最大水平滚动距离
   const wrap = scrollbarRef.value?.wrapRef;
   if (wrap) {
@@ -478,9 +496,9 @@ function doLayout() {
 /** 监听容器尺寸变化，重新计算列宽 */
 useResizeObserver(tableWrapperRef, doLayout);
 
-/** 渲染表头（确保返回 VNode） */
-function renderHeader(column: TableColumnCtx<DefaultRow>, columnIndex: number) {
-  const result = column.renderHeader({
+/** 渲染表头单元格 */
+function renderHeaderCell(column: TableColumnCtx<DefaultRow>, columnIndex: number): VNode | VNode[] {
+  const result = column.renderHeaderCell({
     column,
     columnIndex,
     store,
@@ -491,13 +509,13 @@ function renderHeader(column: TableColumnCtx<DefaultRow>, columnIndex: number) {
   return result;
 }
 
-/** 渲染单元格（确保返回 VNode，并传递 store） */
-function renderCell(
+/** 渲染表体单元格 */
+function renderBodyCell(
   row: DefaultRow,
   column: TableColumnCtx<DefaultRow>,
   rowIndex: number,
 ) {
-  const result = column.renderCell({
+  const result = column.renderBodyCell({
     row,
     column,
     rowIndex,
@@ -568,14 +586,18 @@ function handleSortClick(
     newOrder = orders[nextIndex] ?? null;
   }
 
-  store.updateSort(column, column.name, newOrder);
-  store.execSort();
-  emit("sort-change", { column, name: column.name, order: newOrder });
+  updateSort(column, newOrder);
+  emit("sort-change", column);
+}
+
+/** 获取选中行 */
+function getSelectionRows() {
+  return selection.value.slice();
 }
 
 /** 设置当前行 */
 function setCurrentRow(row: DefaultRow | null) {
-  const { oldCurrentRow } = store.setCurrentRow(row);
+  const oldCurrentRow = storeSetCurrentRow(row);
   if (oldCurrentRow !== row) {
     emit("current-change", row, oldCurrentRow);
   }
@@ -587,14 +609,14 @@ function onBodyCellClick(
   row: DefaultRow,
   column: TableColumnCtx<DefaultRow>,
 ) {
-  const isSameRow = store.states.currentRow.value === row;
+  const isSameRow = curHighlightRow.value === row;
   setCurrentRow(isSameRow ? null : row);
   emit("body-cell-click", row, column, event);
 }
 
 /** 监听 selection 变化，向外 emit 事件 */
 watch(
-  store.states.selection,
+  selection,
   (newSelection) => {
     emit("selection-change", newSelection);
   },
@@ -604,14 +626,14 @@ watch(
 watch(
   () => props.data,
   (newData) => {
-    store.setData(newData);
+    setData(newData);
   },
   { immediate: true }
 );
 
 /** 监听列变化，重新计算列宽 */
 watch(
-  store.states.leafColumns,
+  leafColumns,
   doLayout,
   { flush: "post" },
 );
@@ -628,18 +650,18 @@ defineExpose({
   /** Store 实例 */
   store,
   /** 清空选择 */
-  clearSelection: store.clearSelection,
+  clearSelection,
   /** 获取选中行 */
-  getSelectionRows: store.getSelectionRows,
+  getSelectionRows,
   /** 切换全选 */
   toggleAllSelection: () => {
-    store.toggleAllSelection();
-    emit("select-all", store.getSelectionRows());
+    toggleAllSelection();
+    emit("select-all", selection.value.slice());
   },
   /** 切换行选中 */
-  toggleRowSelection: store.toggleRowSelection,
+  toggleRowSelection,
   /** 清除排序 */
-  clearSort: store.clearSort,
+  clearSort,
   /** 设置当前行 */
   setCurrentRow,
 });

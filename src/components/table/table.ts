@@ -3,7 +3,7 @@ import type { EmitFn, ExtractPropTypes, PropType } from 'vue';
 import { componentSizes } from '@me-ui/constants/config';
 import type { ComponentSize } from '@me-ui/types/config';
 
-import type { DefaultRow, SpanInfo, TableColumnCtx, TableSortOrder } from './types';
+import type { DefaultRow, SpanInfo, TableColumnCtx } from './types';
 import type { TableStore } from './store';
 
 export type { DefaultRow, SpanInfo, TableColumnCtx, TableSortOrder } from './types';
@@ -54,7 +54,7 @@ export const tableEmits = {
   /** 表头单元格点击 */
   'header-cell-click': (_column: TableColumnCtx<DefaultRow>, _event: PointerEvent) => true,
   /** 排序变化 */
-  'sort-change': (_data: { column: TableColumnCtx<DefaultRow>; name: string | null; order: TableSortOrder | null }) => true,
+  'sort-change': (_column: TableColumnCtx<DefaultRow>) => true,
   /** 当前行变化 */
   'current-change': (_currentRow: DefaultRow | null, _oldCurrentRow: DefaultRow | null) => true,
 } as const;

@@ -33,17 +33,17 @@ export const tableColumnProps = {
     type: Number,
     default: DEFAULT_MIN_COLUMN_WIDTH,
   },
-  /** 对齐方式 */
+  /** 表体对齐方式 */
   align: {
     type: String as PropType<TableColumnAlign>,
     default: 'left',
   },
-  /** 表头对齐方式 */
+  /** 表头对齐方式（未设置时跟随 align） */
   headerAlign: {
     type: String as PropType<TableColumnAlign>,
     default: undefined,
   },
-  /** 排序配置（true 开启默认排序，传入函数则使用自定义排序） */
+  /** 排序配置（开启排序传true，自定义排序传函数） */
   sort: {
     type: [Boolean, Function] as PropType<boolean | TableColumnCtx<DefaultRow>['sort']>,
     default: false,
@@ -54,8 +54,8 @@ export const tableColumnProps = {
     default: undefined,
   },
   /** 是否可选（仅 type=selection） */
-  selectable: {
-    type: Function as PropType<TableColumnCtx<DefaultRow>['selectable']>,
+  selectableFn: {
+    type: Function as PropType<TableColumnCtx<DefaultRow>['selectableFn']>,
     default: undefined,
   },
   /** 固定列方向 */

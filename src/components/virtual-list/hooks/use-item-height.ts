@@ -209,6 +209,7 @@ export function useItemHeights<T>(
       itemRefs.set(key, el);
       collectHeight();
     } else {
+      // 在>=3.5.0版本的vue中，旧dom在卸载时el会传递为null，此时itemRefs始终只会持有当前可视区间内的列表项的dom引用
       itemRefs.delete(key);
     }
   }

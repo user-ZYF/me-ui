@@ -82,11 +82,11 @@ export interface TableColumnCtx<T extends DefaultRow = DefaultRow> {
   /** 格式化函数 */
   formatter?: (row: T, column: TableColumnCtx<T>, cellValue: any, rowIndex: number) => string | VNode | VNode[];
   /** 是否可选（仅 type=selection） */
-  selectable?: (row: T, rowIndex: number) => boolean;
-  /** 渲染表头 */
-  renderHeader: (data: TableHeaderRenderData<T>) => string | VNode | VNode[];
-  /** 渲染单元格 */
-  renderCell: (data: TableCellRenderData<T>) => string | VNode | VNode[];
+  selectableFn?: (row: T, rowIndex: number) => boolean;
+  /** 渲染表头单元格 */
+  renderHeaderCell: (data: TableHeaderRenderData<T>) => string | VNode | VNode[];
+  /** 渲染表体单元格 */
+  renderBodyCell: (data: TableCellRenderData<T>) => string | VNode | VNode[];
   /** 固定列方向 */
   fixed?: TableColumnFixed;
   /** 子列（用于多级表头） */
