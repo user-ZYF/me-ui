@@ -41,5 +41,5 @@ const mergedTheme = computed(() => ({
 const cssVarsStyle = computed(() => tokensToCssVars(mergedTheme.value));
 
 /** 提供上下文给子组件 */
-provideConfigProvider(mergedTheme as any, sizeRef, namespaceRef);
+provideConfigProvider(mergedTheme, sizeRef, namespaceRef);
 </script>

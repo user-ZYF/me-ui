@@ -1,4 +1,4 @@
-<!-- ? Tooltip 文字提示组件 -->
+<!-- Tooltip 提示组件 -->
 <template>
   <Trigger ref="triggerCompRef">
     <slot></slot>
@@ -19,7 +19,6 @@ import {
   provide,
   readonly,
   ref,
-  toRef,
   watch,
 } from "vue";
 
@@ -58,6 +57,9 @@ const contentRef = ref<InstanceType<typeof Content>>();
 
 /** 触发元素引用（从 Trigger 组件实例获取） */
 const triggerRef = computed(() => triggerCompRef.value?.triggerRef);
+
+/** 弹出层元素引用 */
+const popperRef = computed(() => contentRef.value?.popperRef);
 
 /** 是否受外部控制 */
 const controlled = computed(() => typeof visibleModel.value === "boolean");
@@ -126,26 +128,23 @@ function clearHideTimer() {
   }
 }
 
-/** 弹出层元素引用 */
-const popperRef = computed(() => contentRef.value?.popperRef);
-
 /** 定位 */
 const { position, updatePopper } = usePopper(
-  triggerRef as any,
-  popperRef as any,
-  toRef(props, "placement"),
+  triggerRef,
+  popperRef,
+  computed(() => props.placement),
 );
 
 provide(TOOLTIP_INJECTION_KEY, {
   controlled,
   open: readonly(open),
-  disabled: toRef(props, "disabled"),
-  trigger: toRef(props, "trigger"),
-  placement: toRef(props, "placement"),
-  effect: toRef(props, "effect"),
-  zIndex: toRef(props, "zIndex"),
-  popperClass: toRef(props, "popperClass"),
-  transition: toRef(props, "transition"),
+  disabled: computed(() => props.disabled),
+  trigger: computed(() => props.trigger),
+  placement: computed(() => props.placement),
+  effect: computed(() => props.effect),
+  zIndex: computed(() => props.zIndex),
+  popperClass: computed(() => props.popperClass),
+  transition: computed(() => props.transition),
   onOpen: show,
   onClose: hide,
   onToggle: (e: Event) => {

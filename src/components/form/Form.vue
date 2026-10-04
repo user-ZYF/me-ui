@@ -198,7 +198,7 @@ async function validateField(
     if (!result) {
       await callback?.(false, invalidFields);
     }
-    return shouldThrow ? Promise.reject(invalidFields) : (false as any);
+    return shouldThrow ? Promise.reject(invalidFields) : false;
   }
 }
 

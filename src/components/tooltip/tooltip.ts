@@ -69,7 +69,7 @@ export const tooltipProps = {
   /** hover 触发时隐藏延迟（毫秒） */
   hideAfter: {
     type: Number,
-    default: 0,
+    default: 100,
   },
   /** 过渡动画名称 */
   transition: {

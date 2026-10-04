@@ -19,13 +19,21 @@ export interface PopperPosition {
   placement: TooltipPlacement;
 }
 
+/** placement 解析结果 */
+export interface ParsedPlacement {
+  /** 方向 */
+  side: string;
+  /** 对齐方式 */
+  align: string;
+}
+
 /** 获取 placement 的主方向和对齐方式 */
-function parsePlacement(placement: TooltipPlacement): { side: string; align: string } {
+function parsePlacement(placement: TooltipPlacement): ParsedPlacement {
   const [side, align] = placement.split('-');
   return { side, align: align ?? 'center' };
 }
 
-/** 根据 trigger 元素的 bounding rect 和 placement 计算弹出层位置 */
+/** 计算弹出层位置 */
 export function computePosition(
   triggerRect: DOMRect,
   popperSize: { width: number; height: number },
@@ -33,20 +41,22 @@ export function computePosition(
   arrowSize: number,
 ): PopperPosition {
   const { side, align } = parsePlacement(placement);
-  const { width: tw, height: th } = triggerRect;
-  const { width: pw, height: ph } = popperSize;
+  const { width: triggerWidth, height: triggerHeight } = triggerRect;
+  const { width: popperWidth, height: popperHeight } = popperSize;
   const offset = 8;
 
   let left = 0;
   let top = 0;
   let arrowLeft = 0;
   let arrowTop = 0;
+
+  // 弹出层的实际位置
   let actualPlacement = placement;
 
   // 计算基础位置
   switch (side) {
     case 'top':
-      top = triggerRect.top - ph - offset;
+      top = triggerRect.top - popperHeight - offset;
       left = triggerRect.left;
       break;
     case 'bottom':
@@ -54,7 +64,7 @@ export function computePosition(
       left = triggerRect.left;
       break;
     case 'left':
-      left = triggerRect.left - pw - offset;
+      left = triggerRect.left - popperWidth - offset;
       top = triggerRect.top;
       break;
     case 'right':
@@ -70,16 +80,16 @@ export function computePosition(
       break;
     case 'end':
       if (side === 'top' || side === 'bottom') {
-        left = triggerRect.left + tw - pw;
+        left = triggerRect.left + triggerWidth - popperWidth;
       } else {
-        top = triggerRect.top + th - ph;
+        top = triggerRect.top + triggerHeight - popperHeight;
       }
       break;
     case 'center':
       if (side === 'top' || side === 'bottom') {
-        left = triggerRect.left + tw / 2 - pw / 2;
+        left = triggerRect.left + triggerWidth / 2 - popperWidth / 2;
       } else {
-        top = triggerRect.top + th / 2 - ph / 2;
+        top = triggerRect.top + triggerHeight / 2 - popperHeight / 2;
       }
       break;
   }
@@ -90,17 +100,17 @@ export function computePosition(
     // 翻转到 bottom
     top = triggerRect.bottom + offset;
     actualPlacement = (`bottom${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
-  } else if (side === 'bottom' && top + ph > window.innerHeight - margin) {
+  } else if (side === 'bottom' && top + popperHeight > window.innerHeight - margin) {
     // 翻转到 top
-    top = triggerRect.top - ph - offset;
+    top = triggerRect.top - popperHeight - offset;
     actualPlacement = (`top${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
   } else if (side === 'left' && left < margin) {
     // 翻转到 right
     left = triggerRect.right + offset;
     actualPlacement = (`right${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
-  } else if (side === 'right' && left + pw > window.innerWidth - margin) {
+  } else if (side === 'right' && left + popperWidth > window.innerWidth - margin) {
     // 翻转到 left
-    left = triggerRect.left - pw - offset;
+    left = triggerRect.left - popperWidth - offset;
     actualPlacement = (`left${align !== 'center' ? `-${align}` : ''}` as TooltipPlacement);
   }
 
@@ -108,13 +118,13 @@ export function computePosition(
   
   // 计算箭头副轴位置（居中于 trigger，主轴由 CSS bottom/top/left/right 控制）
   if (actualSide === 'top' || actualSide === 'bottom') {
-    arrowLeft = triggerRect.left + tw / 2 - left - arrowSize / 2;
-    // clamp 箭头不超出 tooltip 水平边界
-    arrowLeft = Math.max(arrowSize / 2, Math.min(arrowLeft, pw - arrowSize - arrowSize / 2));
+    arrowLeft = triggerRect.left + triggerWidth / 2 - left - arrowSize / 2;
+    // clamp 箭头不超出 tooltip 水平边界（距离边界保持半个箭头的距离）
+    arrowLeft = Math.max(arrowSize / 2, Math.min(arrowLeft, popperWidth - arrowSize - arrowSize / 2));
   } else {
-    arrowTop = triggerRect.top + th / 2 - top - arrowSize / 2;
-    // clamp 箭头不超出 tooltip 垂直边界
-    arrowTop = Math.max(arrowSize / 2, Math.min(arrowTop, ph - arrowSize - arrowSize / 2));
+    arrowTop = triggerRect.top + triggerHeight / 2 - top - arrowSize / 2;
+    // clamp 箭头不超出 tooltip 垂直边界（距离边界保持半个箭头的距离）
+    arrowTop = Math.max(arrowSize / 2, Math.min(arrowTop, popperHeight - arrowSize - arrowSize / 2));
   }
 
   return { left, top, arrowLeft, arrowTop, placement: actualPlacement };
@@ -126,7 +136,7 @@ export function usePopper(
   popperRef: Ref<HTMLElement | undefined>,
   placement: Ref<TooltipPlacement>,
 ) {
-  /** 当前位置 */
+  /** 当前位置（这里为临时值） */
   const position = ref<PopperPosition>({
     left: 0,
     top: 0,
@@ -142,10 +152,15 @@ export function usePopper(
     if (!triggerEl || !popperEl) return;
 
     const triggerRect = triggerEl.getBoundingClientRect();
+    // popper 的尺寸不能用 getBoundingClientRect 获取，因为 rect 会受到 scale 变换的影响，而offset不会
+    const popperSize = {
+      width: popperEl.offsetWidth,
+      height: popperEl.offsetHeight,
+    };
 
     position.value = computePosition(
       triggerRect,
-      { width: popperEl.offsetWidth, height: popperEl.offsetHeight },
+      popperSize,
       placement.value,
       ARROW_SIZE,
     );

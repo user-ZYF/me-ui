@@ -1,9 +1,11 @@
-<!-- Tooltip 内容组件，负责弹出层的渲染和过渡动画 -->
+<!-- Tooltip 内容组件 -->
 <template>
   <teleport to="body">
     <transition :name="transitionName" @after-leave="onAfterLeave" @before-enter="onBeforeEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave">
-      <div v-show="open" ref="popperRef" :class="contentClass" :style="popperStyle" :data-popper-placement="props.position.placement" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+      <div v-show="open" ref="popperRef" :class="contentClass" :style="popperStyle" :data-popper-placement="position.placement" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+        <!-- 内容 -->
         <slot></slot>
+        <!-- 三角箭头 -->
         <span :class="ns.e('arrow')" :style="arrowStyle"></span>
       </div>
     </transition>
@@ -19,7 +21,7 @@ import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { TOOLTIP_INJECTION_KEY } from './constants';
 import { isTriggerType } from './utils';
-import type { PopperPosition } from './hooks/use-popper';
+import { ARROW_SIZE, type PopperPosition } from './hooks/use-popper';
 
 defineOptions({ name: 'MeTooltipContent', inheritAttrs: false });
 
@@ -55,6 +57,8 @@ const popperStyle = computed<CSSProperties>(() => ({
   left: `${props.position.left}px`,
   top: `${props.position.top}px`,
   zIndex: zIndex.value,
+  // 箭头尺寸以 CSS 变量下发，与 JS 侧 ARROW_SIZE 保持单一数据源
+  [`--${ns.namespace}-tooltip-arrow-size`]: `${ARROW_SIZE}px`,
 }));
 
 /** 箭头样式（仅副轴由 JS 计算，主轴由 CSS 控制） */
