@@ -26,7 +26,11 @@ export default defineConfig(({ command }): UserConfig => ({
   css: {
     preprocessorOptions: {
       less: {
-        additionalData: `@import "${resolve(__dirname, 'src/styles/variables.module.less').replace(/\\/g, '/')}";`,
+        // 在每个 .less 文件（含 .vue 中的 <style lang="less">）编译前自动注入全局变量文件，使所有组件无需手动 @import 即可直接使用其中的变量/mixin
+        // 注意：该文件应只包含变量和 mixin，若含实际 CSS 规则会被每个文件重复打包
+        additionalData: `@import "${
+          resolve(__dirname, 'src/styles/variables.module.less').replace(/\\/g, '/')
+        }";`,
       },
     },
   },
@@ -34,6 +38,10 @@ export default defineConfig(({ command }): UserConfig => ({
   root: command === 'serve' ? resolve(__dirname, 'play') : undefined,
   build: {
     lib: {
+      // 新增组件时需同步修改三处：
+      // 1. 此处 entry 添加组件入口
+      // 2. package.json 的 exports 添加对应子路径导出
+      // 3. src/index.ts 导出该组件
       entry: {
         'index': resolve(__dirname, 'src/index.ts'),
         'button': resolve(__dirname, 'src/components/button/index.ts'),
