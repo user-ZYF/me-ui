@@ -1,12 +1,13 @@
-import { inject, provide, ref } from 'vue';
+import { inject, provide, readonly, ref } from 'vue';
 
 import { defaultComponentSize, defaultNamespace } from '@me-ui/constants/config';
 
-import type { Ref } from 'vue';
+import type { InjectionKey, Ref } from 'vue';
 import type { ThemeTokens } from '../types';
 
 /** ConfigProvider 注入 key */
-export const configProviderKey = Symbol('me-config-provider');
+export const configProviderKey: InjectionKey<ConfigProviderContext> =
+  Symbol('me-config-provider');
 
 /** ConfigProvider 注入上下文类型 */
 export interface ConfigProviderContext {
@@ -46,9 +47,9 @@ export function provideConfigProvider(
  */
 export function useConfigProvider(): ConfigProviderContext {
   const defaultContext: ConfigProviderContext = {
-    theme: ref({}),
-    size: ref(defaultComponentSize),
-    namespace: ref(defaultNamespace),
+    theme: readonly(ref({})),
+    size: readonly(ref(defaultComponentSize)),
+    namespace: readonly(ref(defaultNamespace)),
   };
 
   return inject(configProviderKey, defaultContext);
