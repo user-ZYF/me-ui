@@ -2,7 +2,7 @@
 <template>
   <teleport to="body">
     <transition :name="transitionName" @after-leave="onAfterLeave" @before-enter="onBeforeEnter" @after-enter="onAfterEnter" @before-leave="onBeforeLeave">
-      <div v-show="open" ref="popperRef" :class="contentClass" :style="popperStyle" :data-popper-placement="position.placement" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+      <div v-show="open" ref="popperRef" :class="contentClass" :style="popperStyle" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <!-- 内容 -->
         <slot></slot>
         <!-- 三角箭头 -->
@@ -57,18 +57,17 @@ const popperStyle = computed<CSSProperties>(() => ({
   left: `${props.position.left}px`,
   top: `${props.position.top}px`,
   zIndex: zIndex.value,
-  // 箭头尺寸以 CSS 变量下发，与 JS 侧 ARROW_SIZE 保持单一数据源
-  [`--${ns.namespace}-tooltip-arrow-size`]: `${ARROW_SIZE}px`,
+  // transform-origin 跟随实际 placement，保证缩放类过渡从正确方向展开
+  transformOrigin: props.position.placement.startsWith('top') ? 'center bottom' : 'center top',
 }));
 
-/** 箭头样式（仅副轴由 JS 计算，主轴由 CSS 控制） */
-const arrowStyle = computed<CSSProperties>(() => {
-  const placement = props.position.placement;
-  if (placement.startsWith('top') || placement.startsWith('bottom')) {
-    return { left: `${props.position.arrowLeft}px` };
-  }
-  return { top: `${props.position.arrowTop}px` };
-});
+/** 箭头样式（尺寸与位置均由 JS 统一计算） */
+const arrowStyle = computed<CSSProperties>(() => ({
+  width: `${ARROW_SIZE}px`,
+  height: `${ARROW_SIZE}px`,
+  left: `${props.position.arrowLeft}px`,
+  top: `${props.position.arrowTop}px`,
+}));
 
 /** 受控时跳过 */
 function stopWhenControlled() {

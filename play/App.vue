@@ -6,7 +6,8 @@
   <!-- <Tooltip /> -->
   <!-- <Typewriter /> -->
   <!-- <VirtualList /> -->
-   <Select />
+   <!-- <Select /> -->
+   <Form />
 </template>
 
 <script lang="ts" setup>
@@ -15,7 +16,8 @@
 // import Table from "./Table.vue";
 // import Button from "./Button.vue";
 // import Tooltip from "./Tooltip.vue";
-import Select from './Select.vue'
+// import Select from './Select.vue'
+import Form from './Form.vue'
 // import Typewriter from "./Typewriter.vue";
 // import VirtualList from "./VirtualList.vue";
 </script>

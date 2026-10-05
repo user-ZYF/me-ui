@@ -1,0 +1,12 @@
+// ========== zoom-in-top 过渡动画（全局共享，供 select 下拉、form 校验信息等使用） ==========
+.@{namespace}-zoom-in-top-enter-active,
+.@{namespace}-zoom-in-top-leave-active {
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-origin: center top;
+}
+
+.@{namespace}-zoom-in-top-enter-from,
+.@{namespace}-zoom-in-top-leave-to {
+  opacity: 0;
+  transform: scaleY(0);
+}

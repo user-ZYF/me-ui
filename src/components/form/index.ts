@@ -5,6 +5,8 @@ import { withInstall } from '@me-ui/utils/install';
 import Form from './Form.vue';
 import FormItem from './FormItem.vue';
 
+import '@me-ui/styles/transitions.less';
+
 import './form.less';
 
 export const MeForm = withInstall(Form);

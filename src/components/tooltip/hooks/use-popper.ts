@@ -11,9 +11,9 @@ export interface PopperPosition {
   left: number;
   /** top 坐标 */
   top: number;
-  /** 箭头水平位置（仅 top/bottom 方向使用） */
+  /** 箭头水平位置（相对于弹出层） */
   arrowLeft: number;
-  /** 箭头垂直位置（仅 left/right 方向使用） */
+  /** 箭头垂直位置（相对于弹出层） */
   arrowTop: number;
   /** 实际使用的 placement（可能因边界翻转） */
   placement: TooltipPlacement;
@@ -115,16 +115,17 @@ export function computePosition(
   }
 
   const actualSide = parsePlacement(actualPlacement).side;
-  
-  // 计算箭头副轴位置（居中于 trigger，主轴由 CSS bottom/top/left/right 控制）
+
+  // 计算箭头位置（居中于 trigger，但不会超过 popper）
+  const halfArrow = arrowSize / 2;
   if (actualSide === 'top' || actualSide === 'bottom') {
-    arrowLeft = triggerRect.left + triggerWidth / 2 - left - arrowSize / 2;
-    // clamp 箭头不超出 tooltip 水平边界（距离边界保持半个箭头的距离）
-    arrowLeft = Math.max(arrowSize / 2, Math.min(arrowLeft, popperWidth - arrowSize - arrowSize / 2));
+    arrowTop = actualSide === 'top' ? popperHeight - halfArrow : -halfArrow;
+    arrowLeft = triggerRect.left + triggerWidth / 2 - left - halfArrow;
+    arrowLeft = Math.max(halfArrow, Math.min(arrowLeft, popperWidth - arrowSize - halfArrow));
   } else {
-    arrowTop = triggerRect.top + triggerHeight / 2 - top - arrowSize / 2;
-    // clamp 箭头不超出 tooltip 垂直边界（距离边界保持半个箭头的距离）
-    arrowTop = Math.max(arrowSize / 2, Math.min(arrowTop, popperHeight - arrowSize - arrowSize / 2));
+    arrowLeft = actualSide === 'left' ? popperWidth - halfArrow : -halfArrow;
+    arrowTop = triggerRect.top + triggerHeight / 2 - top - halfArrow;
+    arrowTop = Math.max(halfArrow, Math.min(arrowTop, popperHeight - arrowSize - halfArrow));
   }
 
   return { left, top, arrowLeft, arrowTop, placement: actualPlacement };

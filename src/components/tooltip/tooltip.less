@@ -1,6 +1,4 @@
 @B: ~'@{namespace}-tooltip';
-// 箭头尺寸由 JS 侧通过内联 CSS 变量下发（use-popper.ts 的 ARROW_SIZE 为单一数据源）
-@arrow-size: ~'var(--@{namespace}-tooltip-arrow-size)';
 
 .@{B} {
   position: fixed;
@@ -13,8 +11,6 @@
   // ========== 箭头（旋转 45° 的方块，z-index: -1 放在背景之下） ==========
   &__arrow {
     position: absolute;
-    width: @arrow-size;
-    height: @arrow-size;
     z-index: -1;
     pointer-events: none;
     transform: rotate(45deg);
@@ -28,32 +24,7 @@
     }
   }
 
-  // ========== 各方向箭头主轴定位（纯 CSS 控制，不通过 JS） ==========
-  &--top &__arrow,
-  &--top-start &__arrow,
-  &--top-end &__arrow {
-    bottom: calc(@arrow-size / -2);
-  }
-
-  &--bottom &__arrow,
-  &--bottom-start &__arrow,
-  &--bottom-end &__arrow {
-    top: calc(@arrow-size / -2);
-  }
-
-  &--left &__arrow,
-  &--left-start &__arrow,
-  &--left-end &__arrow {
-    right: calc(@arrow-size / -2);
-  }
-
-  &--right &__arrow,
-  &--right-start &__arrow,
-  &--right-end &__arrow {
-    left: calc(@arrow-size / -2);
-  }
-
-  // ========== 各方向箭头 ::before（圆角 + 透明边框） ==========
+  // ========== 各方向箭头 ::before（圆角 + 透明边框；位置统一由 JS 计算） ==========
   &--top &__arrow::before,
   &--top-start &__arrow::before,
   &--top-end &__arrow::before {

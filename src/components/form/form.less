@@ -95,13 +95,16 @@
     }
   }
 
-  // ========== 校验错误信息 ==========
+  // ========== 校验错误信息（绝对定位，不占用布局空间，避免出现时挤压下方元素） ==========
   &__error {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
     color: var(~'@{cv-color-danger}');
     font-size: var(~'@{cv-font-size-small}');
-    line-height: 1.5;
-    padding-top: 4px;
-    width: 100%;
+    line-height: 1;
+    padding-top: 2px;
   }
 
   // ========== 尺寸 ==========
@@ -130,17 +133,4 @@
       min-height: var(~'@{cv-component-size-small}');
     }
   }
-}
-
-// ========== 过渡动画 ==========
-.@{namespace}-zoom-in-top-enter-active,
-.@{namespace}-zoom-in-top-leave-active {
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  transform-origin: center top;
-}
-
-.@{namespace}-zoom-in-top-enter-from,
-.@{namespace}-zoom-in-top-leave-to {
-  opacity: 0;
-  transform: scaleY(0);
 }
