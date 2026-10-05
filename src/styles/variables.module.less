@@ -1,3 +1,24 @@
+// ============================================================
+// 主题变量单一数据源（Single Source of Truth）
+//
+// 本文件同时服务于两个层面：
+// 1. Less 侧：@cv-xxx / @suffix-xxx / @color-xxx 等 Less 变量，
+//    通过 vite.config.ts 的 additionalData 自动注入到每个组件
+//    .less 文件头部，编译期替换（如 var(~'@{cv-color-primary}')）
+// 2. TS 侧：:export 块由 CSS Modules（ICSS）规范提取为 JS 导出，
+//    供 src/constants/config.ts、src/utils/derived-colors.ts 等使用
+//
+// 命名约定：
+// - @cv-xxx      值是 CSS 变量名（如 --me-color-primary），
+//                必须配合 var() 使用，表示"变量名的引用"而非值本身
+// - @suffix-xxx  派生色后缀片段（如 -light-3），与 @cv-xxx 拼接引用派生色
+// - @color-xxx   颜色值本身（如 #fff）
+// - defaultXxx   仅存在于 :export 中，为对应 CSS 变量的默认值
+//
+// 新增主题变量时需同步三处：Less 变量定义、:export 导出、
+// src/env.d.ts 中的 declare module 类型声明
+// ============================================================
+
 // ==================== 命名空间 ====================
 // @namespace 供 Less 编译时 BEM 命名使用，同时通过 :export 导出给 TS
 // CSS 变量名和默认值也在此处统一定义并导出，避免 TS 和 Less 各自维护
@@ -6,15 +27,6 @@
 // ==================== 基础颜色（Less 变量） ====================
 @color-white: #fff;
 @color-black: #000;
-
-// ==================== 派生色后缀（Less 变量） ====================
-// 组件 .less 文件通过 var(~'@{cv-color-primary}@{suffix-light-3}') 引用派生色
-@suffix-light-3: -light-3;
-@suffix-light-5: -light-5;
-@suffix-light-7: -light-7;
-@suffix-light-8: -light-8;
-@suffix-light-9: -light-9;
-@suffix-dark-2: -dark-2;
 
 // ==================== CSS 变量名（Less 变量） ====================
 // 组件 .less 文件通过 var(~'@{cv-xxx}') 引用，派生色从基础色拼接：var(~'@{cv-color-primary}@{suffix-light-3}')
@@ -58,6 +70,15 @@
 @cv-component-size-large: --me-component-size-large;
 @cv-component-size-default: --me-component-size-default;
 @cv-component-size-small: --me-component-size-small;
+
+// ==================== 派生色后缀（Less 变量） ====================
+// 组件 .less 文件通过 var(~'@{cv-color-primary}@{suffix-light-3}') 引用派生色
+@suffix-light-3: -light-3;
+@suffix-light-5: -light-5;
+@suffix-light-7: -light-7;
+@suffix-light-8: -light-8;
+@suffix-light-9: -light-9;
+@suffix-dark-2: -dark-2;
 
 :export {
   namespace: @namespace;

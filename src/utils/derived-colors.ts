@@ -23,7 +23,6 @@ interface DerivedRule {
 
 /**
  * 默认派生色规则
- * 后缀从 variables.module.less 导入（单一数据源），percent 和 base 仅 TS 使用
  */
 const DEFAULT_RULES: DerivedRule[] = [
   { suffix: suffixLight3, percent: 70, base: 'white' },
@@ -35,10 +34,9 @@ const DEFAULT_RULES: DerivedRule[] = [
 ];
 
 /**
- * 按基础色 CSS 变量名索引的百分比覆盖表
  * 部分颜色（如 warning、danger）的原始设计稿派生色不完全遵循默认混合比例，需单独覆盖
  */
-const COLOR_PERCENT_OVERRIDES: Record<string, Partial<Record<string, number>>> = {
+const COLOR_PERCENT_OVERRIDES: Record<string, Record<string, number>> = {
   [cssVarColorWarning]: { [suffixLight3]: 80, [suffixLight7]: 40 },
   [cssVarColorDanger]: { [suffixLight7]: 40 },
 };
@@ -54,7 +52,9 @@ export function generateDerivedColors(baseVar: string): Record<string, string> {
   const result: Record<string, string> = {};
   for (const rule of DEFAULT_RULES) {
     const percent = overrides?.[rule.suffix] ?? rule.percent;
-    result[`${baseVar}${rule.suffix}`] = `color-mix(in srgb, var(${baseVar}) ${percent}%, ${rule.base})`;
+    // color-mix 是现代 css 函数，可能存在兼容性问题
+    result[`${baseVar}${rule.suffix}`] =
+      `color-mix(in srgb, var(${baseVar}) ${percent}%, ${rule.base})`;
   }
   return result;
 }
@@ -70,18 +70,19 @@ export function resetInjection(): void {
 
 /**
  * 生成 :root CSS 变量声明文本（基础变量 + 派生色）
- * SSR 环境下可调用此函数获取 CSS 文本，注入到 HTML 模板中避免 FOUC
- * @param config token 配置表，derived 为 true 的项会自动生成派生色
+ * @param config token 配置表，hasDerivedColors 为 true 的项会自动生成派生色
  * @returns `:root { ... }` CSS 文本
  */
-export function getRootCssVarsText(config: Record<string, TokenConfigItem>): string {
+export function getRootCssVarsText(
+  config: Record<string, TokenConfigItem>,
+): string {
   const declarations: string[] = [];
-  for (const [, { cssVar, default: defaultValue, derived }] of Object.entries(config)) {
-    declarations.push(`  ${cssVar}: ${defaultValue};`);
+  for (const { cssVarName, defaultColor, hasDerivedColors } of Object.values(config)) {
+    declarations.push(`  ${cssVarName}: ${defaultColor};`);
 
     // 派生色：自动生成 light/dark 变体
-    if (derived) {
-      const derivedColors = generateDerivedColors(cssVar);
+    if (hasDerivedColors) {
+      const derivedColors = generateDerivedColors(cssVarName);
       for (const [name, value] of Object.entries(derivedColors)) {
         declarations.push(`  ${name}: ${value};`);
       }
@@ -93,9 +94,11 @@ export function getRootCssVarsText(config: Record<string, TokenConfigItem>): str
 /**
  * 将所有 CSS 变量注入 :root（基础变量 + 派生色）
  * 在库初始化时自动调用，确保只注入一次
- * @param config token 配置表，derived 为 true 的项会自动生成派生色
+ * @param config token 配置表，hasDerivedColors 为 true 的项会自动生成派生色
  */
-export function injectRootCssVars(config: Record<string, TokenConfigItem>): void {
+export function injectRootCssVars(
+  config: Record<string, TokenConfigItem>,
+): void {
   if (injected) return;
   if (typeof document === 'undefined') return;
   if (!document.head) return;

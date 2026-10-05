@@ -11,11 +11,11 @@ export const configProviderKey = Symbol('me-config-provider');
 /** ConfigProvider 注入上下文类型 */
 export interface ConfigProviderContext {
   /** 主题 Token 配置 */
-  theme: Ref<ThemeTokens>;
+  theme: Readonly<Ref<ThemeTokens>>;
   /** 全局组件尺寸 */
-  size: Ref<string>;
+  size: Readonly<Ref<string>>;
   /** CSS 类名命名空间前缀 */
-  namespace: Ref<string>;
+  namespace: Readonly<Ref<string>>;
 }
 
 /**
@@ -25,9 +25,9 @@ export interface ConfigProviderContext {
  * @param namespace 命名空间前缀
  */
 export function provideConfigProvider(
-  theme: Ref<ThemeTokens>,
-  size: Ref<string>,
-  namespace: Ref<string>,
+  theme: Readonly<Ref<ThemeTokens>>,
+  size: Readonly<Ref<string>>,
+  namespace: Readonly<Ref<string>>,
 ) {
   const context: ConfigProviderContext = {
     theme,

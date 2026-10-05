@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, toRef } from 'vue';
+import { computed } from 'vue';
 
 import { useNamespace } from '@me-ui/hooks/use-namespace';
 
@@ -23,13 +23,13 @@ const props = defineProps(configProviderProps);
 
 const ns = useNamespace('config-provider');
 
-/** 全局尺寸响应式引用 */
-const sizeRef = toRef(props, 'size');
-/** 命名空间响应式引用 */
-const namespaceRef = toRef(props, 'namespace');
-
 /** 父级 ConfigProvider 上下文 */
 const parentContext = useConfigProvider();
+
+/** 全局尺寸响应式引用 */
+const sizeRef = computed(() => props.size);
+/** 命名空间响应式引用 */
+const namespaceRef = computed(() => props.namespace);
 
 /** 合并后的主题 Token */
 const mergedTheme = computed(() => ({

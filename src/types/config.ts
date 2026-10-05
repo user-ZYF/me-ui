@@ -7,9 +7,9 @@ export type ComponentType = 'default' | 'primary' | 'success' | 'warning' | 'dan
 /** Token 配置项类型 */
 export interface TokenConfigItem {
   /** CSS 变量名 */
-  cssVar: string;
-  /** 默认值 */
-  default: string;
+  cssVarName: string;
+  /** 默认色值 */
+  defaultColor: string;
   /** 是否具有派生色 */
-  derived?: boolean;
+  hasDerivedColors?: boolean;
 }

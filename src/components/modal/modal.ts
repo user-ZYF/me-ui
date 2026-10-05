@@ -1,5 +1,6 @@
 import type { Component, ExtractPropTypes, PropType, VNode } from 'vue';
 
+import { componentTypes } from '@me-ui/constants/config';
 import type { ComponentType } from '@me-ui/types/config';
 
 /** Modal 类型 */
@@ -59,6 +60,7 @@ export const modalProps = {
   /** 确认按钮类型 */
   confirmType: {
     type: String as PropType<ComponentType>,
+    values: componentTypes,
     default: 'primary',
   },
   /** 是否显示取消按钮 */

@@ -1,8 +1,8 @@
-/** scroll/resize 订阅回调集合 */
+/** scroll/resize 订阅回调集合（模块级订阅器，因此没有使用依赖组件环境的useEventListener） */
 const subscribers = new Set<() => void>();
 /** 公用 rAF */
 let rafId: number | undefined;
-/** 是否已注册全局监听 */
+/** 是否已注册全局监听（保证resize和scroll事件不会被重复注册，多次使用tooltip最多也只会产生一次的事件注册） */
 let initialized = false;
 
 /** 全局 scroll/resize 事件处理 */
