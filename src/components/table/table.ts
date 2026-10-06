@@ -17,7 +17,7 @@ export const tableProps = {
   },
   /** 表格尺寸 */
   size: {
-    type: String as PropType<ComponentSize | undefined>,
+    type: String as PropType<ComponentSize>,
     values: componentSizes,
     default: undefined,
   },

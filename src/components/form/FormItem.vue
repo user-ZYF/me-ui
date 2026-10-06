@@ -2,23 +2,32 @@
 <template>
   <div
     ref="formItemRef"
-    :class="formItemClasses"
+    :class="[
+      ns.b.value,
+      ns.m(_size),
+      ns.is('error', validateState === 'error'),
+      ns.is('validating', validateState === 'validating'),
+      ns.is('success', validateState === 'success'),
+      ns.is('required', isRequired || props.required),
+      ns.is('no-asterisk', formContext?.hideRequiredAsterisk),
+    ]"
   >
     <label
       v-if="!!(label || $slots.label)"
       :for="labelFor"
       :class="ns.e('label')"
     >
-      <slot name="label" :label="currentLabel">
-        {{ currentLabel }}
+      <slot name="label" :label="labelText">
+        {{ labelText }}
       </slot>
     </label>
 
     <div :class="ns.e('content')">
       <slot></slot>
+      <!-- 校验失败错误提示 -->
       <transition :name="`${ns.namespace}-zoom-in-top`" appear>
         <slot v-if="shouldShowError" name="error" :error="validateMessage">
-          <div :class="validateClasses">
+          <div :class="ns.e('error')">
             {{ validateMessage }}
           </div>
         </slot>
@@ -28,7 +37,18 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, toRefs, watch } from 'vue';
+import {
+  computed,
+  inject,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  provide,
+  reactive,
+  ref,
+  toRefs,
+  watch,
+} from 'vue';
 
 import AsyncValidator from 'async-validator';
 
@@ -36,13 +56,16 @@ import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { formContextKey, formItemContextKey } from './constants';
 import { formItemProps } from './form-item';
-import { isFunction } from '@me-ui/utils/types';
 import { cloneDeep, ensureArray, getProp, isArray } from './utils';
 import { useFormSize } from './hooks';
 
 import type { RuleItem } from 'async-validator';
 import type { Arrayable } from './utils';
-import type { FormItemContext, FormItemRule, FormValidateFailure } from './types';
+import type {
+  FormItemContext,
+  FormItemRule,
+  FormValidateFailure,
+} from './types';
 import type { FormItemValidateState } from './form-item';
 
 defineOptions({ name: 'MeFormItem' });
@@ -52,7 +75,10 @@ const props = defineProps(formItemProps);
 const formContext = inject(formContextKey, undefined);
 
 /** 组件尺寸 */
-const _size = useFormSize(undefined, { formItem: false });
+const _size = useFormSize(
+  computed(() => props.size),
+  { formItem: false },
+);
 const ns = useNamespace('form-item');
 
 /** 校验状态 */
@@ -61,82 +87,64 @@ const validateState = ref<FormItemValidateState>('');
 const validateMessage = ref('');
 /** FormItem 根元素引用 */
 const formItemRef = ref<HTMLDivElement>();
-/** 初始值 */
-let initialValue: any = undefined;
 /** 是否正在重置字段 */
-let isResettingField = false;
-
-/** FormItem class */
-const formItemClasses = computed(() => [
-  ns.b.value,
-  ns.m(_size.value),
-  ns.is('error', validateState.value === 'error'),
-  ns.is('validating', validateState.value === 'validating'),
-  ns.is('success', validateState.value === 'success'),
-  ns.is('required', isRequired.value || props.required),
-  ns.is('no-asterisk', formContext?.hideRequiredAsterisk),
-]);
-
-/** 校验信息 class */
-const validateClasses = computed(() => [ns.e('error')]);
+let isResetting = false;
 
 /** 字段路径字符串 */
-const nameString = computed(() => {
-  if (!props.name) return '';
-  return isArray(props.name) ? props.name.join('.') : props.name;
+const propString = computed(() => {
+  if (!props.propPath) return '';
+  return isArray(props.propPath) ? props.propPath.join('.') : props.propPath;
 });
 
 /** label 的 for 属性 */
-const labelFor = computed<string | undefined>(() => props.for);
+const labelFor = computed<string | undefined>(() => props.labelFor);
 
 /** 字段当前值 */
-const fieldValue = computed(() => {
-  const model = formContext?.model;
-  if (!model || !props.name) {
+const formItemValue = computed(() => {
+  const data = formContext?.data;
+  if (!data || !propString.value) {
     return;
   }
-  return getProp(model, props.name).value;
+  return getProp(data, props.propPath!).value;
 });
 
 /** 合并后的校验规则 */
 const normalizedRules = computed(() => {
   const { required } = props;
 
-  const rules: FormItemRule[] = [];
+  // 规则汇总
+  const totalRules: FormItemRule[] = [];
 
   if (props.rules) {
-    rules.push(...ensureArray(props.rules));
+    totalRules.push(...ensureArray(props.rules));
   }
 
   const formRules = formContext?.rules;
-  if (formRules && props.name) {
-    const key = isArray(props.name) ? props.name.join('.') : props.name;
-    const _rules = formRules[key] as Arrayable<FormItemRule> | undefined;
+  if (formRules && propString.value) {
+    const _rules = formRules[propString.value] as Arrayable<FormItemRule> | undefined;
     if (_rules) {
-      rules.push(...ensureArray(_rules));
+      totalRules.push(...ensureArray(_rules));
     }
   }
 
   if (required !== undefined) {
-    const requiredRules = rules
+    // 当props.required存在时，规则中的required需要对齐prop.required
+    const requiredRules = totalRules
       .map((rule, i) => [rule, i] as const)
       .filter(([rule]) => 'required' in rule);
 
     if (requiredRules.length > 0) {
       for (const [rule, i] of requiredRules) {
         if (rule.required === required) continue;
-        rules[i] = { ...rule, required };
+        totalRules[i] = { ...rule, required };
       }
     } else {
-      rules.push({ required });
+      totalRules.push({ required });
     }
   }
 
-  return rules;
+  return totalRules;
 });
-
-/** 是否启用校验 */
-const validateEnabled = computed(() => normalizedRules.value.length > 0);
 
 /** 是否必填 */
 const isRequired = computed(() =>
@@ -147,140 +155,111 @@ const isRequired = computed(() =>
 const shouldShowError = computed(
   () =>
     validateState.value === 'error' &&
-    props.showMessage &&
-    (formContext?.showMessage ?? true),
+    props.showErrorMessage &&
+    (formContext?.showErrorMessage ?? true),
 );
 
-/** 当前 label 文本 */
-const currentLabel = computed(() => props.label || '');
-
-/** 设置校验状态 */
-function setValidationState(state: FormItemValidateState) {
-  validateState.value = state;
-}
+/** label 文本 */
+const labelText = computed(() => props.label);
 
 /** 校验失败处理 */
 function onValidationFailed(error: FormValidateFailure) {
   const { errors } = error;
-  setValidationState('error');
-  validateMessage.value = errors
-    ? (errors?.[0]?.message ?? `${props.name} is required`)
-    : '';
+  validateState.value = 'error';
+  // errorText 作为错误文案的优先覆盖
+  validateMessage.value = props.errorText || errors?.[0]?.message || '';
 
-  formContext?.emit('validate', props.name!, false, validateMessage.value);
+  formContext?.emit('validate', props.propPath!, false, validateMessage.value);
 }
 
 /** 校验成功处理 */
 function onValidationSucceeded() {
-  setValidationState('success');
-  formContext?.emit('validate', props.name!, true, '');
+  validateState.value = 'success';
+  formContext?.emit('validate', props.propPath!, true, '');
 }
 
-/** 执行校验 */
-async function doValidate(rules: RuleItem[]): Promise<true> {
-  const modelName = nameString.value;
+/** 执行校验：成功 resolve，失败 reject */
+async function doValidate(rules: RuleItem[]) {
+  const propKey = propString.value;
   const validator = new AsyncValidator({
-    [modelName]: rules,
+    [propKey]: rules,
   });
-  return validator
-    .validate({ [modelName]: fieldValue.value }, { firstFields: true })
-    .then(() => {
-      onValidationSucceeded();
-      return true as const;
-    })
-    .catch((err: FormValidateFailure) => {
-      onValidationFailed(err);
-      return Promise.reject(err);
-    });
+  try {
+    await validator.validate(
+      { [propKey]: formItemValue.value },
+      // 遇到第一条失败的规则就停止校验
+      { firstFields: true },
+    );
+    onValidationSucceeded();
+  } catch (err) {
+    onValidationFailed(err as FormValidateFailure);
+    throw err;
+  }
 }
 
 /** 校验字段 */
-const validate: FormItemContext['validate'] = async (trigger, callback) => {
-  if (isResettingField || !props.name) {
-    return false;
-  }
-
-  const hasCallback = isFunction(callback);
-  if (!validateEnabled.value) {
-    callback?.(false);
+const validate: FormItemContext['validate'] = async (trigger) => {
+  // 重置中或未配置字段路径，不执行校验
+  if (isResetting || !propString.value) {
+    // 重置结束后自动会clearValidate，这里不干预，避免出现问题
+    // propString为空时，只有使用方能够更改校验状态，而使用方设置的状态不应该被clear
     return false;
   }
 
   const rules = getFilteredRule(trigger);
+  // 没有适用的规则，不执行校验；清掉残留的 error 状态
   if (rules.length === 0) {
-    callback?.(true);
-    return true;
+    clearValidate();
+    return false;
   }
 
-  setValidationState('validating');
+  validateState.value = 'validating';
 
-  return doValidate(rules)
-    .then(() => {
-      callback?.(true);
-      return true as const;
-    })
-    .catch((err: FormValidateFailure) => {
-      const { fields } = err;
-      callback?.(false, fields);
-      return hasCallback ? false : Promise.reject(fields);
-    });
+  try {
+    await doValidate(rules);
+    return true;
+  } catch (err) {
+    throw (err as FormValidateFailure).fields;
+  }
 };
 
 /** 获取过滤后的规则 */
-function getFilteredRule(trigger: string) {
-  const rules = normalizedRules.value;
-  return rules
-    .filter((rule) => {
-      if (!rule.trigger || !trigger) return true;
-      if (isArray(rule.trigger)) {
-        return rule.trigger.includes(trigger);
-      } else {
-        return rule.trigger === trigger;
-      }
-    })
-    .map(({ trigger: _trigger, ...rule }): RuleItem => rule);
+function getFilteredRule(trigger?: string) {
+  return normalizedRules.value.filter((rule) => {
+    // 无触发方式即通用匹配，可以匹配任意的规则
+    if (!rule.trigger || !trigger) return true;
+    return isArray(rule.trigger) ? rule.trigger.includes(trigger) : rule.trigger === trigger;
+  });
 }
 
 /** 清除校验信息 */
 function clearValidate() {
-  setValidationState('');
+  validateState.value = '';
   validateMessage.value = '';
-  isResettingField = false;
+  isResetting = false;
 }
 
 /** 重置字段 */
-async function resetField() {
-  const model = formContext?.model;
-  if (!model || !props.name) return;
+async function resetFormItem() {
+  const data = formContext?.data;
+  if (!data || !propString.value) return;
 
-  const computedValue = getProp(model, props.name);
+  const computedValue = getProp(data, props.propPath!);
 
-  isResettingField = true;
+  isResetting = true;
 
-  computedValue.value = cloneDeep(initialValue);
+  // 初始值由 Form 统一缓存
+  computedValue.value = cloneDeep(formContext.getInitialValue(propString.value));
 
   await nextTick();
   clearValidate();
-
-  isResettingField = false;
 }
 
-/** 设置初始值 */
-function setInitialValue(value: any) {
-  initialValue = cloneDeep(value);
-}
-
-/** 获取初始值 */
-function getInitialValue() {
-  return initialValue;
-}
-
-/** 监听 error prop 变化 */
+/** 监听 errorText prop 变化 */
 watch(
-  () => props.error,
+  () => props.errorText,
   (val) => {
-    validateMessage.value = val || '';
-    setValidationState(val ? 'error' : '');
+    validateMessage.value = val || "";
   },
   { immediate: true },
 );
@@ -289,8 +268,7 @@ watch(
 watch(
   () => props.validateStatus,
   (val) => {
-    if (props.error) return;
-    setValidationState(val || '');
+    validateState.value = val || "";
   },
   { immediate: true },
 );
@@ -302,39 +280,40 @@ const context: FormItemContext = reactive({
   size: _size,
   validateMessage,
   validateState,
-  fieldValue,
-  resetField,
+  formItemValue,
+  resetFormItem,
   clearValidate,
   validate,
-  nameString,
-  setInitialValue,
-  getInitialValue,
+  propString,
 });
 
 /** 提供 FormItem 上下文给子组件 */
 provide(formItemContextKey, context);
 
-/** 监听 name 变化，更新 Form 中的字段注册 */
-watch(nameString, (newNameString, oldNameString) => {
+/** 监听 prop 变化，更新 Form 中的字段注册 */
+watch(propString, (newPropString, oldPropString) => {
   if (!formContext) return;
-  if (oldNameString) {
-    formContext.removeField(context, oldNameString);
+  if (oldPropString) {
+    formContext.removeInitialValue(oldPropString);
   }
-  if (newNameString) {
-    setInitialValue(fieldValue.value);
-    formContext.addField(context);
+  if (newPropString) {
+    // prop 变更视为新绑定：清掉新路径可能存在的旧缓存，注册时以当前值作为初始值
+    formContext.removeInitialValue(newPropString);
+    formContext.addFormItemContext(context);
+  } else {
+    // prop 清空：注销注册，避免空 propString 的 context 滞留
+    formContext.removeFormItemContext(context);
   }
 });
 
 onMounted(() => {
-  if (props.name) {
-    setInitialValue(fieldValue.value);
-    formContext?.addField(context);
+  if (propString.value) {
+    formContext?.addFormItemContext(context);
   }
 });
 
 onBeforeUnmount(() => {
-  formContext?.removeField(context);
+  formContext?.removeFormItemContext(context);
 });
 
 defineExpose({
@@ -349,8 +328,6 @@ defineExpose({
   /** 清除校验信息 */
   clearValidate,
   /** 重置字段 */
-  resetField,
-  /** 设置初始值 */
-  setInitialValue,
+  resetFormItem,
 });
 </script>

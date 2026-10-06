@@ -58,7 +58,7 @@ function onClick(evt: MouseEvent) {
     return;
   }
   if (props.nativeType === 'reset') {
-    form?.resetFields();
+    form?.resetFormItems();
   }
   emit('click', evt);
 }

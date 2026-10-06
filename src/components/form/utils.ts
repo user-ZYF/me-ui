@@ -1,5 +1,5 @@
 import type { FormItemContext } from './types';
-import type { FormItemName } from './form-item.ts';
+import type { FormItemPropPath } from './form-item.ts';
 
 import { isArray } from '@me-ui/utils/types';
 
@@ -21,55 +21,47 @@ export function cloneDeep<T>(value: T): T {
 }
 
 /**
- * 按路径获取对象嵌套属性值
+ * 按路径获取对象嵌套属性的可写引用
  * 支持点分路径（如 'a.b.c'）和数组路径（如 ['a', 'b', 'c']）
  */
-export function getPropByPath(obj: Record<string, any>, path: string | string[]): { value: any; key: string } {
+export function getProp(obj: Record<string, any>, path: FormItemPropPath): { value: any; key: string } {
   let tempObj = obj;
-  let key = '';
+  let finalKey = '';
 
   const pathArr = isArray(path) ? path : path.split('.');
 
   for (let i = 0; i < pathArr.length; i++) {
-    const segment = pathArr[i];
+    const key = pathArr[i];
     if (!tempObj) break;
     if (i === pathArr.length - 1) {
-      key = segment;
+      finalKey = key;
     } else {
-      tempObj = tempObj[segment];
+      tempObj = tempObj[key];
     }
   }
 
   return {
     get value() {
-      return tempObj?.[key];
+      return tempObj?.[finalKey];
     },
     set value(val: any) {
       if (tempObj) {
-        tempObj[key] = val;
+        tempObj[finalKey] = val;
       }
     },
-    key,
+    key: finalKey,
   };
 }
 
-/**
- * 获取对象嵌套属性的可写引用
- */
-export function getProp(obj: Record<string, any>, path: FormItemName) {
-  const propPath = isArray(path) ? path : path.split('.');
-  return getPropByPath(obj, propPath);
-}
-
 /** 按字段路径过滤 FormItem */
-export function filterFields(
-  fields: FormItemContext[],
-  props: Arrayable<FormItemName>,
+export function filterFormItemContexts(
+  contexts: FormItemContext[],
+  propPaths: Arrayable<FormItemPropPath>,
 ): FormItemContext[] {
-  const normalized = ensureArray(props).map((prop) =>
-    isArray(prop) ? prop.join('.') : prop,
+  const normalized = ensureArray(propPaths).map((propPath) =>
+    isArray(propPath) ? propPath.join('.') : propPath,
   );
   return normalized.length > 0
-    ? fields.filter((field) => field.nameString && normalized.includes(field.nameString))
-    : fields;
+    ? contexts.filter((context) => normalized.includes(context.propString))
+    : contexts;
 }

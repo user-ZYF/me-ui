@@ -9,18 +9,19 @@ import { defaultComponentSize } from '@me-ui/constants/config';
 
 /**
  * 获取表单级别的组件尺寸
- * 优先级：FormItem prop > Form prop > ConfigProvider > 默认值
+ * 优先级：组件自身 prop > FormItem > Form > ConfigProvider > 默认值
  */
 export function useFormSize(
   fallback?: MaybeRef<ComponentSize | undefined>,
   ignore: Partial<Record<'form' | 'formItem' | 'global', boolean>> = {},
 ) {
-  const { size: configSize } = useConfigProvider();
+  const configProvider = ignore.global ? undefined : useConfigProvider();
   const form = ignore.form ? undefined : inject(formContextKey, undefined);
   const formItem = ignore.formItem ? undefined : inject(formItemContextKey, undefined);
 
   return computed<ComponentSize>(() => {
-    const size = formItem?.size || form?.size || unref(fallback) || configSize.value || defaultComponentSize;
+    const size =
+      unref(fallback) || formItem?.size || form?.size || configProvider?.size.value || defaultComponentSize;
     return size as ComponentSize;
   });
 }

@@ -2,14 +2,14 @@ import { componentSizes } from '@me-ui/constants/config';
 
 import type { ExtractPropTypes, PropType } from 'vue';
 import type { ComponentSize } from '@me-ui/types/config';
-import type { FormItemName } from './form-item.ts';
+import type { FormItemPropPath } from './form-item.ts';
 import type { FormRules } from './types';
 import { isArray, isBoolean, isString } from '@me-ui/utils/types';
 
 /** Form Props 定义 */
 export const formProps = {
   /** 表单数据对象 */
-  model: {
+  data: {
     type: Object as PropType<Record<string, any>>,
     default: undefined,
   },
@@ -19,7 +19,7 @@ export const formProps = {
     default: undefined,
   },
   /** 是否显示校验错误信息 */
-  showMessage: {
+  showErrorMessage: {
     type: Boolean,
     default: true,
   },
@@ -45,7 +45,7 @@ export const formProps = {
   },
   /** 表单内组件尺寸 */
   size: {
-    type: String as PropType<ComponentSize | undefined>,
+    type: String as PropType<ComponentSize>,
     values: componentSizes,
     default: undefined,
   },
@@ -63,10 +63,10 @@ export type FormProps = ExtractPropTypes<typeof formProps>;
 export const formEmits = {
   /** 表单校验时触发 */
   validate: (
-    name: FormItemName,
+    propPath: FormItemPropPath,
     isValid: boolean,
     message: string,
-  ) => (isString(name) || isArray(name)) && isBoolean(isValid) && isString(message),
+  ) => (isString(propPath) || isArray(propPath)) && isBoolean(isValid) && isString(message),
 } as const;
 
 /** Form Emits 类型 */

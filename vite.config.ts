@@ -38,10 +38,11 @@ export default defineConfig(({ command }): UserConfig => ({
   root: command === 'serve' ? resolve(__dirname, 'play') : undefined,
   build: {
     lib: {
-      // 新增组件时需同步修改三处：
+      // 新增组件时需同步修改四处：
       // 1. 此处 entry 添加组件入口
       // 2. package.json 的 exports 添加对应子路径导出
       // 3. src/index.ts 导出该组件
+      // 4. src/components.d.ts 添加全局组件类型声明（GlobalComponents 接口）
       entry: {
         'index': resolve(__dirname, 'src/index.ts'),
         'button': resolve(__dirname, 'src/components/button/index.ts'),
@@ -63,7 +64,6 @@ export default defineConfig(({ command }): UserConfig => ({
         'virtual-list': resolve(__dirname, 'src/components/virtual-list/index.ts'),
         'setup': resolve(__dirname, 'src/setup.ts'),
       },
-      name: 'MeUI',
       formats: ['es'],
     },
     rollupOptions: {
@@ -78,10 +78,6 @@ export default defineConfig(({ command }): UserConfig => ({
         /^js-easing-functions/,
       ],
       output: {
-        globals: {
-          vue: 'Vue',
-          '@element-plus/icons-vue': 'ElementPlusIconsVue',
-        },
         exports: 'named',
         entryFileNames: '[name].js',
         assetFileNames: '[name].[ext]',

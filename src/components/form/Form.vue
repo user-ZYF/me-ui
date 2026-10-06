@@ -1,6 +1,6 @@
 <!-- Form 表单组件 -->
 <template>
-  <form ref="formRef" :class="formClasses" @submit.prevent @reset.prevent>
+  <form ref="formRef" :class="[ns.b.value, ns.m(formSize)]" @submit.prevent @reset.prevent>
     <slot></slot>
   </form>
 </template>
@@ -13,13 +13,12 @@ import { useConfigProvider } from '@me-ui/components/config-provider/hooks/use-c
 
 import { formContextKey } from './constants';
 import { formEmits, formProps } from './form';
-import { isFunction } from '@me-ui/utils/types';
-import { cloneDeep, ensureArray, filterFields, getProp, isArray } from './utils';
+import { cloneDeep, ensureArray, filterFormItemContexts, getProp, isArray } from './utils';
 
 import type { ValidateFieldsError } from 'async-validator';
 import type { Arrayable } from './utils';
-import type { FormItemContext, FormValidateCallback, FormValidationResult } from './types';
-import type { FormItemName } from './form-item';
+import type { FormItemContext, FormValidationResult } from './types';
+import type { FormItemPropPath } from './form-item';
 
 defineOptions({ name: 'MeForm' });
 
@@ -32,126 +31,102 @@ const { size: configSize } = useConfigProvider();
 /** form 元素引用 */
 const formRef = ref<HTMLFormElement>();
 /** 已注册的 FormItem 列表 */
-const fields = reactive<FormItemContext[]>([]);
-/** 初始值缓存 */
+const formItemContexts = reactive<FormItemContext[]>([]);
+/** 初始值缓存（用于处理动态表单场景） */
 const initialValues = new Map<string, any>();
 
 /** 表单尺寸 */
 const formSize = computed(() => props.size ?? configSize.value ?? 'default');
 
-/** 表单 class */
-const formClasses = computed(() => [
-  ns.b.value,
-  ns.m(formSize.value),
-]);
-
 /** 获取指定字段 */
-function getField(name: FormItemName) {
-  return filterFields(fields, [name])[0];
+function getFormItemContext(propPath: FormItemPropPath) {
+  return filterFormItemContexts(formItemContexts, [propPath])[0];
 }
 
 /** 添加字段 */
-function addField(field: FormItemContext) {
-  if (!fields.includes(field)) {
-    fields.push(field);
+function addFormItemContext(context: FormItemContext) {
+  if (!formItemContexts.includes(context)) {
+    formItemContexts.push(context);
   }
-  if (field.nameString) {
-    if (initialValues.has(field.nameString)) {
-      // 动态表单场景：FormItem 重新挂载时，恢复之前缓存的初始值
-      field.setInitialValue(initialValues.get(field.nameString));
-    } else {
-      // 首次挂载：将当前 model 值作为初始值缓存
-      initialValues.set(field.nameString, cloneDeep(field.fieldValue));
-    }
+  // 首次注册：将当前 data 值作为初始值缓存；已有缓存（重新挂载）则保留原初始值
+  if (context.propString && !initialValues.has(context.propString)) {
+    initialValues.set(context.propString, cloneDeep(context.formItemValue));
   }
 }
 
-/**
- * 移除字段
- * @param field FormItem 上下文
- * @param oldNameString 旧的字段路径，传入时表示 name 变更场景，仅清理旧初始值缓存；
- * 不传时表示组件卸载场景，从 fields 中移除并保留初始值缓存以支持重新挂载
- */
-function removeField(field: FormItemContext, oldNameString?: string) {
-  if (oldNameString) {
-    // name 变更：仅删除旧 name 对应的初始值缓存，组件本身仍在 fields 中
-    initialValues.delete(oldNameString);
-    return;
-  }
-  // 组件卸载：从 fields 中移除，但保留初始值缓存以支持动态表单重新挂载
-  const idx = fields.indexOf(field);
+/** 获取指定字段路径的初始值 */
+function getInitialValue(propString: string) {
+  return initialValues.get(propString);
+}
+
+/** 清除指定字段路径的初始值缓存（prop 变更时调用） */
+function removeInitialValue(propString: string) {
+  initialValues.delete(propString);
+}
+
+/** 移除字段（组件卸载时调用）：从 formItemContexts 中移除，但保留初始值缓存以支持重新挂载 */
+function removeFormItemContext(context: FormItemContext) {
+  const idx = formItemContexts.indexOf(context);
   if (idx > -1) {
-    fields.splice(idx, 1);
-    if (field.nameString) {
-      initialValues.set(field.nameString, cloneDeep(field.getInitialValue()));
-    }
+    formItemContexts.splice(idx, 1);
   }
 }
 
 /**
  * 重置字段
- * 先重置当前挂载的 FormItem，再处理已卸载但仍有初始值缓存的字段，
- * 直接操作 model 恢复其初始值
+ * 先重置当前挂载的 FormItem，再处理已卸载但仍有初始值缓存的字段，直接操作 data 恢复其初始值
  */
-function resetFields(properties: Arrayable<FormItemName> = []) {
-  if (!props.model) return;
+function resetFormItems(propPaths: Arrayable<FormItemPropPath> = []) {
+  if (!props.data) return;
+
+  const propPathArr = ensureArray(propPaths);
 
   // 重置当前挂载的 FormItem
-  filterFields(fields, properties).forEach((field) => field.resetField());
+  filterFormItemContexts(formItemContexts, propPathArr).forEach((context) => context.resetFormItem());
 
-  // 当前仍挂载的 FormItem 的 name 集合
-  const activeNameStrings = new Set(
-    fields.map((f) => f.nameString).filter(Boolean),
-  );
-  // 需要检查的 name 列表：指定了 properties 就用指定的，否则检查所有缓存的初始值
-  const namesToCheck =
-    ensureArray(properties).length > 0
-      ? ensureArray(properties).map((p) => (isArray(p) ? p.join('.') : p))
+  // 需要检查的 prop 列表：指定了 propPaths 就用指定的，否则检查所有缓存的初始值
+  const propsToCheck =
+    propPathArr.length > 0
+      ? propPathArr.map((p) => (isArray(p) ? p.join('.') : p))
       : [...initialValues.keys()];
 
-  // 处理已卸载但仍有初始值缓存的字段，直接操作 model 恢复初始值
-  for (const nameString of namesToCheck) {
-    if (!activeNameStrings.has(nameString) && initialValues.has(nameString)) {
-      getProp(props.model, nameString).value = cloneDeep(
-        initialValues.get(nameString),
-      );
+  // 处理已卸载但仍有初始值缓存的字段，直接操作 data 恢复初始值
+  for (const propString of propsToCheck) {
+    const isMounted = formItemContexts.some((context) => context.propString === propString);
+    if (!isMounted && initialValues.has(propString)) {
+      const target = getProp(props.data, propString);
+      target.value = cloneDeep(initialValues.get(propString));
     }
   }
 }
 
 /** 清除校验信息 */
-function clearValidate(properties: Arrayable<FormItemName> = []) {
-  filterFields(fields, properties).forEach((field) => field.clearValidate());
+function clearValidate(propPaths: Arrayable<FormItemPropPath> = []) {
+  filterFormItemContexts(formItemContexts, propPaths).forEach((context) => context.clearValidate());
 }
 
 /** 是否可校验 */
-const isValidatable = computed(() => !!props.model);
-
-/** 获取需要校验的字段 */
-function obtainValidateFields(modelProps: Arrayable<FormItemName>) {
-  if (fields.length === 0) return [];
-  const filteredFields = filterFields(fields, modelProps);
-  return filteredFields;
-}
+const isValidatable = computed(() => !!props.data);
 
 /** 执行字段校验 */
-async function doValidateField(
-  modelProps: Arrayable<FormItemName> = [],
+async function doValidate(
+  propPaths: Arrayable<FormItemPropPath> = [],
 ): Promise<boolean> {
   if (!isValidatable.value) return false;
 
-  const validateFields = obtainValidateFields(modelProps);
-  if (validateFields.length === 0) return true;
+  const validateContexts = filterFormItemContexts(formItemContexts, propPaths);
+  // 没有需要校验的字段，不执行校验
+  if (validateContexts.length === 0) return false;
 
   let validationErrors: ValidateFieldsError = {};
-  for (const field of validateFields) {
+  for (const context of validateContexts) {
     try {
-      await field.validate('');
-      if (field.validateState === 'error' && !field.error) field.resetField();
-    } catch (fields) {
+      await context.validate();
+    } catch (err) {
+      // 合并错误信息
       validationErrors = {
         ...validationErrors,
-        ...(fields as ValidateFieldsError),
+        ...(err as ValidateFieldsError),
       };
     }
   }
@@ -160,58 +135,38 @@ async function doValidateField(
   return Promise.reject(validationErrors);
 }
 
-/** 校验整个表单 */
+/** 校验字段：不传参时校验整个表单，校验失败时 reject invalidFields */
 async function validate(
-  callback?: FormValidateCallback,
+  propPaths: Arrayable<FormItemPropPath> = [],
 ): FormValidationResult {
-  return validateField(undefined, callback);
-}
-
-/** 校验指定字段 */
-async function validateField(
-  modelProps: Arrayable<FormItemName> = [],
-  callback?: FormValidateCallback,
-): FormValidationResult {
-  let result = false;
-  const shouldThrow = !isFunction(callback);
   try {
-    result = await doValidateField(modelProps);
-    if (result === true) {
-      await callback?.(result);
-    }
-    return result;
+    return await doValidate(propPaths);
   } catch (e) {
     if (e instanceof Error) throw e;
 
-    const invalidFields = e as ValidateFieldsError;
+    const invalidFormItems = e as ValidateFieldsError;
 
-    if (props.scrollToError) {
-      if (formRef.value) {
-        const formItem = formRef.value.querySelector(`.${ns.b.value}-item.is-error`);
-        formItem?.scrollIntoView(
-          props.scrollIntoViewOptions === true
-            ? undefined
-            : props.scrollIntoViewOptions,
-        );
-      }
+    if (props.scrollToError && formRef.value) {
+      // 按 DOM 顺序滚动到页面上最靠前的错误项
+      const errorItem = formRef.value.querySelector<HTMLElement>(`.${ns.b.value}-item.is-error`);
+      scrollToElement(errorItem);
     }
-    if (!result) {
-      await callback?.(false, invalidFields);
-    }
-    return shouldThrow ? Promise.reject(invalidFields) : false;
+
+    return Promise.reject(invalidFormItems);
   }
 }
 
+/** 按 scrollIntoViewOptions 配置滚动到元素 */
+function scrollToElement(el?: HTMLElement | null) {
+  el?.scrollIntoView(
+    props.scrollIntoViewOptions === true ? undefined : props.scrollIntoViewOptions,
+  );
+}
+
 /** 滚动到指定字段 */
-function scrollToField(name: FormItemName) {
-  const field = getField(name);
-  if (field) {
-    field.$el?.scrollIntoView(
-      props.scrollIntoViewOptions === true
-        ? undefined
-        : props.scrollIntoViewOptions,
-    );
-  }
+function scrollToProp(propPath: FormItemPropPath) {
+  const context = getFormItemContext(propPath);
+  scrollToElement(context?.$el);
 }
 
 /** rules 变化时自动校验 */
@@ -231,25 +186,24 @@ provide(
   reactive({
     ...toRefs(props),
     emit,
-
-    resetFields,
+    resetFormItems,
     clearValidate,
-    validateField,
-    addField,
-    removeField,
+    validate,
+    addFormItemContext,
+    removeFormItemContext,
+    getInitialValue,
+    removeInitialValue,
   }),
 );
 
 defineExpose({
-  /** 校验整个表单 */
+  /** 校验字段：不传参时校验整个表单 */
   validate,
-  /** 校验指定字段 */
-  validateField,
   /** 重置字段并移除校验结果 */
-  resetFields,
+  resetFormItems,
   /** 清除指定字段的校验信息 */
   clearValidate,
   /** 滚动到指定字段 */
-  scrollToField,
+  scrollToProp,
 });
 </script>
