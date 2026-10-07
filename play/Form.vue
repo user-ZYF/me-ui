@@ -25,7 +25,16 @@
       <h2>表单校验</h2>
       <p class="play-desc">通过 rules 设置校验规则，支持 required、pattern、len、自定义 validator、异步校验等</p>
       <div class="play-border">
-        <me-form ref="ruleFormRef" :data="ruleForm" :rules="rules" scroll-to-error @validate="onValidate">
+        <me-form
+          ref="ruleFormRef"
+          :data="ruleForm"
+          :rules="rules"
+          scroll-to-error
+          @validate="onValidate"
+          @submit="onSubmit"
+          @submit-failed="onSubmitFailed"
+          @reset="validateResult = '已重置'"
+        >
           <me-form-item label="用户名" prop-path="username">
             <me-input v-model="ruleForm.username" placeholder="必填，blur 触发" />
           </me-form-item>
@@ -58,8 +67,9 @@
             <me-checkbox v-model="ruleForm.agree" label="我已阅读并同意用户协议" />
           </me-form-item>
           <me-form-item>
-            <me-button type="primary" @click="submitForm">提交</me-button>
-            <me-button @click="resetForm">重置</me-button>
+            <!-- native-type=submit/reset 走原生提交/重置事件，表单自动校验/重置，无需手动调 validate -->
+            <me-button type="primary" native-type="submit">提交</me-button>
+            <me-button native-type="reset">重置</me-button>
             <me-button @click="clearValidate">清除校验</me-button>
           </me-form-item>
         </me-form>
@@ -192,7 +202,12 @@
       <h2>嵌套字段路径</h2>
       <p class="play-desc">prop-path 支持数组形式访问嵌套字段，如 ['address', 'detail']</p>
       <div class="play-border">
-        <me-form ref="nestedFormRef" :data="nestedForm" :rules="nestedRules">
+        <me-form
+          :data="nestedForm"
+          :rules="nestedRules"
+          @submit="nestedResult = '✅ 嵌套表单校验通过'"
+          @submit-failed="nestedResult = '❌ 校验失败'"
+        >
           <me-form-item label="省市区" :prop-path="['address', 'region']">
             <me-select v-model="nestedForm.address.region" :options="regionOptions" placeholder="请选择" />
           </me-form-item>
@@ -200,10 +215,11 @@
             <me-input v-model="nestedForm.address.detail" placeholder="街道、门牌号等" />
           </me-form-item>
           <me-form-item>
-            <me-button type="primary" @click="submitNested">校验嵌套表单</me-button>
-            <me-button @click="nestedFormRef?.resetFormItems()">重置</me-button>
+            <me-button type="primary" native-type="submit">校验嵌套表单</me-button>
+            <me-button native-type="reset">重置</me-button>
           </me-form-item>
         </me-form>
+        <p class="play-result">{{ nestedResult }}</p>
       </div>
     </section>
 
@@ -394,18 +410,12 @@ function onValidate(propPath: FormItemPropPath, isValid: boolean, message: strin
   validateLog.value = `字段 ${propPath}：${isValid ? '通过' : `失败 - ${message}`}`;
 }
 
-async function submitForm() {
-  try {
-    const valid = await ruleFormRef.value?.validate();
-    validateResult.value = valid ? '✅ 校验通过' : '❌ 校验失败';
-  } catch (invalidFields) {
-    validateResult.value = `❌ 校验失败：${Object.keys(invalidFields as object).join(', ')}`;
-  }
+function onSubmit() {
+  validateResult.value = '✅ 校验通过（submit 事件）';
 }
 
-function resetForm() {
-  ruleFormRef.value?.resetFormItems();
-  validateResult.value = '已重置';
+function onSubmitFailed(invalidFields: Record<string, unknown>) {
+  validateResult.value = `❌ 校验失败：${Object.keys(invalidFields).join(', ')}`;
 }
 
 function clearValidate() {
@@ -469,7 +479,6 @@ const sizeForm = reactive({ input: '', select: '' });
 const disabledForm = reactive({ input: '禁用的值', select: '', radio: 'a' });
 
 // ========== 嵌套字段 ==========
-const nestedFormRef = ref<InstanceType<typeof MeForm>>();
 const nestedForm = reactive({
   address: { region: '', detail: '' },
 });
@@ -478,13 +487,7 @@ const nestedRules: FormRules = {
   'address.detail': [{ required: true, message: '请输入详细地址', trigger: 'blur' }],
 };
 
-async function submitNested() {
-  try {
-    await nestedFormRef.value?.validate();
-  } catch {
-    // 校验失败信息由 FormItem 展示
-  }
-}
+const nestedResult = ref('');
 
 // ========== showErrorMessage ==========
 const formShowMsg = ref(true);

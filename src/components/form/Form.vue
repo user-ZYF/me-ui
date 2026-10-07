@@ -1,6 +1,6 @@
 <!-- Form 表单组件 -->
 <template>
-  <form ref="formRef" :class="[ns.b.value, ns.m(formSize)]" @submit.prevent @reset.prevent>
+  <form ref="formRef" :class="[ns.b.value, ns.m(formSize)]" @submit.prevent="onSubmit" @reset.prevent="onReset">
     <slot></slot>
   </form>
 </template>
@@ -167,6 +167,26 @@ function scrollToElement(el?: HTMLElement | null) {
 function scrollToProp(propPath: FormItemPropPath) {
   const context = getFormItemContext(propPath);
   scrollToElement(context?.$el);
+}
+
+/** 原生提交：先校验，通过抛 submit，失败抛 submitFailed */
+async function onSubmit() {
+  try {
+    await validate();
+    emit('submit');
+  } catch (e) {
+    if (!(e instanceof Error)) {
+      emit('submitFailed', e as ValidateFieldsError);
+    } else {
+      throw e;
+    }
+  }
+}
+
+/** 原生重置：默认行为已阻止，改为执行字段重置并抛 reset */
+function onReset() {
+  resetFormItems();
+  emit('reset');
 }
 
 /** rules 变化时自动校验 */

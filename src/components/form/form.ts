@@ -1,5 +1,6 @@
 import { componentSizes } from '@me-ui/constants/config';
 
+import type { ValidateFieldsError } from 'async-validator';
 import type { ExtractPropTypes, PropType } from 'vue';
 import type { ComponentSize } from '@me-ui/types/config';
 import type { FormItemPropPath } from './form-item.ts';
@@ -61,6 +62,12 @@ export type FormProps = ExtractPropTypes<typeof formProps>;
 
 /** Form Emits 定义 */
 export const formEmits = {
+  /** 提交且校验通过时触发 */
+  submit: () => true,
+  /** 提交但校验失败时触发 */
+  submitFailed: (invalidFields: ValidateFieldsError) => !!invalidFields,
+  /** 重置时触发 */
+  reset: () => true,
   /** 表单校验时触发 */
   validate: (
     propPath: FormItemPropPath,

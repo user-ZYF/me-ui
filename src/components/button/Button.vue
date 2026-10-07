@@ -33,7 +33,7 @@ import { computed } from 'vue';
 import { Loading } from '@element-plus/icons-vue';
 
 import MeIcon from '@me-ui/components/icon';
-import { useFormItem, useFormDisabled, useFormSize } from '@me-ui/components/form/hooks';
+import { useFormDisabled, useFormSize } from '@me-ui/components/form/hooks';
 import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { buttonEmits, buttonProps } from './button';
@@ -44,7 +44,6 @@ const props = defineProps(buttonProps);
 const emit = defineEmits(buttonEmits);
 
 const ns = useNamespace('button');
-const { form } = useFormItem();
 
 /** 实际尺寸：优先使用 prop 传入的，其次继承 Form/FormItem 的，最后使用 ConfigProvider 的，最后使用默认值 */
 const actualSize = useFormSize(computed(() => props.size));
@@ -56,9 +55,6 @@ function onClick(evt: MouseEvent) {
   if (actualDisabled.value || props.loading) {
     evt.stopPropagation();
     return;
-  }
-  if (props.nativeType === 'reset') {
-    form?.resetFormItems();
   }
   emit('click', evt);
 }
