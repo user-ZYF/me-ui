@@ -1,6 +1,6 @@
 import { computed, inject, type ModelRef, type Ref } from 'vue';
 
-import { useFormDisabled, useFormSize } from '@me-ui/components/form/hooks';
+import { useFormItem, useFormDisabled, useFormSize } from '@me-ui/components/form/hooks';
 
 import type { ComponentSize } from '@me-ui/types/config';
 
@@ -43,6 +43,8 @@ export function useRadio(options: UseRadioOptions): UseRadioReturn {
   /** 注入 RadioGroup 上下文 */
   const radioGroup = inject(radioGroupContextKey, undefined);
 
+  const { formItem } = useFormItem();
+
   /** 是否在 RadioGroup 中 */
   const isInGroup = computed(() => !!radioGroup);
 
@@ -72,11 +74,13 @@ export function useRadio(options: UseRadioOptions): UseRadioReturn {
       const val = value.value as string | number | boolean;
       radioGroup!.modelValue.value = val;
       radioGroup!.change(val);
+      formItem?.validate('change').catch(() => {});
       return true;
     }
 
     if (isStandalone && model) {
       model.value = value.value as string | number | boolean;
+      formItem?.validate('change').catch(() => {});
       return true;
     }
 

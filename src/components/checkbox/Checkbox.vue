@@ -42,7 +42,7 @@ import { computed, inject } from 'vue';
 import { Check, Minus } from '@element-plus/icons-vue';
 
 import MeIcon from '@me-ui/components/icon';
-import { useFormDisabled, useFormSize } from '@me-ui/components/form/hooks';
+import { useFormItem, useFormDisabled, useFormSize } from '@me-ui/components/form/hooks';
 import { useNamespace } from '@me-ui/hooks/use-namespace';
 
 import { checkboxGroupContextKey } from './checkbox-group';
@@ -57,6 +57,7 @@ const emit = defineEmits(checkboxEmits);
 const model = defineModel<boolean>({ default: false });
 
 const ns = useNamespace('checkbox');
+const { formItem } = useFormItem();
 
 /** 注入 CheckboxGroup 上下文 */
 const checkboxGroup = inject(checkboxGroupContextKey, undefined);
@@ -94,11 +95,13 @@ function onChange() {
     checkboxGroup!.modelValue.value = arr;
     checkboxGroup!.change(arr);
     emit('change', isChecked.value);
+    formItem?.validate('change').catch(() => {});
     return;
   }
 
   const newValue = !model.value;
   model.value = newValue;
   emit('change', newValue);
+  formItem?.validate('change').catch(() => {});
 }
 </script>
